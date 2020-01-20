@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>python2.x中json的操作</title>
+    <url>/2020/01/20/python2-x%E4%B8%ADjson%E7%9A%84%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h2 id="python2-x中json的操作"><a href="#python2-x中json的操作" class="headerlink" title=" python2.x中json的操作 "></a><center> python2.x中json的操作 </center></h2><a id="more"></a>
+
+<p>json的操作就是将字典转换为json格式的字符串(dump/dumps),也可以将json格式的字符串转换成字典(load/loads).</p>
+<ol>
+<li>dumps方法(字典转换成json格式的字符串）</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">adict = &#123;<span class="string">'a'</span>: <span class="string">'123'</span>, <span class="string">'b'</span>: <span class="string">'测试'</span>, <span class="string">'c'</span>: <span class="string">'json'</span>&#125;</span><br><span class="line">   astr = json.dumps(adict)</span><br><span class="line">   print(astr)</span><br><span class="line">   <span class="comment"># &#123;"a": "123", "c": "json", "b": "\u6d4b\u8bd5"&#125;</span></span><br><span class="line">   astr = json.dumps(adict, indent=<span class="number">4</span>, ensure_ascii=<span class="literal">False</span>) <span class="comment">#indent确定缩进，ensure_ascii=False显示中文</span></span><br><span class="line">   print(astr)</span><br><span class="line">   <span class="comment">#&#123;</span></span><br><span class="line">   	<span class="string">"a"</span>: <span class="string">"123"</span>, </span><br><span class="line">   	<span class="string">"c"</span>: <span class="string">"json"</span>, </span><br><span class="line">   	<span class="string">"b"</span>: <span class="string">"测试"</span></span><br><span class="line"> &#125;</span><br><span class="line">   <span class="keyword">with</span> open(<span class="string">'str.json'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">       f.write(astr.decode(<span class="string">'utf-8'</span>).encode(<span class="string">'utf-8'</span>))</span><br><span class="line">   <span class="comment"># 可以通过 sudo apt install jq 工具来查看json文件</span></span><br><span class="line">   <span class="comment"># cat str.json|jq</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>dump方法作用和上面一样</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">adict = &#123;<span class="string">'a'</span>: <span class="string">'123'</span>, <span class="string">'b'</span>: <span class="string">'测试'</span>, <span class="string">'c'</span>: <span class="string">'json'</span>&#125;</span><br><span class="line">   f = open(<span class="string">'str.json'</span>, <span class="string">'w'</span>)</span><br><span class="line">   json.dump(adict, f, indent=<span class="number">4</span>, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">   <span class="comment">#不需要write方法就可以写入文件</span></span><br></pre></td></tr></table></figure>
+
+<p>因此，操作文件的时候，使用dump,不需要操作文件的时候，使用dumps.</p>
+<ol start="3">
+<li>loads方法,将json字符串转换成字典</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">f = open(<span class="string">'str.json'</span>)</span><br><span class="line">   content = f.read()</span><br><span class="line">   data = json.loads(content)</span><br><span class="line">   <span class="comment">###############</span></span><br><span class="line">   f = open(<span class="string">'str.json'</span>)</span><br><span class="line">   data = json.load(f)</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>可以通过codecs模块中的open方法指定编码</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">f = codecs.open(<span class="string">'str.json'</span>, encoding=<span class="string">'utf-8'</span>)<span class="comment"># python3 中的open方法可以使用encoding参数</span></span><br></pre></td></tr></table></figure>
+
+<p>应用中遇到的问题: 使用Django，通过<code>session.set_expiry(timedelta(days=3))</code> 为<code>session</code> 设置过期时间时，遇到了<code>TypeError: datetime.datetime(2020, 1, 23, 11, 1, 58, 993654) is not JSON serializable</code> 这样的错误，就是因为json默认不支持对<code>datetime</code> 对象的序列化。</p>
+<p>首先解决方法:在工程的配置文件 <code>settings</code> 中设置一个属性</p>
+<p>`SESSION_SERIALIZER=’django.contrib.sessions.serializers.PickleSerializer’ </p>
+<p>如果自定义支持对<code>datetime</code> 的序列化，可以通过下面的方式：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">   <span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line">   adict = &#123;<span class="string">'name'</span>: <span class="string">'test'</span>, <span class="string">'create_time'</span>: datetime.now()&#125;</span><br><span class="line">   </span><br><span class="line">   <span class="class"><span class="keyword">class</span> <span class="title">DateEncoder</span><span class="params">(json.JSONEncoder)</span>:</span></span><br><span class="line">       <span class="function"><span class="keyword">def</span> <span class="title">default</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">           <span class="keyword">if</span> isinstance(obj, datetime):</span><br><span class="line">               <span class="keyword">return</span> obj.strftime(<span class="string">"%Y-%m-%d %H:%M:%S"</span>)</span><br><span class="line">           <span class="keyword">else</span>:</span><br><span class="line">               <span class="keyword">return</span> super(DateEncoder, self).default(obj)</span><br><span class="line">    </span><br><span class="line">   print(json.dumps(adict, cls=DateEncoder))</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>python</category>
+      </categories>
+      <tags>
+        <tag>json</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>python中的魔术方法使用</title>
     <url>/2020/01/18/python%E4%B8%AD%E7%9A%84%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95%E4%BD%BF%E7%94%A8/</url>
     <content><![CDATA[<h2 id="Python中的魔术方法使用"><a href="#Python中的魔术方法使用" class="headerlink" title="Python中的魔术方法使用"></a><center>Python中的魔术方法使用</center></h2><a id="more"></a>

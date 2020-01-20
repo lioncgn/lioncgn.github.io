@@ -45,18 +45,19 @@
   };
 </script>
 
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <meta name="description" content="python2.x中json的操作">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2020/01/17/hello-world/index.html">
+<meta property="og:title" content="python2.x中json的操作">
+<meta property="og:url" content="http://yoursite.com/2020/01/20/python2-x%E4%B8%ADjson%E7%9A%84%E6%93%8D%E4%BD%9C/index.html">
 <meta property="og:site_name" content="你的眼神">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
-<meta property="article:published_time" content="2020-01-17T05:33:55.612Z">
-<meta property="article:modified_time" content="2020-01-17T05:33:55.612Z">
+<meta property="og:description" content="python2.x中json的操作">
+<meta property="article:published_time" content="2020-01-19T18:43:14.000Z">
+<meta property="article:modified_time" content="2020-01-20T03:20:58.227Z">
 <meta property="article:author" content="cgn">
+<meta property="article:tag" content="json">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/01/17/hello-world/">
+<link rel="canonical" href="http://yoursite.com/2020/01/20/python2-x%E4%B8%ADjson%E7%9A%84%E6%93%8D%E4%BD%9C/">
 
 
 <script id="page-configurations">
@@ -68,7 +69,7 @@
   };
 </script>
 
-  <title>Hello World | 你的眼神</title>
+  <title>python2.x中json的操作 | 你的眼神</title>
   
 
 
@@ -208,7 +209,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/17/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/python2-x%E4%B8%ADjson%E7%9A%84%E6%93%8D%E4%BD%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -221,7 +222,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello World
+          python2.x中json的操作
         </h1>
 
         <div class="post-meta">
@@ -230,8 +231,20 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-01-17 13:33:55" itemprop="dateCreated datePublished" datetime="2020-01-17T13:33:55+08:00">2020-01-17</time>
+              <time title="创建时间：2020-01-20 02:43:14 / 修改时间：11:20:58" itemprop="dateCreated datePublished" datetime="2020-01-20T02:43:14+08:00">2020-01-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
             </span>
 
           
@@ -245,19 +258,40 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+        <h2 id="python2-x中json的操作"><a href="#python2-x中json的操作" class="headerlink" title=" python2.x中json的操作 "></a><center> python2.x中json的操作 </center></h2><a id="more"></a>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>json的操作就是将字典转换为json格式的字符串(dump/dumps),也可以将json格式的字符串转换成字典(load/loads).</p>
+<ol>
+<li>dumps方法(字典转换成json格式的字符串）</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">adict = &#123;<span class="string">'a'</span>: <span class="string">'123'</span>, <span class="string">'b'</span>: <span class="string">'测试'</span>, <span class="string">'c'</span>: <span class="string">'json'</span>&#125;</span><br><span class="line">   astr = json.dumps(adict)</span><br><span class="line">   print(astr)</span><br><span class="line">   <span class="comment"># &#123;"a": "123", "c": "json", "b": "\u6d4b\u8bd5"&#125;</span></span><br><span class="line">   astr = json.dumps(adict, indent=<span class="number">4</span>, ensure_ascii=<span class="literal">False</span>) <span class="comment">#indent确定缩进，ensure_ascii=False显示中文</span></span><br><span class="line">   print(astr)</span><br><span class="line">   <span class="comment">#&#123;</span></span><br><span class="line">   	<span class="string">"a"</span>: <span class="string">"123"</span>, </span><br><span class="line">   	<span class="string">"c"</span>: <span class="string">"json"</span>, </span><br><span class="line">   	<span class="string">"b"</span>: <span class="string">"测试"</span></span><br><span class="line"> &#125;</span><br><span class="line">   <span class="keyword">with</span> open(<span class="string">'str.json'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">       f.write(astr.decode(<span class="string">'utf-8'</span>).encode(<span class="string">'utf-8'</span>))</span><br><span class="line">   <span class="comment"># 可以通过 sudo apt install jq 工具来查看json文件</span></span><br><span class="line">   <span class="comment"># cat str.json|jq</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>dump方法作用和上面一样</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adict = &#123;<span class="string">'a'</span>: <span class="string">'123'</span>, <span class="string">'b'</span>: <span class="string">'测试'</span>, <span class="string">'c'</span>: <span class="string">'json'</span>&#125;</span><br><span class="line">   f = open(<span class="string">'str.json'</span>, <span class="string">'w'</span>)</span><br><span class="line">   json.dump(adict, f, indent=<span class="number">4</span>, ensure_ascii=<span class="literal">False</span>)</span><br><span class="line">   <span class="comment">#不需要write方法就可以写入文件</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>因此，操作文件的时候，使用dump,不需要操作文件的时候，使用dumps.</p>
+<ol start="3">
+<li>loads方法,将json字符串转换成字典</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f = open(<span class="string">'str.json'</span>)</span><br><span class="line">   content = f.read()</span><br><span class="line">   data = json.loads(content)</span><br><span class="line">   <span class="comment">###############</span></span><br><span class="line">   f = open(<span class="string">'str.json'</span>)</span><br><span class="line">   data = json.load(f)</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<ol start="4">
+<li>可以通过codecs模块中的open方法指定编码</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f = codecs.open(<span class="string">'str.json'</span>, encoding=<span class="string">'utf-8'</span>)<span class="comment"># python3 中的open方法可以使用encoding参数</span></span><br></pre></td></tr></table></figure>
+
+<p>应用中遇到的问题: 使用Django，通过<code>session.set_expiry(timedelta(days=3))</code> 为<code>session</code> 设置过期时间时，遇到了<code>TypeError: datetime.datetime(2020, 1, 23, 11, 1, 58, 993654) is not JSON serializable</code> 这样的错误，就是因为json默认不支持对<code>datetime</code> 对象的序列化。</p>
+<p>首先解决方法:在工程的配置文件 <code>settings</code> 中设置一个属性</p>
+<p>`SESSION_SERIALIZER=’django.contrib.sessions.serializers.PickleSerializer’ </p>
+<p>如果自定义支持对<code>datetime</code> 的序列化，可以通过下面的方式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line">   <span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line">   adict = &#123;<span class="string">'name'</span>: <span class="string">'test'</span>, <span class="string">'create_time'</span>: datetime.now()&#125;</span><br><span class="line">   </span><br><span class="line">   <span class="class"><span class="keyword">class</span> <span class="title">DateEncoder</span><span class="params">(json.JSONEncoder)</span>:</span></span><br><span class="line">       <span class="function"><span class="keyword">def</span> <span class="title">default</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">           <span class="keyword">if</span> isinstance(obj, datetime):</span><br><span class="line">               <span class="keyword">return</span> obj.strftime(<span class="string">"%Y-%m-%d %H:%M:%S"</span>)</span><br><span class="line">           <span class="keyword">else</span>:</span><br><span class="line">               <span class="keyword">return</span> super(DateEncoder, self).default(obj)</span><br><span class="line">    </span><br><span class="line">   print(json.dumps(adict, cls=DateEncoder))</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 
     </div>
 
@@ -266,17 +300,20 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/json/" rel="tag"># json</a>
+          </div>
 
         
 
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/01/17/ubuntu16-04%E5%AE%89%E8%A3%85%E6%9C%80%E6%96%B0%E7%89%88%E7%9A%84nodejs/" rel="next" title="ubuntu16.04安装最新版的nodejs">
-      ubuntu16.04安装最新版的nodejs <i class="fa fa-chevron-right"></i>
+    <a href="/2020/01/18/python%E4%B8%AD%E7%9A%84%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95%E4%BD%BF%E7%94%A8/" rel="prev" title="python中的魔术方法使用">
+      <i class="fa fa-chevron-left"></i> python中的魔术方法使用
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -336,7 +373,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#python2-x中json的操作"><span class="nav-number">1.</span> <span class="nav-text"> python2.x中json的操作 </span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
