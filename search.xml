@@ -101,6 +101,64 @@
       </tags>
   </entry>
   <entry>
+    <title>面试题</title>
+    <url>/2020/01/20/interview/</url>
+    <content><![CDATA[<h2 id="web开发面试题"><a href="#web开发面试题" class="headerlink" title=" web开发面试题 "></a><center> web开发面试题 </center></h2><ol>
+<li><p>中间件有几种方法？</p>
+<ul>
+<li>适用于所有请求批量操作</li>
+</ul>
+<p>场景:</p>
+<pre><code>- 基于角色的权限控制
+- 用户认证
+- csrf 
+- session
+- 日志记录
+- 黑名单</code></pre></li>
+<li><p>csrf_token 如何实现的？如何避免csrf验证？</p>
+</li>
+<li><p>谈谈对restful 的理解？</p>
+</li>
+<li><p>面向对象的理解？</p>
+<p>封装 ，继承，多态</p>
+<p>封装: 类的封装，实例的封装</p>
+<p>继承: 为什么要继承？深度优先（经典类）广度优先（新式类）</p>
+</li>
+<li><p>django请求的声明周期?</p>
+<p>WSGI —&gt;中间件–&gt;路由匹配 —&gt;视图（FBV/CBV)—&gt;响应</p>
+</li>
+<li><p>常见的请求头，状态码，请求方法</p>
+</li>
+<li><p>源码流程</p>
+</li>
+<li><p>mysql 联表查询语句？ 数据量很大的时候，分页如何做？</p>
+</li>
+<li><p>如何实现跨域？</p>
+<ul>
+<li>CORS</li>
+<li>jsonp</li>
+<li>nginx 反向代理</li>
+</ul>
+</li>
+<li><p>djangorestframework提供的功能或者入口在哪里？</p>
+<ul>
+<li>首先我们自己定义的类视图要继承APIView或者它的子类</li>
+<li>APIView 重新实现了dispatch方法</li>
+<li>dispatch方法中两个重要的方法：initialize_request 和initial方法</li>
+<li>initialize_request()对原始的request进行封装，同时添加了解析器和认证器；</li>
+<li>initial方法中实现了版本，执行认证，检查权限和频率访问；</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>python</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>restful风格规范</title>
     <url>/2020/01/20/restful%E9%A3%8E%E6%A0%BC%E8%A7%84%E8%8C%83/</url>
     <content><![CDATA[<h2 id="restful风格规范"><a href="#restful风格规范" class="headerlink" title=" restful风格规范 "></a><center> restful风格规范 </center></h2><a id="more"></a>
