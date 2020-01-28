@@ -204,6 +204,293 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/28/%E5%88%86%E6%9E%90%E4%B8%AD%E9%97%B4%E4%BB%B6CsrfViewMiddleware%E6%BA%90%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/28/%E5%88%86%E6%9E%90%E4%B8%AD%E9%97%B4%E4%BB%B6CsrfViewMiddleware%E6%BA%90%E7%A0%81/" class="post-title-link" itemprop="url">分析中间件CsrfViewMiddleware源码</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-28 23:33:37" itemprop="dateCreated datePublished" datetime="2020-01-28T23:33:37+08:00">2020-01-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-29 04:23:40" itemprop="dateModified" datetime="2020-01-29T04:23:40+08:00">2020-01-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/django/" itemprop="url" rel="index">
+                    <span itemprop="name">django</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="CsrfViewMiddleware-源码分析"><a href="#CsrfViewMiddleware-源码分析" class="headerlink" title=" ＣsrfViewMiddleware 源码分析"></a><center> <code>ＣsrfViewMiddleware</code> 源码分析</center></h3><ol>
+<li><p>流程图</p>
+<p><img src="https://raw.githubusercontent.com/lioncgn/upload_images/master/CsrfViewMiddleware.jpg" alt="avatar"></p>
+</li>
+</ol>
+<ol start="2">
+<li>源码分析</li>
+</ol>
+<ul>
+<li>在工程的配置文件要有中间件 <code>CsrfViewMiddleware</code> 才能使用<code>csrf</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MIDDLEWARE = [</span><br><span class="line">    <span class="string">'django.middleware.security.SecurityMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.sessions.middleware.SessionMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.common.CommonMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.csrf.CsrfViewMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth.middleware.AuthenticationMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.messages.middleware.MessageMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.clickjacking.XFrameOptionsMiddleware'</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求进来，首先通过各个中间件的<code>process_requst</code> 方法</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">       <span class="comment"># 第一次请求，返回None</span></span><br><span class="line">       csrf_token = self._get_token(request)</span><br><span class="line">       <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">           <span class="comment"># Use same token next time.</span></span><br><span class="line">           request.META[<span class="string">'CSRF_COOKIE'</span>] = csrf_token</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">_get_token</span><span class="params">(self, request)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">           <span class="keyword">try</span>:</span><br><span class="line">               <span class="keyword">return</span> request.session.get(CSRF_SESSION_KEY)</span><br><span class="line">           <span class="keyword">except</span> AttributeError:</span><br><span class="line">               <span class="keyword">raise</span> ImproperlyConfigured(</span><br><span class="line">                   <span class="string">'CSRF_USE_SESSIONS is enabled, but request.session is not '</span></span><br><span class="line">                   <span class="string">'set. SessionMiddleware must appear before CsrfViewMiddleware '</span></span><br><span class="line">                   <span class="string">'in MIDDLEWARE%s.'</span> % (<span class="string">'_CLASSES'</span> <span class="keyword">if</span> settings.MIDDLEWARE <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">''</span>)</span><br><span class="line">               )</span><br><span class="line">       <span class="keyword">else</span>:</span><br><span class="line">           ＃ 默认配置中，CSRF_USE_SESSIONS 为<span class="literal">False</span>，总不会执行</span><br><span class="line">           <span class="keyword">try</span>:</span><br><span class="line">           ＃　第一次请求，没有cookie，返回<span class="literal">None</span></span><br><span class="line">               cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]</span><br><span class="line">           <span class="keyword">except</span> KeyError:</span><br><span class="line">               <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">           csrf_token = _sanitize_token(cookie_token)</span><br><span class="line">           <span class="keyword">if</span> csrf_token != cookie_token:</span><br><span class="line">               <span class="comment"># Cookie token needed to be replaced;</span></span><br><span class="line">               <span class="comment"># the cookie needs to be reset.</span></span><br><span class="line">               request.csrf_cookie_needs_reset = <span class="literal">True</span></span><br><span class="line">           <span class="keyword">return</span> csrf_token</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>然后找到路由系统，根据请求的URL,找到对应的视图处理函数，然后再在各个中间件中找寻process_view</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_view</span><span class="params">(self, request, callback, callback_args, callback_kwargs)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> getattr(request, <span class="string">'csrf_processing_done'</span>, <span class="literal">False</span>):</span><br><span class="line">           <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">       <span class="keyword">if</span> getattr(callback, <span class="string">'csrf_exempt'</span>, <span class="literal">False</span>):</span><br><span class="line">           <span class="keyword">return</span> <span class="literal">None</span>	</span><br><span class="line">       <span class="keyword">if</span> request.method <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>, <span class="string">'OPTIONS'</span>, <span class="string">'TRACE'</span>):</span><br><span class="line">           <span class="keyword">if</span> request.is_secure():  <span class="comment"># 如果是　https请求</span></span><br><span class="line">                   referer = force_text(</span><br><span class="line">                   request.META.get(<span class="string">'HTTP_REFERER'</span>),</span><br><span class="line">                   strings_only=<span class="literal">True</span>,</span><br><span class="line">                   errors=<span class="string">'replace'</span></span><br><span class="line">               )</span><br><span class="line">               <span class="keyword">if</span> referer <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_NO_REFERER)</span><br><span class="line">          　　　....</span><br><span class="line">            csrf_token = request.META.get(<span class="string">'CSRF_COOKIE'</span>)</span><br><span class="line">            <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="literal">None</span>: <span class="comment"># 为空，直接拒绝</span></span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_NO_CSRF_COOKIE)</span><br><span class="line">  　　　　　　　　request_csrf_token = <span class="string">""</span></span><br><span class="line">           　<span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">               <span class="keyword">try</span>:</span><br><span class="line">                   request_csrf_token = request.POST.get(<span class="string">'csrfmiddlewaretoken'</span>, <span class="string">''</span>)</span><br><span class="line">               <span class="keyword">except</span> IOError:</span><br><span class="line">                   <span class="keyword">pass</span></span><br><span class="line">             <span class="keyword">if</span> request_csrf_token == <span class="string">""</span>:</span><br><span class="line">                   request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, <span class="string">''</span>)</span><br><span class="line">             request_csrf_token = _sanitize_token(request_csrf_token)</span><br><span class="line">             <span class="comment"># 比较请求头中的csrf_token 与从表单提交数据中获取的 request_csrf_token是否符合规则</span></span><br><span class="line">             <span class="keyword">if</span> <span class="keyword">not</span> _compare_salted_tokens(request_csrf_token, csrf_token):</span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_BAD_TOKEN)</span><br><span class="line">        </span><br><span class="line">       <span class="comment"># 对于get, head, options, trace请求方法，直接跳过检查</span></span><br><span class="line">  　　　　　<span class="keyword">return</span> self._accept(request)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行真正的视图处理函数，如果返回的是渲染后的表单，同时表单中有标签  ,那么在渲染这个标签的时候，将调用get_token() 函数，这个函数的作用有两方面</p>
+<ul>
+<li>为请求头添加<code>CSRF_COOKIE</code> 属性，值为随机生成的64位<code>ascii</code>值</li>
+<li>为表单隐藏的字段<code>csrfmiddlewaretoken</code> 赋值</li>
+<li>设置请求头<code>CSRF_COOKIE_USED</code> 为True</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_token</span><span class="params">(request)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">"CSRF_COOKIE"</span> <span class="keyword">not</span> <span class="keyword">in</span> request.META:</span><br><span class="line">               csrf_secret = _get_new_csrf_string()</span><br><span class="line">               request.META[<span class="string">"CSRF_COOKIE"</span>] = _salt_cipher_secret(csrf_secret)</span><br><span class="line">           <span class="keyword">else</span>:</span><br><span class="line">               csrf_secret = _unsalt_cipher_token(request.META[<span class="string">"CSRF_COOKIE"</span>])</span><br><span class="line">           request.META[<span class="string">"CSRF_COOKIE_USED"</span>] = <span class="literal">True</span></span><br><span class="line">           <span class="keyword">return</span> _salt_cipher_secret(csrf_secret)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后执行<code>process_response</code> 响应，根据上面<code>get_token</code> 被调用，将执行<code>_set_token()</code> 函数，为响应设置<code>cookie</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process_response</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> getattr(request, <span class="string">'csrf_cookie_needs_reset'</span>, <span class="literal">False</span>):</span><br><span class="line">          <span class="keyword">if</span> getattr(response, <span class="string">'csrf_cookie_set'</span>, <span class="literal">False</span>):</span><br><span class="line">              <span class="keyword">return</span> response</span><br><span class="line"><span class="comment"># 执行过 get_token后，这个条件不成立</span></span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> request.META.get(<span class="string">"CSRF_COOKIE_USED"</span>, <span class="literal">False</span>): </span><br><span class="line">          <span class="keyword">return</span> response</span><br><span class="line">      ＃　为返回的响应设置cookie</span><br><span class="line">      self._set_token(request, response)</span><br><span class="line">      response.csrf_cookie_set = <span class="literal">True</span></span><br><span class="line">      <span class="keyword">return</span> response</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_set_token</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">      <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">          request.session[CSRF_SESSION_KEY] = request.META[<span class="string">'CSRF_COOKIE'</span>]</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">          response.set_cookie(</span><br><span class="line">              settings.CSRF_COOKIE_NAME,　＃　cookie键为　csrftoken</span><br><span class="line">              request.META[<span class="string">'CSRF_COOKIE'</span>], <span class="comment"># 对应的值为　get_token函数生成的值</span></span><br><span class="line">              max_age=settings.CSRF_COOKIE_AGE,</span><br><span class="line">              domain=settings.CSRF_COOKIE_DOMAIN,</span><br><span class="line">              path=settings.CSRF_COOKIE_PATH,</span><br><span class="line">              secure=settings.CSRF_COOKIE_SECURE,</span><br><span class="line">              httponly=settings.CSRF_COOKIE_HTTPONLY,</span><br><span class="line">          )</span><br><span class="line">          <span class="comment"># Set the Vary header since content varies with the CSRF cookie.</span></span><br><span class="line">          patch_vary_headers(response, (<span class="string">'Cookie'</span>,))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>总结</p>
+<ul>
+<li><p>对get,head, options, trace这样的方法，不做<code>csrf</code>认证</p>
+</li>
+<li><p>只有当表单中使用了 这样的标签后，调用<code>get_token</code> 方法，为表单中与<code>csrf</code> 有关的字段赋值，同时这个值会随着每次请求而发生变化；</p>
+</li>
+<li><p>对于post,put, patch, delete 这样的请求，都会做出验证，如果想要不对这些做出认证，方法可以有</p>
+<ul>
+<li><p>不使用这个中间件</p>
+</li>
+<li><p>使用<code>csrf_exempt</code> 这个装饰器</p>
+</li>
+<li><p>如果是类视图中的函数，可以为类添加<code>@method_decorator(csrf_exempt, name=&#39;dispatch&#39;)</code></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/28/study-%E5%BF%83%E7%90%86%E8%B7%AF%E7%BA%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/28/study-%E5%BF%83%E7%90%86%E8%B7%AF%E7%BA%BF/" class="post-title-link" itemprop="url">study-心理路线</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-01-28 09:57:32 / 修改时间：19:46:22" itemprop="dateCreated datePublished" datetime="2020-01-28T09:57:32+08:00">2020-01-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="自觉持续的勤奋"><a href="#自觉持续的勤奋" class="headerlink" title=" 自觉持续的勤奋"></a><center> 自觉持续的勤奋</center></h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/28/study-%E5%BF%83%E7%90%86%E8%B7%AF%E7%BA%BF/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/27/django-template-%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/27/django-template-%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">django template 使用</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-27 09:26:40" itemprop="dateCreated datePublished" datetime="2020-01-27T09:26:40+08:00">2020-01-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-28 02:32:47" itemprop="dateModified" datetime="2020-01-28T02:32:47+08:00">2020-01-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/django/" itemprop="url" rel="index">
+                    <span itemprop="name">django</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="django-中的template使用"><a href="#django-中的template使用" class="headerlink" title=" django 中的template使用 "></a><center> django 中的template使用 </center></h2><h3 id="1-可以使用python-manage-py-shell-来快速测试模板语法是否正确"><a href="#1-可以使用python-manage-py-shell-来快速测试模板语法是否正确" class="headerlink" title="1. 可以使用python manage.py shell 来快速测试模板语法是否正确"></a>1. 可以使用<code>python manage.py shell</code> 来快速测试模板语法是否正确</h3><ul>
+<li>模板中分变量和标签 </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 变量的表示方法 &#123;&#123; var &#125;&#125;</span></span><br><span class="line">   <span class="comment"># 标签的表示方法  &#123;% if　%&#125;&#125; &#123;% else %&#125; &#123;% endif %&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>测试前的准备工作：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.template <span class="keyword">import</span> Context, Template</span><br><span class="line">   <span class="comment"># 生成一个模板对象</span></span><br><span class="line">   t = Template(<span class="string">'My name is &#123;&#123; name &#125;&#125;'</span>)</span><br><span class="line">   <span class="comment"># 创建给模板传递数据的对象,使用字典映射变量和他们的值</span></span><br><span class="line">   c = Context(&#123;<span class="string">'name'</span>: <span class="string">'Test'</span>&#125;) <span class="comment"># 给变量name 传递一个字符串 'Test'</span></span><br><span class="line">   <span class="comment"># 使用模板对象的render方法进行填充</span></span><br><span class="line">   t.render(c) <span class="comment"># 输出是一个unicode对象</span></span><br><span class="line">   <span class="comment"># u'My name is Test'</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>向模板传递字典，或者类对象，如何访问他们的数据, 都是通过<code>.</code> 进行访问</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">person = &#123;<span class="string">'name'</span>: <span class="string">'Sally'</span>, <span class="string">'age'</span>: <span class="number">32</span>&#125;</span><br><span class="line">t = Template(<span class="string">'&#123;&#123; person.name &#125;&#125; is &#123;&#123; person.age &#125;&#125; years old.'</span>)</span><br><span class="line">c = Context(&#123;<span class="string">'person'</span>: person&#125;)</span><br><span class="line">t.render(c)</span><br><span class="line"><span class="comment"># 访问对象的属性</span></span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line">d = datetime.now()</span><br><span class="line">t = Template(<span class="string">'The month is &#123;&#123; date.month &#125;&#125; and the year is &#123;&#123; date.year &#125;&#125;'</span>)</span><br><span class="line">c = Context(&#123;<span class="string">'date'</span>: d&#125;)</span><br><span class="line">t.render(c)</span><br><span class="line"><span class="comment"># 也可以访问对象的方法，但是只能调用不带参数的方法，同时不能带()</span></span><br><span class="line">t = Template(<span class="string">'&#123;&#123; var &#125;&#125;--- &#123;&#123; var.upper &#125;&#125;----&#123;&#123; var.isdigit &#125;&#125;'</span>)</span><br><span class="line">t.render(Context(&#123;<span class="string">'var'</span>: <span class="string">'hello'</span>&#125;))</span><br><span class="line"><span class="comment"># 也可以通过索引访问列表中的元素，但是不能使用负索引</span></span><br><span class="line">alist = [<span class="string">'a'</span>, <span class="string">'b'</span>]</span><br><span class="line">t = Template(<span class="string">'Item 1 is &#123;&#123; items.1 &#125;&#125;'</span>)</span><br><span class="line">t.render(Context(&#123;<span class="string">'items'</span>: alist&#125;))</span><br><span class="line"><span class="comment"># 模板系统遇到点时，会按照一下顺序进行查找：</span></span><br><span class="line"><span class="comment"># 1. 字典类型</span></span><br><span class="line"><span class="comment"># 2. 属性查找</span></span><br><span class="line"><span class="comment"># 3. 方法调用</span></span><br><span class="line"><span class="comment"># 4. 列表类型索引查找</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 点查找可以多级嵌套使用</span></span><br><span class="line">person = &#123;<span class="string">'name'</span>: <span class="string">'sally'</span>, <span class="string">'age'</span>: <span class="number">20</span>&#125;</span><br><span class="line">t = Template(<span class="string">'&#123;&#123; person.name.upper &#125;&#125; is &#123;&#123; person.age &#125;&#125; years old'</span>)</span><br><span class="line">c = Context(&#123;<span class="string">'person'</span>: person&#125;)</span><br><span class="line">t.render(c)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法调用注意点</span></span><br><span class="line"><span class="comment"># 如果方法中有抛出异常，那么在渲染过程中就会传播此异常。为了不传播此异常，只要设置该异常有</span></span><br><span class="line">silent_variable_failure = <span class="literal">True</span> 这个属性就不会传播此异常</span><br><span class="line">t = Template(<span class="string">"My name is &#123;&#123; person.first_name &#125;&#125;"</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">first_name</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> SilentAssertionError, <span class="string">"foo"</span></span><br><span class="line">        </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SilentAssertionError</span><span class="params">(AssertionError)</span>:</span></span><br><span class="line">    silent_variable_failure = <span class="literal">True</span></span><br><span class="line">t.render(Context(&#123;<span class="string">'person'</span>: Person()&#125;))</span><br><span class="line"><span class="comment"># 默认情况下，变量不存在，模板系统将展示它为空字符串；</span></span><br><span class="line">​</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 注释语法： </span><br><span class="line"></span><br><span class="line">  - 单行注释 &#96;&#123;#  This is a comment #&#125;&#96;</span><br><span class="line">  - 多行注释 &#96;&#123;% comment %&#125; &#123;% endcomment %&#125;&#96;</span><br><span class="line"></span><br><span class="line">- 过滤器，显示变量内容前修改它的值</span><br><span class="line"></span><br><span class="line">  - &#96;&#123;&#123; name|lower &#125;&#125;&#96; 转变为小写显示</span><br><span class="line">  - &#96;&#123;&#123; my_list|first|upper &#125;&#125;&#96; 列表的第一个元素大写显示</span><br><span class="line">  - 带参数的过滤器，通过冒号之后添加双引号作为参数的值</span><br><span class="line">  - &#96;&#123;&#123; bio|truncatewords:&quot;30&quot; &#125;&#125;&#96; 显示变量的前30个词</span><br><span class="line"></span><br><span class="line">### 2. MVC</span><br><span class="line"></span><br><span class="line">- MVC(Model-View-Controller)，一种软件架构模式，分别是数据存取逻辑，业务逻辑和表现逻辑相互分开并组合在一起。</span><br><span class="line">- M: 数据存取部分， 对应于Django中的models</span><br><span class="line">- V:选择显示哪些数据以及如何显示，由视图和模板处理</span><br><span class="line">- C：根据用户输入委派视图部分，也就是Django中的路由，对给定的URL调用适当的python函数</span><br><span class="line">- 由于C由框架自行处理，Django中更关注的是Model，模板（Template)和视图（Views），所以也被称为MTV框架；</span><br><span class="line">- M（代表模型Model),数据存取层，处理与数据相关的所有事务：如何存取，如何验证有效性，以及数据之间的关系</span><br><span class="line">- T( 代表模板Template),表现层，如何在页面中显示；</span><br><span class="line">- V(View):业务逻辑层，是模型与模板之间的桥梁；</span><br><span class="line"></span><br><span class="line">### 3.模型</span><br><span class="line"></span><br><span class="line">- 通过&#96;python manage.py shell&#96; 研究 存取数据的一些知识</span><br><span class="line"></span><br><span class="line">  &#96;&#96;&#96;python</span><br><span class="line">  	from App.models import Animal</span><br><span class="line">  	# 查找所有对象</span><br><span class="line">  	animal_list &#x3D; Animal.objects.all() #返回一个QuerySet </span><br><span class="line">  	animal &#x3D; Animal.objects.get(name&#x3D;&#39;dog&#39;) # 返回单个对象 </span><br><span class="line">  	# 只能用于返回单个对象，当返回值多于一个或者没有找到时会报错</span><br><span class="line">  	try:</span><br><span class="line">  		animal &#x3D; Animal.objects.get(name&#x3D;&#39;dog&#39;)</span><br><span class="line">  	except Animal.DoesNotExist:  #DoesNotExist是类的属性，可以捕获并处理</span><br><span class="line">  		print(&#39;Animal does not name is dog&#39;)</span><br><span class="line">  	# 排序,按照某个字段进行排序</span><br><span class="line">  	animal &#x3D; Animal.objects.order_by(&#39;name&#39;)</span><br><span class="line">  	# 倒序排列通过</span><br><span class="line">  	aniaml &#x3D; Animal.objects.order_by(&#39;-name&#39;)</span><br><span class="line">  	# 对应的sql语句就是</span><br><span class="line">  	# select id, name from Animal order by name DESC;</span><br><span class="line">  	# order_by(arg1, arg2) 多个字段表示arg1相同的情况下，按照arg2进行排序</span><br><span class="line">  	# 如果向对所有的查询都执行排序，就配置类属性,那么默认情况下都会执行排序</span><br><span class="line">  	class Meta:</span><br><span class="line">  		ordering &#x3D; [&#39;name&#39;]</span><br><span class="line">  		</span><br><span class="line">  	# 过滤和排序可以同时使用</span><br><span class="line">  	animal &#x3D; Animal.objects.filter(name&#x3D;&#39;dog&#39;).order_by(&#39;name&#39;)</span><br><span class="line">  	#对应的sql</span><br><span class="line">  	# select id, name from Animal where name&#x3D;&#39;dog&#39; order by name;</span><br><span class="line">  	# 返回前两条记录</span><br><span class="line">  	# animal &#x3D; Animal.objects.order_by(&#39;name&#39;)[0:2]</span><br><span class="line">  	# 对应的sql</span><br><span class="line">  	# select id, name from Animal order by name offset 0 limit 2;</span><br><span class="line">  	# 不支持负索引</span><br><span class="line">  	</span><br><span class="line">  	# save 方法将一条记录的所有数据提交到数据库</span><br><span class="line">  	# update 方法只将更新的数据提交到数据库，可以避免其他列可能被其他进程改动，引起竞态；</span><br><span class="line">  	Animal.objects.order_by(id&#x3D;1).update(name&#x3D;&#39;Dog&#39;) # 返回受影响的记录条数</span><br><span class="line">  	#对应的sql语句</span><br><span class="line">  	# select id, name from Animal set name&#x3D;&#39;Dog&#39; where id&#x3D;1;</span><br><span class="line">  	</span><br><span class="line">  	# 删除操作,删除指定的一条记录</span><br><span class="line">  	Animal.objects.filter(id&#x3D;1).delete()</span><br><span class="line">  	# 删除所有记录</span><br><span class="line">  	Animal.objects.all().delete()</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="4"><a href="#4" class="headerlink" title="4."></a>4.</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/20/djangorestframework-%E7%BB%84%E4%BB%B6%E4%BD%BF%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -235,7 +522,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-25 16:49:19" itemprop="dateModified" datetime="2020-01-25T16:49:19+08:00">2020-01-25</time>
+                <time title="修改时间：2020-01-28 02:09:45" itemprop="dateModified" datetime="2020-01-28T02:09:45+08:00">2020-01-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -318,7 +605,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-25 16:51:25" itemprop="dateModified" datetime="2020-01-25T16:51:25+08:00">2020-01-25</time>
+                <time title="修改时间：2020-01-28 19:46:46" itemprop="dateModified" datetime="2020-01-28T19:46:46+08:00">2020-01-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -346,15 +633,45 @@
           <h2 id="web开发面试题"><a href="#web开发面试题" class="headerlink" title=" web开发面试题 "></a><center> web开发面试题 </center></h2><ol>
 <li><p>中间件有几种方法？</p>
 <ul>
-<li>适用于所有请求批量操作</li>
+<li><p>process_request(self, request)</p>
+<ul>
+<li>django接收到request之后，在未解析url确定运行的view之前</li>
+<li>返回值有None, HttpResponse对象</li>
+<li>如果返回None,Django继续处理这个request,执行后续的中间件；</li>
+<li>如果返回ＨttpResponse,Django不再执行其他的中间件以及视图，立即返回；</li>
+</ul>
+</li>
+<li><p>process_view(self, request, view, <em>args, *</em>kwargs)</p>
+<ul>
+<li>调用时机是在：django执行完request预处理函数并确定待执行的view之后，但是在view函数实际执行之前</li>
+<li>request,是HttpResponse对象，view是要调用的视图函数对象</li>
+<li><em>args, *</em>kwargs:传入view的位置参数和关键字参数；</li>
+<li>返回None 或者HttpResponse对象</li>
+<li>返回None,Ｄjango继续处理这个request,执行后续的中间件，然后调用相应的ｖｉｅｗ;</li>
+<li>返回HttpResponse对象，django不再执行任何其他的中间件以及对应的view, 立即返回ＨttpResponse;</li>
+</ul>
+</li>
+<li><p>process_response(self, request, response)</p>
+<ul>
+<li>调用时机是在django执行ｖｉｅｗ函数并生成response 之后</li>
+<li>参数：request是request对象，response是从view中返回的response对象</li>
+<li>必须返回　ＨttpResponse对象；</li>
+</ul>
+</li>
+<li><p>process_exception(self, request, exception)</p>
+<ul>
+<li>调用时机：view函数抛出了一个未捕获的异常调用</li>
+<li>参数：exception是view函数抛出的实际的异常对象exception</li>
+<li>返回值：None, django使用框架内置的异常处理机制</li>
+<li>返回　HttpResponse对象，</li>
+</ul>
+</li>
+<li><p>适用于所有请求批量操作</p>
+</li>
 </ul>
 <p>场景:</p>
-<pre><code>- 基于角色的权限控制
-- 用户认证
-- csrf 
-- session
-- 日志记录
-- 黑名单</code></pre></li>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 基于角色的权限控制</span><br><span class="line">- 用户认证</span><br><span class="line">- csrf </span><br><span class="line">- session</span><br><span class="line">- 日志记录</span><br><span class="line">- 黑名单</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>csrf_token 如何实现的？如何避免csrf验证？</p>
 </li>
 <li><p>谈谈对restful 的理解？</p>
@@ -862,7 +1179,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -875,7 +1192,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

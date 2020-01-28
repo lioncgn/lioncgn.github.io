@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="ＣsrfViewMiddleware 源码分析 流程图     源码分析   在工程的配置文件要有中间件 CsrfViewMiddleware 才能使用csrf  123456789MIDDLEWARE &#x3D; [    &#39;django.middleware.security.SecurityMiddleware&#39;,    &#39;django.contrib.sessions.middleware.Se">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分析中间件CsrfViewMiddleware源码">
+<meta property="og:url" content="http://yoursite.com/2020/01/28/%E5%88%86%E6%9E%90%E4%B8%AD%E9%97%B4%E4%BB%B6CsrfViewMiddleware%E6%BA%90%E7%A0%81/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="ＣsrfViewMiddleware 源码分析 流程图     源码分析   在工程的配置文件要有中间件 CsrfViewMiddleware 才能使用csrf  123456789MIDDLEWARE &#x3D; [    &#39;django.middleware.security.SecurityMiddleware&#39;,    &#39;django.contrib.sessions.middleware.Se">
+<meta property="og:image" content="https://raw.githubusercontent.com/lioncgn/upload_images/master/CsrfViewMiddleware.jpg">
+<meta property="article:published_time" content="2020-01-28T15:33:37.000Z">
+<meta property="article:modified_time" content="2020-01-28T20:23:40.404Z">
+<meta property="article:author" content="cgn">
+<meta property="article:tag" content="中间件">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lioncgn/upload_images/master/CsrfViewMiddleware.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2020/01/28/%E5%88%86%E6%9E%90%E4%B8%AD%E9%97%B4%E4%BB%B6CsrfViewMiddleware%E6%BA%90%E7%A0%81/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>分析中间件CsrfViewMiddleware源码 | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/28/%E5%88%86%E6%9E%90%E4%B8%AD%E9%97%B4%E4%BB%B6CsrfViewMiddleware%E6%BA%90%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分析中间件CsrfViewMiddleware源码
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-28 23:33:37" itemprop="dateCreated datePublished" datetime="2020-01-28T23:33:37+08:00">2020-01-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-29 04:23:40" itemprop="dateModified" datetime="2020-01-29T04:23:40+08:00">2020-01-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/django/" itemprop="url" rel="index">
+                    <span itemprop="name">django</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="CsrfViewMiddleware-源码分析"><a href="#CsrfViewMiddleware-源码分析" class="headerlink" title=" ＣsrfViewMiddleware 源码分析"></a><center> <code>ＣsrfViewMiddleware</code> 源码分析</center></h3><ol>
+<li><p>流程图</p>
+<p><img src="https://raw.githubusercontent.com/lioncgn/upload_images/master/CsrfViewMiddleware.jpg" alt="avatar"></p>
+</li>
+</ol>
+<ol start="2">
+<li>源码分析</li>
+</ol>
+<ul>
+<li>在工程的配置文件要有中间件 <code>CsrfViewMiddleware</code> 才能使用<code>csrf</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MIDDLEWARE = [</span><br><span class="line">    <span class="string">'django.middleware.security.SecurityMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.sessions.middleware.SessionMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.common.CommonMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.csrf.CsrfViewMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth.middleware.AuthenticationMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.contrib.messages.middleware.MessageMiddleware'</span>,</span><br><span class="line">    <span class="string">'django.middleware.clickjacking.XFrameOptionsMiddleware'</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求进来，首先通过各个中间件的<code>process_requst</code> 方法</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">       <span class="comment"># 第一次请求，返回None</span></span><br><span class="line">       csrf_token = self._get_token(request)</span><br><span class="line">       <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">           <span class="comment"># Use same token next time.</span></span><br><span class="line">           request.META[<span class="string">'CSRF_COOKIE'</span>] = csrf_token</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">_get_token</span><span class="params">(self, request)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">           <span class="keyword">try</span>:</span><br><span class="line">               <span class="keyword">return</span> request.session.get(CSRF_SESSION_KEY)</span><br><span class="line">           <span class="keyword">except</span> AttributeError:</span><br><span class="line">               <span class="keyword">raise</span> ImproperlyConfigured(</span><br><span class="line">                   <span class="string">'CSRF_USE_SESSIONS is enabled, but request.session is not '</span></span><br><span class="line">                   <span class="string">'set. SessionMiddleware must appear before CsrfViewMiddleware '</span></span><br><span class="line">                   <span class="string">'in MIDDLEWARE%s.'</span> % (<span class="string">'_CLASSES'</span> <span class="keyword">if</span> settings.MIDDLEWARE <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">''</span>)</span><br><span class="line">               )</span><br><span class="line">       <span class="keyword">else</span>:</span><br><span class="line">           ＃ 默认配置中，CSRF_USE_SESSIONS 为<span class="literal">False</span>，总不会执行</span><br><span class="line">           <span class="keyword">try</span>:</span><br><span class="line">           ＃　第一次请求，没有cookie，返回<span class="literal">None</span></span><br><span class="line">               cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]</span><br><span class="line">           <span class="keyword">except</span> KeyError:</span><br><span class="line">               <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">           csrf_token = _sanitize_token(cookie_token)</span><br><span class="line">           <span class="keyword">if</span> csrf_token != cookie_token:</span><br><span class="line">               <span class="comment"># Cookie token needed to be replaced;</span></span><br><span class="line">               <span class="comment"># the cookie needs to be reset.</span></span><br><span class="line">               request.csrf_cookie_needs_reset = <span class="literal">True</span></span><br><span class="line">           <span class="keyword">return</span> csrf_token</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>然后找到路由系统，根据请求的URL,找到对应的视图处理函数，然后再在各个中间件中找寻process_view</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_view</span><span class="params">(self, request, callback, callback_args, callback_kwargs)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> getattr(request, <span class="string">'csrf_processing_done'</span>, <span class="literal">False</span>):</span><br><span class="line">           <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">       <span class="keyword">if</span> getattr(callback, <span class="string">'csrf_exempt'</span>, <span class="literal">False</span>):</span><br><span class="line">           <span class="keyword">return</span> <span class="literal">None</span>	</span><br><span class="line">       <span class="keyword">if</span> request.method <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>, <span class="string">'OPTIONS'</span>, <span class="string">'TRACE'</span>):</span><br><span class="line">           <span class="keyword">if</span> request.is_secure():  <span class="comment"># 如果是　https请求</span></span><br><span class="line">                   referer = force_text(</span><br><span class="line">                   request.META.get(<span class="string">'HTTP_REFERER'</span>),</span><br><span class="line">                   strings_only=<span class="literal">True</span>,</span><br><span class="line">                   errors=<span class="string">'replace'</span></span><br><span class="line">               )</span><br><span class="line">               <span class="keyword">if</span> referer <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_NO_REFERER)</span><br><span class="line">          　　　....</span><br><span class="line">            csrf_token = request.META.get(<span class="string">'CSRF_COOKIE'</span>)</span><br><span class="line">            <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="literal">None</span>: <span class="comment"># 为空，直接拒绝</span></span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_NO_CSRF_COOKIE)</span><br><span class="line">  　　　　　　　　request_csrf_token = <span class="string">""</span></span><br><span class="line">           　<span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">               <span class="keyword">try</span>:</span><br><span class="line">                   request_csrf_token = request.POST.get(<span class="string">'csrfmiddlewaretoken'</span>, <span class="string">''</span>)</span><br><span class="line">               <span class="keyword">except</span> IOError:</span><br><span class="line">                   <span class="keyword">pass</span></span><br><span class="line">             <span class="keyword">if</span> request_csrf_token == <span class="string">""</span>:</span><br><span class="line">                   request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, <span class="string">''</span>)</span><br><span class="line">             request_csrf_token = _sanitize_token(request_csrf_token)</span><br><span class="line">             <span class="comment"># 比较请求头中的csrf_token 与从表单提交数据中获取的 request_csrf_token是否符合规则</span></span><br><span class="line">             <span class="keyword">if</span> <span class="keyword">not</span> _compare_salted_tokens(request_csrf_token, csrf_token):</span><br><span class="line">                   <span class="keyword">return</span> self._reject(request, REASON_BAD_TOKEN)</span><br><span class="line">        </span><br><span class="line">       <span class="comment"># 对于get, head, options, trace请求方法，直接跳过检查</span></span><br><span class="line">  　　　　　<span class="keyword">return</span> self._accept(request)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行真正的视图处理函数，如果返回的是渲染后的表单，同时表单中有标签  ,那么在渲染这个标签的时候，将调用get_token() 函数，这个函数的作用有两方面</p>
+<ul>
+<li>为请求头添加<code>CSRF_COOKIE</code> 属性，值为随机生成的64位<code>ascii</code>值</li>
+<li>为表单隐藏的字段<code>csrfmiddlewaretoken</code> 赋值</li>
+<li>设置请求头<code>CSRF_COOKIE_USED</code> 为True</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_token</span><span class="params">(request)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">"CSRF_COOKIE"</span> <span class="keyword">not</span> <span class="keyword">in</span> request.META:</span><br><span class="line">               csrf_secret = _get_new_csrf_string()</span><br><span class="line">               request.META[<span class="string">"CSRF_COOKIE"</span>] = _salt_cipher_secret(csrf_secret)</span><br><span class="line">           <span class="keyword">else</span>:</span><br><span class="line">               csrf_secret = _unsalt_cipher_token(request.META[<span class="string">"CSRF_COOKIE"</span>])</span><br><span class="line">           request.META[<span class="string">"CSRF_COOKIE_USED"</span>] = <span class="literal">True</span></span><br><span class="line">           <span class="keyword">return</span> _salt_cipher_secret(csrf_secret)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后执行<code>process_response</code> 响应，根据上面<code>get_token</code> 被调用，将执行<code>_set_token()</code> 函数，为响应设置<code>cookie</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process_response</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> getattr(request, <span class="string">'csrf_cookie_needs_reset'</span>, <span class="literal">False</span>):</span><br><span class="line">          <span class="keyword">if</span> getattr(response, <span class="string">'csrf_cookie_set'</span>, <span class="literal">False</span>):</span><br><span class="line">              <span class="keyword">return</span> response</span><br><span class="line"><span class="comment"># 执行过 get_token后，这个条件不成立</span></span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> request.META.get(<span class="string">"CSRF_COOKIE_USED"</span>, <span class="literal">False</span>): </span><br><span class="line">          <span class="keyword">return</span> response</span><br><span class="line">      ＃　为返回的响应设置cookie</span><br><span class="line">      self._set_token(request, response)</span><br><span class="line">      response.csrf_cookie_set = <span class="literal">True</span></span><br><span class="line">      <span class="keyword">return</span> response</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_set_token</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">      <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">          request.session[CSRF_SESSION_KEY] = request.META[<span class="string">'CSRF_COOKIE'</span>]</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">          response.set_cookie(</span><br><span class="line">              settings.CSRF_COOKIE_NAME,　＃　cookie键为　csrftoken</span><br><span class="line">              request.META[<span class="string">'CSRF_COOKIE'</span>], <span class="comment"># 对应的值为　get_token函数生成的值</span></span><br><span class="line">              max_age=settings.CSRF_COOKIE_AGE,</span><br><span class="line">              domain=settings.CSRF_COOKIE_DOMAIN,</span><br><span class="line">              path=settings.CSRF_COOKIE_PATH,</span><br><span class="line">              secure=settings.CSRF_COOKIE_SECURE,</span><br><span class="line">              httponly=settings.CSRF_COOKIE_HTTPONLY,</span><br><span class="line">          )</span><br><span class="line">          <span class="comment"># Set the Vary header since content varies with the CSRF cookie.</span></span><br><span class="line">          patch_vary_headers(response, (<span class="string">'Cookie'</span>,))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>总结</p>
+<ul>
+<li><p>对get,head, options, trace这样的方法，不做<code>csrf</code>认证</p>
+</li>
+<li><p>只有当表单中使用了 这样的标签后，调用<code>get_token</code> 方法，为表单中与<code>csrf</code> 有关的字段赋值，同时这个值会随着每次请求而发生变化；</p>
+</li>
+<li><p>对于post,put, patch, delete 这样的请求，都会做出验证，如果想要不对这些做出认证，方法可以有</p>
+<ul>
+<li><p>不使用这个中间件</p>
+</li>
+<li><p>使用<code>csrf_exempt</code> 这个装饰器</p>
+</li>
+<li><p>如果是类视图中的函数，可以为类添加<code>@method_decorator(csrf_exempt, name=&#39;dispatch&#39;)</code></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"># 中间件</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/28/study-%E5%BF%83%E7%90%86%E8%B7%AF%E7%BA%BF/" rel="prev" title="study-心理路线">
+      <i class="fa fa-chevron-left"></i> study-心理路线
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#CsrfViewMiddleware-源码分析"><span class="nav-number">1.</span> <span class="nav-text"> ＣsrfViewMiddleware 源码分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>
