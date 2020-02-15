@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>rabbitmq初学习</title>
+    <url>/2020/02/15/rabbitmq%E5%88%9D%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h2 id="rabbitmq初学习"><a href="#rabbitmq初学习" class="headerlink" title=" rabbitmq初学习"></a><center> rabbitmq初学习</center></h2><a id="more"></a>
+<p>学习地址: <a href="https://www.rabbitmq.com/tutorials/tutorial-one-python.html" target="_blank" rel="noopener">rabbitmq在python中的使用</a> </p>
+<p>1.目录结构</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">study_rabbitmq/</span><br><span class="line">├── receive_message.py</span><br><span class="line">└── send_message.py</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>receive_message.py</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="comment">#!/usr/bin/env python</span></span><br><span class="line"> <span class="number">2</span> <span class="comment"># -*- coding=utf-8 -*-</span></span><br><span class="line"> <span class="number">3</span> <span class="keyword">import</span> pika</span><br><span class="line"> <span class="number">4</span>  </span><br><span class="line"> <span class="number">5</span> connection = pika.BlockingConnection(pika.ConnectionParameters(<span class="string">'localhost'</span>))</span><br><span class="line"> <span class="number">6</span>  </span><br><span class="line"> <span class="number">7</span> channel = connection.channel()</span><br><span class="line"> <span class="number">8</span> <span class="comment"># 这个code不必重复使用，如果我们已经确定这个hello队列已经存在的话，如果不确定，那么就需要写上(可重复使用，只在第一次被创建)</span></span><br><span class="line"> <span class="number">9</span> channel.queue_declare(queue=<span class="string">'hello'</span>)</span><br><span class="line"><span class="number">10</span>  </span><br><span class="line"><span class="number">11</span>  </span><br><span class="line"><span class="number">12</span> <span class="comment"># 无论何时接收到消息，回调函数都将被调用</span></span><br><span class="line"><span class="number">13</span> <span class="function"><span class="keyword">def</span> <span class="title">callback</span><span class="params">(ch, method, properties, body)</span>:</span></span><br><span class="line"><span class="number">14</span>     print(<span class="string">"[x] Received %r"</span> % body)</span><br><span class="line"><span class="number">15</span>  </span><br><span class="line"><span class="number">16</span> <span class="comment"># 从'hello'这个队列中接收消息</span></span><br><span class="line"><span class="number">17</span> channel.basic_consume(queue=<span class="string">'hello'</span>, on_message_callback=callback, auto_ack=<span class="literal">True</span>)</span><br><span class="line"><span class="number">18</span>  </span><br><span class="line"><span class="number">19</span> print(<span class="string">"[*] Waiting for messages.To exit press CTRL+C"</span>)</span><br><span class="line"><span class="number">20</span> <span class="comment"># 开启循环等待消息到来,调用回调函数</span></span><br><span class="line"><span class="number">21</span> channel.start_consuming()</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>send_message.py</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="comment">#!/usr/bin/env python</span></span><br><span class="line"> <span class="number">2</span> <span class="comment"># -*- coding=utf-8 -*-</span></span><br><span class="line"> <span class="number">3</span> <span class="keyword">import</span> time</span><br><span class="line"> <span class="number">4</span> <span class="keyword">import</span> pika</span><br><span class="line"> <span class="number">5</span>  </span><br><span class="line"> <span class="number">6</span> <span class="comment"># 建立与rabbitmq server的连接</span></span><br><span class="line"> <span class="number">7</span> connection = pika.BlockingConnection(pika.ConnectionParameters(<span class="string">'localhost'</span>))</span><br><span class="line"> <span class="number">8</span> channel = connection.channel()</span><br><span class="line"> <span class="number">9</span> <span class="comment"># 创建一个接收我们消息的queue</span></span><br><span class="line"><span class="number">10</span> channel.queue_declare(queue=<span class="string">'hello'</span>)</span><br><span class="line"><span class="number">11</span> <span class="comment"># rabbitmq 不能直接发送消息到队列中，必须通过exchange,这里使用默认exchange(一个空字符串)</span></span><br><span class="line"><span class="number">12</span> <span class="comment"># routing_key 指定队列的名字，使用这个交换器根据routing_key决定将消息发送到哪个队列中</span></span><br><span class="line"><span class="number">13</span> channel.basic_publish(exchange=<span class="string">''</span>, routing_key=<span class="string">'hello'</span>, body=<span class="string">'hello world!'</span>)</span><br><span class="line"><span class="number">14</span>  </span><br><span class="line"><span class="number">15</span> print(<span class="string">"[x] Sent 'hello world!'"</span>)</span><br><span class="line"><span class="number">16</span> connection.close()</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>执行过程</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1.启动 consumer</span></span><br><span class="line">cgn@cgn-Lenovo-S40<span class="number">-70</span>:~/study_rabbitmq$ python receive_message.py </span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages.To exit press CTRL+C</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.打开另一个终端启动　producer</span></span><br><span class="line">cgn@cgn-Lenovo-S40<span class="number">-70</span>:~/study_rabbitmq$ python send_message.py </span><br><span class="line">[x] Sent <span class="string">'hello world!'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 查看队列情况</span></span><br><span class="line"> sudo rabbitmqctl list_queues</span><br><span class="line"> hello	<span class="number">0</span></span><br><span class="line"></span><br><span class="line">＃４．查看消息是否被接收，消息被处理后是否发送确认标志</span><br><span class="line">~/study_rabbitmq$ sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged</span><br><span class="line">hello	<span class="number">0</span>	<span class="number">0</span></span><br><span class="line">＃ <span class="number">5.</span> 可以使用如下命令删除这个没有意义的队列</span><br><span class="line">sudo rabbitmqctl stop_app</span><br><span class="line">sudo rabbitmqctl reset</span><br><span class="line">sudo rabbitmqctl start_app</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>celery</category>
+      </categories>
+      <tags>
+        <tag>MQ</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>celery初认识</title>
     <url>/2020/02/08/celery%E5%88%9D%E8%AE%A4%E8%AF%86/</url>
     <content><![CDATA[<h3 id="celery初认识"><a href="#celery初认识" class="headerlink" title="celery初认识"></a><center>celery初认识</center></h3><a id="more"></a>
