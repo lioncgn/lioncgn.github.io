@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="flask学习(-)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask学习(-)">
+<meta property="og:url" content="http://yoursite.com/2020/02/17/flask%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="flask学习(-)">
+<meta property="article:published_time" content="2020-02-17T14:34:00.000Z">
+<meta property="article:modified_time" content="2020-02-18T10:56:54.765Z">
+<meta property="article:author" content="cgn">
+<meta property="article:tag" content="web框架">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/17/flask%E5%AD%A6%E4%B9%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>flask学习(-) | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/17/flask%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          flask学习(-)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-17 22:34:00" itemprop="dateCreated datePublished" datetime="2020-02-17T22:34:00+08:00">2020-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-18 18:56:54" itemprop="dateModified" datetime="2020-02-18T18:56:54+08:00">2020-02-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="flask学习"><a href="#flask学习" class="headerlink" title="flask学习(-)"></a><center>flask学习(-)</center></h2><a id="more"></a>
+
+<p>flask作为轻量级，易于扩展的微型python web框架。Flask有两个依赖：一个是ＷSGI工具集(Werkzeug),一个是Jinja2模板引擎。Flask只保留web开发的核心功能，其他功能全靠外部扩展来实现(比如数据库集成，表单认证，文件上传)。WSGI是python中用来规定Web服务器如何与Python Web程序进行沟通的标准，与WSGI完全兼容的Flask能够配置到各种大型网络服务器中。</p>
+<p>１．配置文件</p>
+<ul>
+<li><code>app.config[&#39;ADMIN_NAME&#39;] = &#39;cgn&#39; 单个配置</code></li>
+<li><code>app.config.update(TESTING=True, SECRET_KEY=&#39;dsfsdfs&#39;) 多个配置</code></li>
+<li><code>大型配置app.config.from_object(&#39;settings.DevelopmentConfig&#39;)</code></li>
+</ul>
+<p>２．路由器</p>
+<ul>
+<li>route()的常见参数有methods, endpoint,其他参数有</li>
+<li>defaults: url没有参数，但是视图函数有参数的情况下，这里可以使用它</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/test', defaults=&#123;'id': 1&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">teset</span><span class="params">(id)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"id is %s"</span> % id</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>redirect_to: 重定向到另一个位置</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/redirect', redirect_to='/test')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">redirect</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"hello redirect"</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>​    subdomain:支持子域名</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/www', subdomain='www')  # 访问　www.test.com:5000/www</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">www</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"www"</span></span><br><span class="line"><span class="comment"># 设置的前提：　app.config["SERVER_NAME"] = 'test.com:5000'</span></span><br><span class="line"><span class="comment"># 同时还需要修改 hosts文件，添加　127.0.0.1　www.test.com</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>strict_slashes: 是否严格的’/‘结尾</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route('/strict', strict_slashes=False) # strict_slashes=True, 严格url</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">strict</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"strict visit"</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>基于装饰器实现，本质是通过　app.add_url_rule(rule, endpoint, view_func, **options)实现</li>
+<li>除了基本的FBV,还可以实现CBV</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IndexView</span><span class="params">(views.MethodView)</span>:</span></span><br><span class="line">    methods = [<span class="string">'GET'</span>]</span><br><span class="line">    decorators = [auth,]</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Hello Index.GET"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Index.POST"</span></span><br><span class="line"></span><br><span class="line">app.add_url_rule(<span class="string">'/index'</span>, view_func=IndexView.as_view(name=<span class="string">'index'</span>))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>内置的URL变量转换器</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">string: (默认值)不包括斜线的字符串 &lt;val&gt;</span><br><span class="line">int: &lt;int:year&gt; 整型</span><br><span class="line">float: &lt;flaot:val&gt; 浮点数</span><br><span class="line">path: &lt;path:path&gt; 包含斜线的字符串</span><br><span class="line">any: &lt;any(blue, white, red):color&gt; 匹配一系列给定值中的元素</span><br><span class="line">uuid: UUID字符串</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>扩展URL变量转换器支持正则表达式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> werkzeug.routing <span class="keyword">import</span> BaseConverter</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RegerConverter</span><span class="params">(BaseConverter)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, map, regex)</span>:</span></span><br><span class="line">        super(RegerConverter, self).__init__(map)</span><br><span class="line">        self.regex = regex</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_python</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="comment"># 匹配成功时，传递给视图函数的参数的值</span></span><br><span class="line">        <span class="keyword">return</span> value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_url</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        ＃使用url_for 反向生成url调用的函数</span><br><span class="line">        val = super(RegerConverter, self).to_url(value)</span><br><span class="line">        <span class="keyword">return</span> val</span><br><span class="line"></span><br><span class="line">app.url_map.converters[<span class="string">'regex'</span>] = RegerConverter</span><br><span class="line">＃使用&lt;reger:test&gt; 这个转换器</span><br><span class="line"><span class="meta">@app.route('/index/&lt;reger("\d+"):test&gt;')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index_test</span><span class="params">(test)</span>:</span></span><br><span class="line">    print(test)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'Hello %s'</span> % test</span><br></pre></td></tr></table></figure>
+
+<p>常见的错误:</p>
+<ul>
+<li>自定义装饰器，当给视图函数使用多个装饰器时，装饰器的顺序很重要，如:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">LoginRequired</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        print(session)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'username'</span> <span class="keyword">not</span> <span class="keyword">in</span> session:</span><br><span class="line">            <span class="keyword">return</span> redirect(url_for(<span class="string">'login'</span>))</span><br><span class="line">        <span class="keyword">return</span> func(*args, **kwargs)</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">@app.route('/detail/&lt;int:id&gt;', methods=['GET'], endpoint='detail_id')</span></span><br><span class="line"><span class="meta">@LoginRequired   # 访问之前要确认是否已经登录</span></span><br><span class="line">＃这个装饰器要放在@app.route的下面，如果放在上面，那么将不起任何作用，这时的理解是当请求到来的时候，执行的＃　视图处理函数就是＠app.route下面的函数，而在它上面的装饰器(如果有的话)的处理逻辑没有执行；</span><br><span class="line">＃同时这时候还需要给每个使用这个装饰器的函数添加endpoint参数，因为如果不添加，可能导致下面的错误</span><br><span class="line">＃因为视图函数的名字不能相同，这时候视图函数的名字都是wrapper</span><br><span class="line"><span class="comment"># AssertionError: View function mapping is overwriting an existing endpoint function: #wrapper</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detail_id</span><span class="params">(id)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> id <span class="keyword">in</span> data_dict:</span><br><span class="line">        info = data_dict[id]</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'detail_id.html'</span>, info=info)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>上面的也可以通过修改装饰器函数(不添加endpoint)也可以实现,被装饰的视图函数的名字不同</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">LoginRequired</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">	@wraps(func)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        print(session)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'username'</span> <span class="keyword">not</span> <span class="keyword">in</span> session:</span><br><span class="line">            <span class="keyword">return</span> redirect(url_for(<span class="string">'login'</span>))</span><br><span class="line">        <span class="keyword">return</span> func(*args, **kwargs)</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br></pre></td></tr></table></figure>
+
+<p>３．模板语言</p>
+<ul>
+<li>向模板中传递html格式的字符串，如何标记为safe,使用　,或者通过Markup()</li>
+<li>支持宏定义</li>
+<li>其他语法与Django模板相似</li>
+</ul>
+<p>４．请求与响应</p>
+<ul>
+<li>请求的属性</li>
+<li>返回值</li>
+<li>如何定制响应相关的属性</li>
+</ul>
+<p>５．请求扩展</p>
+<ul>
+<li>@app.before_request 在每个请求之前都要执行被这个装饰器装饰的函数，可以有返回值，一旦返回值不是None,将拦截请求，或者重定向</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 实现每个请求之前检查用户是否登录，除了`/login`</span></span><br><span class="line"><span class="meta">@app.before_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_request</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'请求之前'</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">'/login'</span> == request.path:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'username'</span> <span class="keyword">not</span> <span class="keyword">in</span> session:</span><br><span class="line">            <span class="keyword">return</span> redirect(url_for(<span class="string">'login'</span>))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>@app.before_first_request,第一个请求到来的时候执行，不管是否有返回值都不会拦截</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.before_first_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_first_request</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'这是第一个请求'</span>)</span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(<span class="string">'login'</span>))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>@app.after_request, 每个请求完成后都要执行的响应处理函数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.after_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">after_request</span><span class="params">(response)</span>:</span></span><br><span class="line">    print(<span class="string">'bye bye'</span>)</span><br><span class="line">    <span class="keyword">return</span> response</span><br></pre></td></tr></table></figure>
+
+<p><strong>可以使用多个请求和多个响应处理函数，它们的执行顺序是，请求处理从上到下，而响应是从下到上,,如果第一个请求被拦截后，那么后面的请求不会执行，但是响应都会执行</strong> </p>
+<ul>
+<li>＠app.errorhandler定制错误处理函数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.errorhandler(404)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">error</span><span class="params">(arg)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'Page not found'</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>给模板自定义全局函数或者过滤器</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.template_global()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">use_global</span><span class="params">(a1, a2)</span>:</span></span><br><span class="line">    <span class="keyword">return</span>  a1 + a2</span><br><span class="line"><span class="comment"># &#123;&#123; use_global(1, 2) &#125;&#125;</span></span><br><span class="line"><span class="meta">@app.template_filter()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">use_filter</span><span class="params">(a1, a2, a3)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> a1 + a2 + a3</span><br><span class="line"><span class="comment"># &#123;&#123; 3|use_filter(3, 4) &#125;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>６．中间件</p>
+<p>当请求到来的时候，实际上执行的是app.wsgi_app(environ, start_response)这个方法，利用这一点，我们可以在处理请求之前做一些事情，下面就是中间件的处理，仅仅打印一些信息。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyMiddleware</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, app)</span>:</span></span><br><span class="line">        self.app = app</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></span><br><span class="line">        print(<span class="string">'&#123;&#125;: 请求之前'</span>.format(MyMiddleware.__name__))</span><br><span class="line">        result = self.app(environ, start_response)</span><br><span class="line">        print(<span class="string">'&#123;&#125;: 请求之后'</span>.format(MyMiddleware.__name__))</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line">app.wsgi_app = MyMiddleware(app.wsgi_app)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>７．闪现</p>
+<ul>
+<li>基于session实现的对临时数据的存取，主要应用显示消息</li>
+<li>flash(‘message’)  —&gt;存消息</li>
+<li>get_flashed_messages() —&gt;取出某个请求的所有消息，返回值是列表[(‘message’, ‘category’)],然后清空；</li>
+</ul>
+<p>８．蓝图</p>
+<p>利用蓝图可以将应用分模块安排，可以按照功能模块化程序，同时蓝图可以有自己的静态文件夹和模板文件夹，另外蓝图也可以完成请求的扩展(注册路由，错误处理函数，上下文处理函数，请求处理函数)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> views.admin <span class="keyword">import</span> admin_bp</span><br><span class="line"><span class="keyword">from</span> views.auth <span class="keyword">import</span> auth_bp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app.register_blueprint(auth_bp, url_prefix=<span class="string">'/auth'</span>)</span><br><span class="line">app.register_blueprint(admin_bp, url_prefix=<span class="string">'/admin'</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/web%E6%A1%86%E6%9E%B6/" rel="tag"># web框架</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/15/django-with-celery%E4%BD%BF%E7%94%A8/" rel="prev" title="Django with celery使用">
+      <i class="fa fa-chevron-left"></i> Django with celery使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#flask学习"><span class="nav-number">1.</span> <span class="nav-text">flask学习(-)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>
