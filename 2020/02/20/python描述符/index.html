@@ -52,7 +52,7 @@
 <meta property="og:site_name" content="你的眼神">
 <meta property="og:description" content="再谈python中的descriptor">
 <meta property="article:published_time" content="2020-02-20T04:25:17.000Z">
-<meta property="article:modified_time" content="2020-02-20T06:49:49.143Z">
+<meta property="article:modified_time" content="2020-02-20T15:03:09.228Z">
 <meta property="article:author" content="cgn">
 <meta property="article:tag" content="新式类">
 <meta name="twitter:card" content="summary">
@@ -233,7 +233,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-02-20 12:25:17 / 修改时间：14:49:49" itemprop="dateCreated datePublished" datetime="2020-02-20T12:25:17+08:00">2020-02-20</time>
+              <time title="创建时间：2020-02-20 12:25:17 / 修改时间：23:03:09" itemprop="dateCreated datePublished" datetime="2020-02-20T12:25:17+08:00">2020-02-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -274,7 +274,7 @@
 <h3 id="3-仅仅使用-get"><a href="#3-仅仅使用-get" class="headerlink" title="3. 仅仅使用__get__"></a>3. 仅仅使用<code>__get__</code></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="class"><span class="keyword">class</span> <span class="title">DataDesc</span><span class="params">(object)</span>:</span></span><br><span class="line">   ...:     <span class="function"><span class="keyword">def</span> <span class="title">__get__</span><span class="params">(self, obj, type=None)</span>:</span></span><br><span class="line">   ...:         <span class="keyword">return</span> (self, obj, type)</span><br><span class="line">   ...:     </span><br><span class="line">In [<span class="number">5</span>]: <span class="class"><span class="keyword">class</span> <span class="title">Test</span><span class="params">(object)</span>:</span></span><br><span class="line">   ...:     d = DataDesc()</span><br><span class="line">   ...:     </span><br><span class="line">In [<span class="number">6</span>]: t = Test()</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: t.d <span class="comment">#调用__get__</span></span><br><span class="line">Out[<span class="number">7</span>]: </span><br><span class="line">(&lt;__main__.DataDesc at <span class="number">0x7f55399f79d0</span>&gt;,</span><br><span class="line"> &lt;__main__.Test at <span class="number">0x7f55399f62d0</span>&gt;,</span><br><span class="line"> __main__.Test)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: Test.d  ＃调用__get__</span><br><span class="line">Out[<span class="number">8</span>]: (&lt;__main__.DataDesc at <span class="number">0x7f55399f79d0</span>&gt;, <span class="literal">None</span>, __main__.Test)</span><br><span class="line"></span><br><span class="line">n [<span class="number">9</span>]: t.d = <span class="string">'hello'</span> </span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: t.d </span><br><span class="line">Out[<span class="number">10</span>]: <span class="string">'hello'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">11</span>]: Test.d</span><br><span class="line">Out[<span class="number">11</span>]: (&lt;__main__.DataDesc at <span class="number">0x7f55399f79d0</span>&gt;, <span class="literal">None</span>, __main__.Test)</span><br><span class="line"></span><br><span class="line">In [<span class="number">12</span>]: Test.d = <span class="string">'world'</span>  </span><br><span class="line"></span><br><span class="line">In [<span class="number">13</span>]: t.d</span><br><span class="line">Out[<span class="number">13</span>]: <span class="string">'hello'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">14</span>]: Test.d</span><br><span class="line">Out[<span class="number">14</span>]: <span class="string">'world'</span></span><br></pre></td></tr></table></figure>
 
 <p>总结: 通过obj.attr 属性查找策略(优先级)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. attr是自动产生的属性（最高) 如：__class__，__str__</span><br><span class="line">2. 查找obj.__class__.__dict__ 也就是对象obj所在类中存在data descriptor对象(实现了&#96;__get__&#96; 和&#96;__set__&#96;方法),找到就返回&#96;__get__&#96;的执行结果，没有找到就到父类或者祖先类中查找是否有data descirptor,</span><br><span class="line">（实际上就是查找这个类属性是不是data descriptor对象或者父类中是否存在这个对象，如果是就执行__get__方法）</span><br><span class="line">3. 就到obj.__dict__中查找，找到就返回，找不到就进入下一步;</span><br><span class="line">（实际上就是先查找当前类或者父类中有无此属性)</span><br><span class="line">４．在obj.__class__.__dict__中查找是否存在non-data descriptor(仅仅实现了&#96;__get__&#96;方法)，找到就返回&#96;__get__&#96; 的结果，如果找到一个普通属性，就直接返回；找不到就报AttributeError;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. attr是自动产生的属性（最高) 如：__class__，__str__</span><br><span class="line">2. 查找obj.__class__.__dict__ 也就是对象obj所在类中存在data descriptor对象attr(实现了&#96;__get__&#96; 和&#96;__set__&#96;方法),找到就返回&#96;__get__&#96;的执行结果，没有找到就到父类或者祖先类中查找是否有data descirptor,</span><br><span class="line">（实际上就是查找这个类属性是不是有data descriptor对象或者父类中是否存在这个对象，如果是就执行__get__方法）</span><br><span class="line">3. 就到obj.__dict__中查找，找到就返回，找不到就进入下一步;如果obj是一个类，找到descriptor就返回</span><br><span class="line">__get__的执行结果，或者普通属性的值，没有执行下一步；</span><br><span class="line">（实际上就是先查找当前类或者父类中有无此属性)</span><br><span class="line">４．在obj.__class__.__dict__中查找是否存在non-data descriptor(仅仅实现了&#96;__get__&#96;方法)，找到就返回&#96;__get__&#96; 的结果，如果找到一个普通属性，就直接返回；找不到就报AttributeError;</span><br></pre></td></tr></table></figure>
 
 <p>通过obj.attr = value赋值策略：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 查找obj.__class__.__dict__中是否有data descriptor对象，有就调用`__set__` 方法，没有就去父类或者祖先类中查找是否有data descriptor,依然没有就进入下一步；</span><br><span class="line">２．直接在obj.__dict__中加入obj.__dict__[attr] = vlaue;</span><br></pre></td></tr></table></figure>
@@ -380,7 +380,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -393,7 +393,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

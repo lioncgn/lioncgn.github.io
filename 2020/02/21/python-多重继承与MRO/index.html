@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="python多重继承,混入(Mixin),以及MRO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 多重继承与MRO">
+<meta property="og:url" content="http://yoursite.com/2020/02/21/python-%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8EMRO/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="python多重继承,混入(Mixin),以及MRO">
+<meta property="og:image" content="https://raw.githubusercontent.com/lioncgn/upload_images/master/mul.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lioncgn/upload_images/master/new.png">
+<meta property="article:published_time" content="2020-02-21T03:01:07.000Z">
+<meta property="article:modified_time" content="2020-02-21T13:37:09.721Z">
+<meta property="article:author" content="cgn">
+<meta property="article:tag" content="MRO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lioncgn/upload_images/master/mul.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/21/python-%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8EMRO/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>python 多重继承与MRO | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/21/python-%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF%E4%B8%8EMRO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python 多重继承与MRO
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-21 11:01:07 / 修改时间：21:37:09" itemprop="dateCreated datePublished" datetime="2020-02-21T11:01:07+08:00">2020-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="python多重继承-混入-Mixin-以及MRO"><a href="#python多重继承-混入-Mixin-以及MRO" class="headerlink" title="python多重继承,混入(Mixin),以及MRO"></a><center>python多重继承,混入(Mixin),以及MRO</center></h2><a id="more"></a>
+
+<h3 id="1-不同python版本对Class-不同的解释"><a href="#1-不同python版本对Class-不同的解释" class="headerlink" title="1. 不同python版本对Class 不同的解释"></a>1. 不同python版本对<code>Class</code> 不同的解释</h3><ul>
+<li>python2.7 中存在有经典类和新式类</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">5</span>]: <span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span><span class="keyword">pass</span>  <span class="comment"># 经典类</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">6</span>]: len(dir(A))</span><br><span class="line">Out[<span class="number">6</span>]: <span class="number">2</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: <span class="class"><span class="keyword">class</span> <span class="title">B</span><span class="params">(object)</span>:</span><span class="keyword">pass</span>　<span class="comment"># 新式类</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: len(dir(B))</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">18</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>python3.x版本中,所有定义的类都是新式类，即便写法不一样；</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span><span class="keyword">pass</span>      <span class="comment"># 新式类                                                                                                      </span></span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: len(dir(A))                                                                                                              </span><br><span class="line">Out[<span class="number">2</span>]: <span class="number">26</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: <span class="class"><span class="keyword">class</span> <span class="title">B</span><span class="params">(object)</span>:</span><span class="keyword">pass</span>   <span class="comment"># 新式类                                                                                                  </span></span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: len(dir(B))                                                                                                              </span><br><span class="line">Out[<span class="number">4</span>]: <span class="number">26</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>判断一个实例是否是一个类的对象时</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">isinstance(obj, Class) # 用来判断obj是否是class或者其父类的一个实例；</span><br><span class="line">type(obj) is Class  # 可以用来判断obj是否是Class创建，不能用来判断有继承关系的父类</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>与继承有关的特殊类方法，实例对象没有此方法</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__base__  <span class="comment"># 第一个父类</span></span><br><span class="line">__bases__  <span class="comment"># 父类组成的元祖</span></span><br><span class="line">__mro__ <span class="comment"># 方法解析顺序组成的元祖</span></span><br><span class="line">mro()   <span class="comment"># 返回方法解析顺序组成的列表</span></span><br><span class="line">__subclasses__() <span class="comment"># 类的子类组成的列表</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>私有属性在定义时，就会自动转变为<code>_class__attr</code> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span><span class="params">(object)</span>:</span></span><br><span class="line">	__COUNT = <span class="number">100</span>   <span class="comment"># 内部已经转化为 _Animal__COUNT = 100</span></span><br><span class="line">    HEIGHT = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__ini__</span><span class="params">(self, age, weight, height)</span>:</span></span><br><span class="line">            self.__COUNT += <span class="number">1</span>  <span class="comment"># 内部转化为self._Animal__COUNT = self._Animal__COUNT + 1</span></span><br><span class="line"> <span class="number">10</span>         self.age = age</span><br><span class="line"> <span class="number">11</span>         self.__weight = weight <span class="comment"># 内部转化为　self._Animal__weight = weight</span></span><br><span class="line"> <span class="number">12</span>         self.HEIGHT = height</span><br><span class="line"> <span class="number">13</span>  </span><br><span class="line"> <span class="number">14</span>     <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="number">15</span>         print(<span class="string">'&#123;&#125; eat'</span>.format(self.__class__.__name__))</span><br><span class="line"> <span class="number">16</span>  </span><br><span class="line"> <span class="number">17</span>     <span class="function"><span class="keyword">def</span> <span class="title">__getweight</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="number">18</span>         print(self.__weight) <span class="comment"># self._Animal__weight</span></span><br><span class="line"> <span class="number">19</span>  </span><br><span class="line"> <span class="number">20</span>     @classmethod</span><br><span class="line"> <span class="number">21</span>     <span class="function"><span class="keyword">def</span> <span class="title">showcount1</span><span class="params">(cls)</span>:</span>  </span><br><span class="line"> <span class="number">22</span>         print(cls)</span><br><span class="line"> <span class="number">23</span>         print(cls.__dict__) </span><br><span class="line"> <span class="number">24</span>         print(cls.__COUNT)  <span class="comment"># cls._Animal__COUNT</span></span><br><span class="line"> <span class="number">25</span>  </span><br><span class="line"> <span class="number">26</span>     @classmethod</span><br><span class="line"> <span class="number">27</span>     <span class="function"><span class="keyword">def</span> <span class="title">__showcount2</span><span class="params">(cls)</span>:</span>  <span class="comment"># self._Animal__showcount2(cls)</span></span><br><span class="line"> <span class="number">28</span>         print(cls.__COUNT)</span><br><span class="line"> <span class="number">29</span>  </span><br><span class="line"> <span class="number">30</span>     <span class="function"><span class="keyword">def</span> <span class="title">showcount3</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="number">31</span>         print(self.__COUNT) <span class="comment"># self._Animal__COUNT</span></span><br><span class="line"> <span class="number">32</span>  </span><br><span class="line"> <span class="number">33</span> <span class="class"><span class="keyword">class</span> <span class="title">Cat</span><span class="params">(Animal)</span>:</span></span><br><span class="line"> <span class="number">34</span>     NAME = <span class="string">'CAT'</span>   </span><br><span class="line"> <span class="number">35</span>     __COUNT = <span class="number">200</span>  <span class="comment"># self._Cat__COUNT</span></span><br><span class="line"> c = Cat(<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: c.__dict__</span><br><span class="line">Out[<span class="number">5</span>]: &#123;<span class="string">'HEIGHT'</span>: <span class="number">5</span>, <span class="string">'_Animal__COUNT'</span>: <span class="number">101</span>, <span class="string">'_Animal__weight'</span>: <span class="number">4</span>, <span class="string">'age'</span>: <span class="number">3</span>&#125;</span><br><span class="line"></span><br><span class="line">In [<span class="number">6</span>]: Cat.__dict__</span><br><span class="line">Out[<span class="number">6</span>]: </span><br><span class="line">dict_proxy(&#123;<span class="string">'NAME'</span>: <span class="string">'CAT'</span>,</span><br><span class="line">            <span class="string">'_Cat__COUNT'</span>: <span class="number">200</span>,</span><br><span class="line">            <span class="string">'__doc__'</span>: <span class="literal">None</span>,</span><br><span class="line">            <span class="string">'__module__'</span>: <span class="string">'study_subclass'</span>&#125;)</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: Animal.__dict__</span><br><span class="line">Out[<span class="number">8</span>]: </span><br><span class="line">dict_proxy(&#123;<span class="string">'HEIGHT'</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">'_Animal__COUNT'</span>: <span class="number">100</span>,</span><br><span class="line">            <span class="string">'_Animal__getweight'</span>: &lt;function study_subclass.__getweight&gt;,</span><br><span class="line">            <span class="string">'_Animal__showcount2'</span>: &lt;classmethod at <span class="number">0x7ff0ae878f30</span>&gt;,</span><br><span class="line">            <span class="string">'__dict__'</span>: &lt;attribute <span class="string">'__dict__'</span> of <span class="string">'Animal'</span> objects&gt;,</span><br><span class="line">            <span class="string">'__doc__'</span>: <span class="literal">None</span>,</span><br><span class="line">            <span class="string">'__init__'</span>: &lt;function study_subclass.__init__&gt;,</span><br><span class="line">            <span class="string">'__module__'</span>: <span class="string">'study_subclass'</span>,</span><br><span class="line">            <span class="string">'__weakref__'</span>: &lt;attribute <span class="string">'__weakref__'</span> of <span class="string">'Animal'</span> objects&gt;,</span><br><span class="line">            <span class="string">'eat'</span>: &lt;function study_subclass.eat&gt;,</span><br><span class="line">            <span class="string">'showcount1'</span>: &lt;classmethod at <span class="number">0x7ff0ae878280</span>&gt;,</span><br><span class="line">            <span class="string">'showcount3'</span>: &lt;function study_subclass.showcount3&gt;&#125;)</span><br><span class="line"></span><br><span class="line">In [<span class="number">13</span>]: c.showcount1()  <span class="comment"># 把c的类传入cls中去</span></span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">study_subclass</span>.<span class="title">Cat</span>'&gt;</span></span><br><span class="line">&#123;'__module__': 'study_subclass', '__doc__': None, 'NAME': 'CAT', '_Cat__COUNT': 200&#125;</span><br><span class="line"><span class="number">100</span>　<span class="comment"># 因为Cat.__dict__中没有_Animal__COUNT,所以到父类中找，找到了父类;</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">14</span>]:</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-多重继承问题"><a href="#2-多重继承问题" class="headerlink" title="2. 多重继承问题"></a>2. 多重继承问题</h3><ul>
+<li><p>python支持多继承，但同时也带来了二义性(如何调用哪个父类中的方法)，提供了深度优先（经典类)和广度优先(新式类）策略来解决这样的问题</p>
+</li>
+<li><p>python2.７版本中的经典类中，类没有<code>mro()</code> 方法和<code>__mro__</code>属性，它的MRO执行顺序是这样的</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lioncgn/upload_images/master/mul.png" alt="经典类MRO执行策略"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">上面的执行顺序就是　F--&gt;E---&gt;B--&gt;A--&gt;D，然后Ｃ无法访问到（不知道原因）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>新式类中使用的是 <code>C3算法</code>，解决了经典类中的无法访问到的问题(使用的是<code>深度优先算法</code>)，改进了(<code>广度优先算法</code>)中存在<code>单调性</code>问题（单调性指的就是一旦F(D, E) ,那么在Ｆ的所有子类中，访问顺序都是从D到Ｅ)</p>
+<p>针对上面的继承关系，新式类的MRO顺序是下面这样的：</p>
+<p><img src="https://raw.githubusercontent.com/lioncgn/upload_images/master/new.png" alt="新式类MRO顺序"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">新式类中mro执行顺序Ｆ--&gt;E--&gt;B--&gt;D--&gt;C--&gt;A--object</span><br></pre></td></tr></table></figure>
+
+<p><strong>这里使用了Ｃ3算法，要生成F的继续顺序时(理解为调用mro()),首先将入度为０(指向该节点的箭头数量)的节点放入列表，并将F节点及与它有关的箭头从上图删除；继续寻找入度为０的节点，找到Ｅ和Ｄ,左侧优先的原则，将E放入列表，然后删除；接下来找到B和Ｄ,将Ｂ放入列表；接下来就是Ｄ,然后C,接下来就是Ａ,最后一个元素就是object</strong> </p>
+</li>
+<li><p>多重继承的情况下，可能存在重复调用问题，当每个子类中都使用<code>父类.属性名</code> 调用父类的方法时，父类重复调用, 为了解决这个问题，使用super()这个类就可以解决这个问题；</p>
+</li>
+</ul>
+<h3 id="3-super与MRO"><a href="#3-super与MRO" class="headerlink" title="3.super与MRO"></a>3.super与MRO</h3><ul>
+<li>新式类，都会自带<code>__mro__</code> 属性，当使用super()调用父类的方法时，会按照<code>__mro__</code> 属性中的元素逐个查找方法，如果找到就停止查找，如果没有找到就报错；</li>
+<li>super()是一个类，可以接收的参数如下:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">super() <span class="comment"># 只能在python3中使用，与 super(cls, self)相同</span></span><br><span class="line"><span class="comment"># 第一个参数是类名，第二个参数是一个实例化对象，这个对象可以是子类的实例化对象</span></span><br><span class="line"><span class="comment"># 第一个参数type就是从__mro__找到的那个类的位置开始</span></span><br><span class="line"><span class="comment"># 第二个参数obj,决定的就是用哪个类的__mro__</span></span><br><span class="line">super(type, obj)</span><br><span class="line">super(type1, type2) <span class="comment"># 可以都是类，如果想使用super(F, F), 必须使用super(F, F).f(F())才能使用</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>调用super()类，之所以能够解决上面的问题，关键在于它查找类的方式等同与下面的方式:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里cls就相当于 type, ins 相当于类的实例对象</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">class_query</span><span class="params">(cls, ins)</span>:</span> </span><br><span class="line">	cls_list = ins.__class__.mro()</span><br><span class="line">	<span class="keyword">return</span> cls_list[cls_list.index(cls) + <span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现"><a href="#4-在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现" class="headerlink" title="4. 在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现."></a>4. 在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现.</h3><ul>
+<li>Mixin设计模式的使用原则</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Mixin类不应该显式出现__init__ 初始化方法；</span><br><span class="line">Mixin类通常不能独立工作，混入其他类中的功能实现；</span><br><span class="line">Mixin类的祖先类应该也是Mixin类；</span><br><span class="line">使用Mixin类通常在继承列表的第一个位置；</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MRO/" rel="tag"># MRO</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/20/flask-cookie%E4%BD%BF%E7%94%A8/" rel="prev" title="flask cookie使用">
+      <i class="fa fa-chevron-left"></i> flask cookie使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#python多重继承-混入-Mixin-以及MRO"><span class="nav-number">1.</span> <span class="nav-text">python多重继承,混入(Mixin),以及MRO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-不同python版本对Class-不同的解释"><span class="nav-number">1.1.</span> <span class="nav-text">1. 不同python版本对Class 不同的解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-多重继承问题"><span class="nav-number">1.2.</span> <span class="nav-text">2. 多重继承问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-super与MRO"><span class="nav-number">1.3.</span> <span class="nav-text">3.super与MRO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现"><span class="nav-number">1.4.</span> <span class="nav-text">4. 在看源码过程中，多处使用Mixin设计模式，其实就是多重继承的表现.</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>
