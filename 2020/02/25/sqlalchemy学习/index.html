@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="sqlalchemy学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqlalchemy学习">
+<meta property="og:url" content="http://yoursite.com/2020/02/25/sqlalchemy%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="sqlalchemy学习">
+<meta property="article:published_time" content="2020-02-24T17:40:44.000Z">
+<meta property="article:modified_time" content="2020-02-27T05:59:17.750Z">
+<meta property="article:author" content="cgn">
+<meta property="article:tag" content="sqlalchemy">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/25/sqlalchemy%E5%AD%A6%E4%B9%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>sqlalchemy学习 | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/25/sqlalchemy%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sqlalchemy学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-25 01:40:44" itemprop="dateCreated datePublished" datetime="2020-02-25T01:40:44+08:00">2020-02-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-27 13:59:17" itemprop="dateModified" datetime="2020-02-27T13:59:17+08:00">2020-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="sqlalchemy学习"><a href="#sqlalchemy学习" class="headerlink" title="sqlalchemy学习"></a><center>sqlalchemy学习</center></h3><a id="more"></a>
+
+<h3 id="1-session与scoped-session"><a href="#1-session与scoped-session" class="headerlink" title="1. session与scoped_session"></a>1. session与scoped_session</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scoped_session用在多线程环境下，内部通过threading.local()对象存储session,是线程隔离的,在同一线程中，多次创建的session对象是相同的，也就是可以同时操作同一个数据对象；</span><br><span class="line">而原生的session，多次创建都不同，而数据对象只能add到一个session对象中，不能同时被多个不同的session 操作，只有当一个session.close()之后，这个数据对象才能被其他session使用；</span><br><span class="line">而且同一个数据对象多次add,多次提交，在数据库中也只有一条记录；</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-session中authflash-autocommit参数默认值是什么？意义是什么？"><a href="#2-session中authflash-autocommit参数默认值是什么？意义是什么？" class="headerlink" title="2. session中authflash, autocommit参数默认值是什么？意义是什么？"></a>2. session中authflash, autocommit参数默认值是什么？意义是什么？</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个参数用来表示在执行查询之前，自动将session中累计的状态改变发送到数据库</span></span><br><span class="line"><span class="comment"># 就是执行session.query()之前，会自动执行session.flush(),将session中累计的改变通过sql语句的形式</span></span><br><span class="line"><span class="comment"># 发送到数据库，</span></span><br><span class="line">autoflash = <span class="literal">True</span> <span class="comment">#默认值，</span></span><br><span class="line"><span class="comment"># 因此执行sesion.add()后，在执行session.commit()之前，使用session.query()就能查询到这次的改变；</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 针对事务，不会自动提交，需要手动 session.commit()提交到数据库，</span></span><br><span class="line">autocommit = <span class="literal">False</span> <span class="comment">#默认值</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-常用数据类型："><a href="#3-常用数据类型：" class="headerlink" title="3.常用数据类型："></a>3.常用数据类型：</h3><ul>
+<li>Integer</li>
+<li>Float (默认总共6位)</li>
+<li>Boolean — tinyint</li>
+<li>DECIMAL(10, 6)  —  总共10位，有6位是小数位，超过截取，没超过补0；</li>
+<li>Enum(“python”, “flask”, “django”) 只能取这三个值；</li>
+<li>Date :  使用 datetime.date.today()</li>
+<li>DateTime: 使用 datetime.datetime.now()</li>
+<li>Time: datetime.time(2, 3, 5)</li>
+<li>Text</li>
+<li>LONGTEXT</li>
+</ul>
+<h3 id="4-Column-的常用参数"><a href="#4-Column-的常用参数" class="headerlink" title="4. Column 的常用参数"></a>4. Column 的常用参数</h3><ul>
+<li>primary_key</li>
+<li>autoincrement   # 对于主键自动为True</li>
+<li>nullable 默认为True</li>
+<li>default 设置默认值</li>
+<li>onupdate=datetime.now :当修改带这个参数的字段时，这个字段的此属性将自动更新时间；</li>
+<li>name 参数自定义设置字段名</li>
+</ul>
+<h3 id="5-query参数"><a href="#5-query参数" class="headerlink" title="5. query参数"></a>5. query参数</h3><ul>
+<li>表格类 query(Article)</li>
+<li>表格类对象 query(Article.id, Article.price)</li>
+<li>聚合函数 func.avg(Ariticle.price)</li>
+</ul>
+<h3 id="6-filter-参数"><a href="#6-filter-参数" class="headerlink" title="6. filter 参数"></a>6. filter 参数</h3><ul>
+<li>filter( == )</li>
+<li>filter(!=)</li>
+<li>filter(Article.title.like=’%’)  ilike (大小写无关)</li>
+<li>in_([])  在这里面， 不在这里面是 <code>~ in_([])</code></li>
+<li><code>and_()</code>  </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">filter(and_(Note.body == <span class="string">'foo'</span>, Note.title == <span class="string">'Foo'</span>))</span><br><span class="line">filter(Note.body == <span class="string">'foo'</span>, Note.title == <span class="string">'Foo'</span>)</span><br><span class="line">filter(Note.body == <span class="string">'foo'</span>).filter(Note.title == <span class="string">'Foo'</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>or_()</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filter(or_(Note.body == <span class="string">'foo'</span>, Note.body == <span class="string">'bar'</span>))</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-外键约束的ondelete参数有哪些"><a href="#7-外键约束的ondelete参数有哪些" class="headerlink" title="7.外键约束的ondelete参数有哪些"></a>7.外键约束的ondelete参数有哪些</h3><ul>
+<li><pre><code class="python">uid = Column(Integer, ForeignKey(<span class="string">'user.id'</span>), nullable=<span class="literal">False</span>) <span class="comment"># 下面的功能通过原生的sql得出的，在通过ORM操作时，不一样；</span>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- ondelete&#x3D;&quot;RESTRICT&quot; ,默认值，当删除父表中的对象时，与它有关的子表中的对象因为这个约束不能删除，报错；</span><br><span class="line">- ondelete&#x3D;&quot;NO ACTION&quot;, 行为与&quot;RESTRICT&quot;一致；</span><br><span class="line">- ondelete&#x3D;&quot;CASCADE&quot;  ,当删除父类的对象，与它有关的子表记录也被删除；</span><br><span class="line">- ondelete&#x3D;&quot;SET NULL&quot;, 当删除父类的对象，与它有关的子表记录设置为NULL, 如果此时还设置nullable&#x3D;False,那么不能创建这样的外键；</span><br><span class="line"></span><br><span class="line">### 8. 通过relationship 这个关系属性来获取对应的对象</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;python</span><br><span class="line">class User(Base):</span><br><span class="line">    __tablename__ &#x3D; &#39;user&#39;</span><br><span class="line">    id &#x3D; Column(Integer, primary_key&#x3D;True)</span><br><span class="line">    name &#x3D; Column(String(20))</span><br><span class="line">    # articles &#x3D; relationship(&#39;Article&#39;, backref&#x3D;&#39;user&#39;)</span><br><span class="line">    # 这是关系属性，不会添加到数据库中，可以任意修改它，而不用修改数据库</span><br><span class="line">    # 查看用户的所有文章</span><br><span class="line">    # 可以省略 back_populates&#x3D;&#39;user&#39;这个属性；</span><br><span class="line">    # 一旦使用backref&#x3D;&#39;user&#39;，那么另一侧一定不能再定义user属性，否则报错；</span><br><span class="line">    </span><br><span class="line">    articles &#x3D; relationship(&#39;Article&#39;)  </span><br><span class="line"></span><br><span class="line">    def __repr__(self):</span><br><span class="line">        return &quot;&lt;User&lt;name:%s&gt;&quot; % self.name</span><br><span class="line"></span><br><span class="line">class Article(Base):</span><br><span class="line">    __tablename__ &#x3D; &#39;article&#39;</span><br><span class="line">    id &#x3D; Column(Integer, primary_key&#x3D;True)</span><br><span class="line">    title &#x3D; Column(String(20), nullable&#x3D;False)</span><br><span class="line">    price &#x3D; Column(Float, nullable&#x3D;False)</span><br><span class="line">    # ondelete&#x3D;&quot;RESTRICT&quot;, &quot;NO ACTION&quot;</span><br><span class="line">    # ondelete&#x3D;&quot;CASCADE&quot;</span><br><span class="line">    # ondelete&#x3D;&quot;SET NULL&quot;</span><br><span class="line">    uid &#x3D; Column(Integer, ForeignKey(&#39;user.id&#39;))</span><br><span class="line">    # user &#x3D; relationship(&#39;User&#39;, back_populates&#x3D;&#39;articles&#39;)</span><br><span class="line">    # 查看文章对应的用户</span><br><span class="line">    user &#x3D; relationship(&#39;User&#39;)</span><br><span class="line"></span><br><span class="line">    def __repr__(self):</span><br><span class="line">        return &quot;&lt;Article(title:%s&gt;&quot; % self.title</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 上面的两个表建立联系，除了使用uid的方式</span></span><br><span class="line">article = Article(title=<span class="string">'test'</span>, price=<span class="number">23.42</span>, uid=<span class="number">1</span>) </span><br><span class="line"><span class="comment"># 通过relationship来建立关系</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以为作者的文章赋值：</span></span><br><span class="line">user = User(name=<span class="string">'cgn'</span>)</span><br><span class="line">article1 = Article(title=<span class="string">'三国演义'</span>, price=<span class="number">234.23</span>)</span><br><span class="line">article2 = Article(title=<span class="string">'水浒传'</span>, price=<span class="number">232.10</span>)</span><br><span class="line"></span><br><span class="line">user.articles.append(article1)</span><br><span class="line">user.articles.append(article2)</span><br><span class="line"></span><br><span class="line">session.add(user)</span><br><span class="line">session.commit()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以通过为文章的作者赋值</span></span><br><span class="line">article = Article(title=<span class="string">'红楼梦'</span>, price=<span class="number">23.234</span>)</span><br><span class="line"></span><br><span class="line">user = session.query(User).filter_by(id=<span class="number">1</span>).first()</span><br><span class="line">article.author = user</span><br><span class="line">session.add(article)</span><br><span class="line">session.commit()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如何定义一对一关系：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'user'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    name = Column(String(<span class="number">20</span>))</span><br><span class="line">    articles = relationship(<span class="string">'Article'</span>)</span><br><span class="line">    <span class="comment"># 定义User与UserExtend的一对一关系，通过在没有ForeignKey的这一侧，定义relationship时</span></span><br><span class="line">    <span class="comment"># 使用userlist=False来说明；这时候 user.u_extend没有append方法，只能</span></span><br><span class="line">    <span class="comment"># 通过user.u_extend = userextend_obj 来进行赋值</span></span><br><span class="line">    u_extend = relationship(<span class="string">'UserExtend'</span>, uselist=<span class="literal">False</span>) </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;User&lt;name:%s&gt;"</span> % self.name</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserExtend</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'userextend'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    school = Column(String(<span class="number">20</span>))</span><br><span class="line">    uid = Column(Integer, ForeignKey(<span class="string">'user.id'</span>))</span><br><span class="line">    ue_user = relationship(<span class="string">'User'</span>) <span class="comment"># 默认不能使用 append方法，可以认为默认就是uselist=False</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>简化一对一关系的书写：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在有外键的表中定义关系属性时，使用</span><br><span class="line">ue_user = relationship(<span class="string">'User'</span>, backref=backref(<span class="string">'u_extend'</span>, uselist=<span class="literal">False</span>))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用sql语句删除时，将参考外键的参数进行删除；</li>
+<li><strong>当使用<code>orm</code> 进行删除时，情况有变化：</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果外键的字段可以为NULL，那么将设置NULL, 同时user删除</span></span><br><span class="line"><span class="comment"># 如果外键的字段不可以为NULL, 那么删除时将报错；行为和执行sql语句一样；</span></span><br><span class="line">session.delete(user)  </span><br><span class="line">session.commit()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>还可以使用<code>cascade</code> 参数，定义删除一个父对象时(使用cascade的一侧)，子对象如何操作？</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cascade： 默认取值， save-update, merge</span><br><span class="line">save-update: 作用是，当为父对象执行 session.add()操作时，子对象也同时被添加到session中；</span><br><span class="line">其他参数：</span><br><span class="line">delete: 当父对象执行删除操作时，子对象也将被删除(而在一对多关系时，默认的删除行为是父对象删除时，子对象设置为NULL)</span><br><span class="line">delete-orphan: 参数表示当父对象和子对象关系解除后，子对象也删除(而默认的行为是设置为NULL)</span><br><span class="line"></span><br><span class="line"><span class="comment"># merge的作用就是可以插入并更新数据，当执行merge时候，子对象也将执行merge操作；</span></span><br><span class="line">user = User(name=<span class="string">'testmerge'</span>, id=<span class="number">10</span>)</span><br><span class="line">article1 = Article(title=<span class="string">'test1'</span>, id=<span class="number">32</span>)</span><br><span class="line">article2 = Article(title=<span class="string">'test2'</span>, id=<span class="number">80</span>)</span><br><span class="line">user.articles.append(article1)</span><br><span class="line">user.articles.append(article2)</span><br><span class="line">session.merge(user)</span><br><span class="line">session.commit()</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="9-定义多对多关系"><a href="#9-定义多对多关系" class="headerlink" title="9. 定义多对多关系"></a>9. 定义多对多关系</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">article_tag = Table(</span><br><span class="line">    <span class="string">'article_tag'</span>, </span><br><span class="line">    Base.metadata,</span><br><span class="line">    <span class="comment"># 定义联合主键</span></span><br><span class="line">    Column(<span class="string">'article_id'</span>, Integer, ForeignKey(<span class="string">'article.id'</span>), primary_key=<span class="literal">True</span>),</span><br><span class="line">    Column(<span class="string">'tag_id'</span>, Integer, ForeignKey(<span class="string">'tag.id'</span>), primary_key=<span class="literal">True</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Article</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'article'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    title = Column(String(<span class="number">20</span>), nullable=<span class="literal">False</span>)</span><br><span class="line">    tags = relationship(<span class="string">'Tag'</span>, secondary=article_tag, backref=<span class="string">'articles'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;Article: title:%s"</span> % self.title</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Tag</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'tag'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    name = Column(String(<span class="number">20</span>), nullable=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;Tag: name:%s&gt;"</span> % self.name</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-排序方式"><a href="#10-排序方式" class="headerlink" title="10. 排序方式"></a>10. 排序方式</h3><ul>
+<li>默认升序(asc)</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">articles = session.query(Article).order_by(Article.create_time.desc()).all() <span class="comment"># 倒序</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">articles = session.query(Article).order_by(text(<span class="string">"create_time"</span>)).all() <span class="comment"># 升序</span></span><br></pre></td></tr></table></figure>
+</li>
+<li></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">articles = session.query(Article).order_by(text(<span class="string">"-create_time"</span>)).all() <span class="comment"># 降序</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Article</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'article'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    title = Column(String(<span class="number">20</span>), nullable=<span class="literal">False</span>)</span><br><span class="line">    create_time = Column(DateTime, default=datetime.now)</span><br><span class="line"></span><br><span class="line">    __mapper_args__ = &#123;</span><br><span class="line">        <span class="string">"order_by"</span>: -create_time   <span class="comment"># 倒序  create_time.desc()</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    articles = session.query(<span class="string">'Article'</span>).all()</span><br><span class="line">    print(articles)  <span class="comment"># 按照 __mapper_args__ 的排序方式输出；</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>也可以使用如下方式：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Article</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">'article'</span></span><br><span class="line">    id = Column(Integer, primary_key=<span class="literal">True</span>)</span><br><span class="line">    title = Column(String(<span class="number">20</span>), nullable=<span class="literal">False</span>)</span><br><span class="line">    create_time = Column(DateTime, default=datetime.now)</span><br><span class="line">    uid = Column(Integer, ForeignKey(<span class="string">'user.id'</span>))</span><br><span class="line"></span><br><span class="line">    author = relationship(<span class="string">'User'</span>, backref=backref(<span class="string">'articles'</span>, order_by=create_time.desc()))</span><br></pre></td></tr></table></figure>
+
+<h3 id="11-limit-offset"><a href="#11-limit-offset" class="headerlink" title="11. limit, offset"></a>11. limit, offset</h3><ul>
+<li>取前10篇文章：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">articles = session.query(Article)[<span class="number">0</span>:<span class="number">10</span>]</span><br><span class="line">articles = session.query(Article).offset(<span class="number">10</span>).limit(<span class="number">10</span>).all()</span><br><span class="line">articles = session.query(Article).slice(<span class="number">0</span>, <span class="number">10</span>).all()</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-使用-lazy-’dynamic’"><a href="#12-使用-lazy-’dynamic’" class="headerlink" title="12. 使用 lazy=’dynamic’"></a>12. 使用 lazy=’dynamic’</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当调用关系属性会返回大量的数据记录，并且总是需要对关系属性返回的结果附加额外的查询时才需要使用动态加载：</span><br><span class="line">lazy=<span class="string">'dynamic'</span>;</span><br><span class="line">author = relationship(<span class="string">'User'</span>, backref=backref(<span class="string">'articles'</span>, lazy=<span class="string">'dynamic'</span>))</span><br></pre></td></tr></table></figure>
+
+<h3 id="13-group-by-与having"><a href="#13-group-by-与having" class="headerlink" title="13. group_by  与having"></a>13. group_by  与having</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询每个年龄段中年龄小于18的人数；</span></span><br><span class="line">session.query(User.age, func.count(User.id)).group_by(User.age).having(User.age &lt; <span class="number">18</span>).all()</span><br></pre></td></tr></table></figure>
+
+<h3 id="14-join"><a href="#14-join" class="headerlink" title="14. join"></a>14. join</h3><ul>
+<li>join是内连接</li>
+<li>按照用户发表的文章数量进行排序，如果文章数量相同，按照id的降序排序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">session.query(User).join(Article, User.id == Article.uid).group_by(User.id).order_by(func.count(Article.id).desc(), User.id.desc()).all()</span><br></pre></td></tr></table></figure>
+
+<h3 id="15-子查询"><a href="#15-子查询" class="headerlink" title="15. 子查询"></a>15. 子查询</h3><ul>
+<li>一次查询的条件依赖于另一个查询的结果时，就是子查询</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用两次查询，传统上</span></span><br><span class="line">user = session.query(User).filter_by(username=<span class="string">'李四'</span>).first()</span><br><span class="line">result = session.query(User).filter_by(city=user.city, age=user.age).all()</span><br><span class="line"><span class="keyword">print</span> result</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用子查询， 只查找一次</span></span><br><span class="line">stmt = session.query(User.city.label(<span class="string">'city'</span>), User.age.label(<span class="string">'age'</span>)).filter_by(username=<span class="string">'李四'</span>).subquery()</span><br><span class="line"></span><br><span class="line">result = session.query(User).filter(User.city == stmt.c.city, User.age == stmt.c.age).all()</span><br><span class="line"><span class="keyword">print</span> result</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/sqlalchemy/" rel="tag"># sqlalchemy</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/22/flask-wtforms-%E7%BB%84%E4%BB%B6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="prev" title="flask wtfroms 组件源码分析">
+      <i class="fa fa-chevron-left"></i> flask wtfroms 组件源码分析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/27/flask-sqlalchemy%E4%B8%8Ealembic%E5%AD%A6%E4%B9%A0/" rel="next" title="flask-sqlalchemy与alembic学习">
+      flask-sqlalchemy与alembic学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlalchemy学习"><span class="nav-number">1.</span> <span class="nav-text">sqlalchemy学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-session与scoped-session"><span class="nav-number">2.</span> <span class="nav-text">1. session与scoped_session</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-session中authflash-autocommit参数默认值是什么？意义是什么？"><span class="nav-number">3.</span> <span class="nav-text">2. session中authflash, autocommit参数默认值是什么？意义是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-常用数据类型："><span class="nav-number">4.</span> <span class="nav-text">3.常用数据类型：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Column-的常用参数"><span class="nav-number">5.</span> <span class="nav-text">4. Column 的常用参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-query参数"><span class="nav-number">6.</span> <span class="nav-text">5. query参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-filter-参数"><span class="nav-number">7.</span> <span class="nav-text">6. filter 参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-外键约束的ondelete参数有哪些"><span class="nav-number">8.</span> <span class="nav-text">7.外键约束的ondelete参数有哪些</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-定义多对多关系"><span class="nav-number">9.</span> <span class="nav-text">9. 定义多对多关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-排序方式"><span class="nav-number">10.</span> <span class="nav-text">10. 排序方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-limit-offset"><span class="nav-number">11.</span> <span class="nav-text">11. limit, offset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-使用-lazy-’dynamic’"><span class="nav-number">12.</span> <span class="nav-text">12. 使用 lazy&#x3D;’dynamic’</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-group-by-与having"><span class="nav-number">13.</span> <span class="nav-text">13. group_by  与having</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-join"><span class="nav-number">14.</span> <span class="nav-text">14. join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-子查询"><span class="nav-number">15.</span> <span class="nav-text">15. 子查询</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>
