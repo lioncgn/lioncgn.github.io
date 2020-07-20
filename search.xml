@@ -149,7 +149,13 @@
 </li>
 </ul>
 </li>
+<li><p>flask 这种将<code>session</code> 存储在客户端的默认方式，并不安全，即使不知道密钥的情况下也可以轻易的解析出数据来，因此，不能用来存储敏感数据，或者存储到其他地方</p>
+</li>
 </ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> itsdangerous <span class="keyword">import</span> base64_decode</span><br><span class="line">s = <span class="string">'eyJ0ZXN0IjoiaGVsbG8ifQ.XxUYlQ.2J3BtV8aACUDCaddD-ZxFlIEtRI'</span></span><br><span class="line">data, timestamp, secret = s.split(<span class="string">'.'</span>)</span><br><span class="line">base64_decode(data)</span><br><span class="line"><span class="comment"># 就可以解析出 '&#123;"test":"hello"&#125;'</span></span><br></pre></td></tr></table></figure>
+
+
+
 <h2 id="5-使用第三方插件，将session-存放到redis-中如何操作"><a href="#5-使用第三方插件，将session-存放到redis-中如何操作" class="headerlink" title="5. 使用第三方插件，将session 存放到redis 中如何操作"></a>5. 使用第三方插件，将<code>session</code> 存放到<code>redis</code> 中如何操作</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_session <span class="keyword">import</span> Session</span><br><span class="line"><span class="keyword">from</span> redis <span class="keyword">import</span> Redis</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.secret_key = <span class="string">'test'</span></span><br><span class="line">app.config[<span class="string">'SESSION_TYPE'</span>] = <span class="string">'redis'</span></span><br><span class="line">app.config[<span class="string">'SESSION_REDIS'</span>] = Redis(password=<span class="string">'studyredis'</span>)</span><br><span class="line"></span><br><span class="line">sess = Session(app)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    print(session)</span><br><span class="line">    session[<span class="string">'test'</span>] = <span class="string">'hello'</span> <span class="comment">#此时就能在redis数据库中找到session: 开头的key；</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hello world"</span></span><br></pre></td></tr></table></figure>
 
 ]]></content>
