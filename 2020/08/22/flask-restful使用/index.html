@@ -46,14 +46,19 @@
   };
 </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="你的眼神">
-<meta property="og:url" content="http://yoursite.com/tags/cookie/index.html">
+  <meta name="description" content="Flask_restful使用1. Rest API规范是什么，在falsk中究竟如何实现？2. flask中如何基于蓝图来实现rest api3. flask restful如何对请求的数据进行类型检查？12345678910111213141516171.使用url定义资源，一般会将api作为url前缀或者将api加入主机名中，作为子域名；# http:&#x2F;&#x2F;example.com&#x2F;api  u">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask_restful使用">
+<meta property="og:url" content="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="Flask_restful使用1. Rest API规范是什么，在falsk中究竟如何实现？2. flask中如何基于蓝图来实现rest api3. flask restful如何对请求的数据进行类型检查？12345678910111213141516171.使用url定义资源，一般会将api作为url前缀或者将api加入主机名中，作为子域名；# http:&#x2F;&#x2F;example.com&#x2F;api  u">
+<meta property="article:published_time" content="2020-08-22T02:59:28.000Z">
+<meta property="article:modified_time" content="2020-08-23T09:32:08.811Z">
 <meta property="article:author" content="cgn">
+<meta property="article:tag" content="flask">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/tags/cookie/">
+<link rel="canonical" href="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/">
 
 
 <script id="page-configurations">
@@ -61,11 +66,11 @@
   CONFIG.page = {
     sidebar: "",
     isHome: false,
-    isPost: false
+    isPost: true
   };
 </script>
 
-  <title>标签: cookie | 你的眼神</title>
+  <title>flask_restful使用 | 你的眼神</title>
   
 
 
@@ -202,50 +207,109 @@
           <div class="content">
             
 
+  <div class="posts-expand">
+      
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h1 class="collection-header">cookie
-          <small>标签</small>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/sister.jpeg">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          flask_restful使用
         </h1>
-      </div>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-22 10:59:28" itemprop="dateCreated datePublished" datetime="2020-08-22T10:59:28+08:00">2020-08-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-23 17:32:08" itemprop="dateModified" datetime="2020-08-23T17:32:08+08:00">2020-08-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <h1 class="collection-header">2020</h1>
+        <h1 id="Flask-restful使用"><a href="#Flask-restful使用" class="headerlink" title="Flask_restful使用"></a><center>Flask_restful使用</center></h1><h2 id="1-Rest-API规范是什么，在falsk中究竟如何实现？"><a href="#1-Rest-API规范是什么，在falsk中究竟如何实现？" class="headerlink" title="1. Rest API规范是什么，在falsk中究竟如何实现？"></a>1. Rest API规范是什么，在falsk中究竟如何实现？</h2><h2 id="2-flask中如何基于蓝图来实现rest-api"><a href="#2-flask中如何基于蓝图来实现rest-api" class="headerlink" title="2. flask中如何基于蓝图来实现rest api"></a>2. flask中如何基于蓝图来实现rest api</h2><h2 id="3-flask-restful如何对请求的数据进行类型检查？"><a href="#3-flask-restful如何对请求的数据进行类型检查？" class="headerlink" title="3. flask restful如何对请求的数据进行类型检查？"></a>3. flask restful如何对请求的数据进行类型检查？</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>使用url定义资源，一般会将api作为url前缀或者将api加入主机名中，作为子域名；</span><br><span class="line"><span class="comment"># http://example.com/api  url前缀</span></span><br><span class="line"><span class="comment"># http://api.example.com  子域名</span></span><br><span class="line"><span class="number">2.</span>使用http方法描述操作</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取资源集合或者集合中某个元素，使用get方法，返回响应： 资源的表现层，200响应</span></span><br><span class="line"><span class="comment"># 集合中创建一个新成员，使用post方法，返回的响应是：指向新地址的表现层，首部Location字段为指向资源的url,201响应</span></span><br><span class="line"><span class="comment"># put方法： 更新某个资源，提供完整的资源数据，返回响应：空数据，204响应</span></span><br><span class="line"><span class="comment"># patch方法： 更新某个资源，只提供更新部分的数据，返回响应：空数据，204响应（No Content)</span></span><br><span class="line"><span class="comment"># delete方法：删除某个资源，(请求被接收，删除操作未执行，返回202（Accepted)响应；删除操作已经执行，返回204响应；删除操作已经执行，返回包含状态信息的表现层，返回200响应；</span></span><br><span class="line"><span class="number">3.</span>使用json交换数据</span><br><span class="line"><span class="number">4.</span>设置api版本</span><br><span class="line"><span class="comment"># 可以通过添加url前缀或者直接使用子域名来实现</span></span><br><span class="line"><span class="comment"># http://example.com/v1</span></span><br><span class="line"><span class="comment"># http://example.com/v2</span></span><br><span class="line"><span class="comment"># http://v1.example.com</span></span><br><span class="line"><span class="comment"># http://v2.example.com</span></span><br></pre></td></tr></table></figure>
+
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-02-20T18:09:19+08:00"
-              content="2020-02-20">
-          02-20
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/flask/" rel="tag"># flask</a>
+          </div>
 
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/02/20/flask-cookie%E4%BD%BF%E7%94%A8/" itemprop="url">
-            <span itemprop="name">flask cookie使用</span>
-          </a>
-      </h2>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/21/signal/" rel="prev" title="flask中使用signal">
+      <i class="fa fa-chevron-left"></i> flask中使用signal
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/23/django%E4%B8%AD%E7%9A%84%E7%BA%A7%E8%81%94%E6%93%8D%E4%BD%9C/" rel="next" title="django中的级联操作">
+      django中的级联操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
   </article>
+  
+  
+  
 
-    </div>
   </div>
-  
-  
-  
-
-  
-
 
 
           </div>
@@ -296,6 +360,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Flask-restful使用"><span class="nav-number">1.</span> <span class="nav-text">Flask_restful使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Rest-API规范是什么，在falsk中究竟如何实现？"><span class="nav-number">1.1.</span> <span class="nav-text">1. Rest API规范是什么，在falsk中究竟如何实现？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-flask中如何基于蓝图来实现rest-api"><span class="nav-number">1.2.</span> <span class="nav-text">2. flask中如何基于蓝图来实现rest api</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-flask-restful如何对请求的数据进行类型检查？"><span class="nav-number">1.3.</span> <span class="nav-text">3. flask restful如何对请求的数据进行类型检查？</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
