@@ -321,7 +321,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-23 17:32:08" itemprop="dateModified" datetime="2020-08-23T17:32:08+08:00">2020-08-23</time>
+                <time title="修改时间：2020-08-29 08:03:50" itemprop="dateModified" datetime="2020-08-29T08:03:50+08:00">2020-08-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -346,9 +346,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Flask-restful使用"><a href="#Flask-restful使用" class="headerlink" title="Flask_restful使用"></a><center>Flask_restful使用</center></h1><h2 id="1-Rest-API规范是什么，在falsk中究竟如何实现？"><a href="#1-Rest-API规范是什么，在falsk中究竟如何实现？" class="headerlink" title="1. Rest API规范是什么，在falsk中究竟如何实现？"></a>1. Rest API规范是什么，在falsk中究竟如何实现？</h2><h2 id="2-flask中如何基于蓝图来实现rest-api"><a href="#2-flask中如何基于蓝图来实现rest-api" class="headerlink" title="2. flask中如何基于蓝图来实现rest api"></a>2. flask中如何基于蓝图来实现rest api</h2><h2 id="3-flask-restful如何对请求的数据进行类型检查？"><a href="#3-flask-restful如何对请求的数据进行类型检查？" class="headerlink" title="3. flask restful如何对请求的数据进行类型检查？"></a>3. flask restful如何对请求的数据进行类型检查？</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>使用url定义资源，一般会将api作为url前缀或者将api加入主机名中，作为子域名；</span><br><span class="line"><span class="comment"># http://example.com/api  url前缀</span></span><br><span class="line"><span class="comment"># http://api.example.com  子域名</span></span><br><span class="line"><span class="number">2.</span>使用http方法描述操作</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取资源集合或者集合中某个元素，使用get方法，返回响应： 资源的表现层，200响应</span></span><br><span class="line"><span class="comment"># 集合中创建一个新成员，使用post方法，返回的响应是：指向新地址的表现层，首部Location字段为指向资源的url,201响应</span></span><br><span class="line"><span class="comment"># put方法： 更新某个资源，提供完整的资源数据，返回响应：空数据，204响应</span></span><br><span class="line"><span class="comment"># patch方法： 更新某个资源，只提供更新部分的数据，返回响应：空数据，204响应（No Content)</span></span><br><span class="line"><span class="comment"># delete方法：删除某个资源，(请求被接收，删除操作未执行，返回202（Accepted)响应；删除操作已经执行，返回204响应；删除操作已经执行，返回包含状态信息的表现层，返回200响应；</span></span><br><span class="line"><span class="number">3.</span>使用json交换数据</span><br><span class="line"><span class="number">4.</span>设置api版本</span><br><span class="line"><span class="comment"># 可以通过添加url前缀或者直接使用子域名来实现</span></span><br><span class="line"><span class="comment"># http://example.com/v1</span></span><br><span class="line"><span class="comment"># http://example.com/v2</span></span><br><span class="line"><span class="comment"># http://v1.example.com</span></span><br><span class="line"><span class="comment"># http://v2.example.com</span></span><br></pre></td></tr></table></figure>
-
-
+          <h1 id="Flask-restful使用"><a href="#Flask-restful使用" class="headerlink" title="Flask_restful使用"></a><center>Flask_restful使用</center></h1>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -390,10 +396,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-08-21 17:52:56 / 修改时间：18:08:00" itemprop="dateCreated datePublished" datetime="2020-08-21T17:52:56+08:00">2020-08-21</time>
+              <time title="创建时间：2020-08-21 17:52:56" itemprop="dateCreated datePublished" datetime="2020-08-21T17:52:56+08:00">2020-08-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-29 08:06:33" itemprop="dateModified" datetime="2020-08-29T08:06:33+08:00">2020-08-29</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -417,11 +429,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Flask中如何使用信号"><a href="#Flask中如何使用信号" class="headerlink" title="Flask中如何使用信号"></a><center>Flask中如何使用信号</center></h1><h2 id="1-自定义信号"><a href="#1-自定义信号" class="headerlink" title="1. 自定义信号"></a>1. 自定义信号</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.定义信号：</span></span><br><span class="line"><span class="keyword">from</span> blinker <span class="keyword">import</span> Namespace</span><br><span class="line">namespace = Namespace()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个信号</span></span><br><span class="line">test_signal = namespace.signal(<span class="string">'test_signal'</span>）</span><br><span class="line">                               </span><br><span class="line"><span class="comment"># 定义信号处理函数（至少一个位置参数sender),根据发送信号函数传入的参数来决定是否带参数，不确定的话，使用**kwargs来接收任意多个参数）                              </span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">request_start</span><span class="params">(sender, access_log)</span>:</span> <span class="comment"># 参数名和发送函数的参数名要一致</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'access.log'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(access_log + <span class="string">'\n'</span>)</span><br><span class="line">                    </span><br><span class="line"><span class="comment"># 订阅一个信号</span></span><br><span class="line">test_signal.connect(request_start)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 发送信号 </span></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    log_str = access_log(index.__name__)</span><br><span class="line">    test_signal.send(<span class="string">'test'</span>, access_log=log_str)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'hello world'</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="2-flask内置信号使用"><a href="#2-flask内置信号使用" class="headerlink" title="2. flask内置信号使用"></a>2. flask内置信号使用</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> template_rendered, before_render_template, got_request_exception</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_template_rendered</span><span class="params">(sender, **kwargs)</span>:</span></span><br><span class="line">    print(sender)</span><br><span class="line">    print(kwargs)</span><br><span class="line">    print(<span class="string">'template rendered'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_before_render</span><span class="params">(sender, **kwargs)</span>:</span></span><br><span class="line">    print(sender)</span><br><span class="line">    print(kwargs)</span><br><span class="line">    print(<span class="string">'before render'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">r_exc_log</span><span class="params">(sender, *args, **kwargs)</span>:</span></span><br><span class="line">    print(sender)</span><br><span class="line">    print(args)</span><br><span class="line">    print(kwargs)</span><br><span class="line"></span><br><span class="line">template_rendered.connect(test_template_rendered) <span class="comment"># 当模板渲染完成后将触发这里的信号</span></span><br><span class="line">before_render_template.connect(test_before_render)<span class="comment"># 当模板渲染之前触发</span></span><br><span class="line">got_request_exception.connect(r_exc_log)<span class="comment"># 在请求过程中抛出异常触发</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/render')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_render</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'test.html'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/error')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_error</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">raise</span> TypeError</span><br></pre></td></tr></table></figure>
-
-
+          <h1 id="Flask中如何使用信号"><a href="#Flask中如何使用信号" class="headerlink" title="Flask中如何使用信号"></a><center>Flask中如何使用信号</center></h1>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/21/signal/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
