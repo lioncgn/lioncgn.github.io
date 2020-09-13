@@ -46,19 +46,19 @@
   };
 </script>
 
-  <meta name="description" content="rabbitmq初学习">
+  <meta name="description" content="Django缓存框架">
 <meta property="og:type" content="article">
-<meta property="og:title" content="rabbitmq初学习">
-<meta property="og:url" content="http://yoursite.com/2020/02/15/rabbitmq%E5%88%9D%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:title" content="django缓存">
+<meta property="og:url" content="http://yoursite.com/2020/09/08/django%E7%BC%93%E5%AD%98/index.html">
 <meta property="og:site_name" content="你的眼神">
-<meta property="og:description" content="rabbitmq初学习">
-<meta property="article:published_time" content="2020-02-15T13:52:31.000Z">
-<meta property="article:modified_time" content="2020-02-17T10:03:04.207Z">
+<meta property="og:description" content="Django缓存框架">
+<meta property="article:published_time" content="2020-09-08T02:07:03.000Z">
+<meta property="article:modified_time" content="2020-09-13T14:03:56.075Z">
 <meta property="article:author" content="cgn">
-<meta property="article:tag" content="MQ">
+<meta property="article:tag" content="django">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/02/15/rabbitmq%E5%88%9D%E5%AD%A6%E4%B9%A0/">
+<link rel="canonical" href="http://yoursite.com/2020/09/08/django%E7%BC%93%E5%AD%98/">
 
 
 <script id="page-configurations">
@@ -70,7 +70,7 @@
   };
 </script>
 
-  <title>rabbitmq初学习 | 你的眼神</title>
+  <title>django缓存 | 你的眼神</title>
   
 
 
@@ -212,7 +212,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/15/rabbitmq%E5%88%9D%E5%AD%A6%E4%B9%A0/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/08/django%E7%BC%93%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/sister.jpeg">
@@ -225,7 +225,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          rabbitmq初学习
+          django缓存
         </h1>
 
         <div class="post-meta">
@@ -235,14 +235,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-15 21:52:31" itemprop="dateCreated datePublished" datetime="2020-02-15T21:52:31+08:00">2020-02-15</time>
+              <time title="创建时间：2020-09-08 10:07:03" itemprop="dateCreated datePublished" datetime="2020-09-08T10:07:03+08:00">2020-09-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-17 18:03:04" itemprop="dateModified" datetime="2020-02-17T18:03:04+08:00">2020-02-17</time>
+                <time title="修改时间：2020-09-13 22:03:56" itemprop="dateModified" datetime="2020-09-13T22:03:56+08:00">2020-09-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -250,8 +250,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/celery/" itemprop="url" rel="index">
-                    <span itemprop="name">celery</span>
+                  <a href="/categories/django/" itemprop="url" rel="index">
+                    <span itemprop="name">django</span>
                   </a>
                 </span>
             </span>
@@ -274,31 +274,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="rabbitmq初学习"><a href="#rabbitmq初学习" class="headerlink" title=" rabbitmq初学习"></a><center> rabbitmq初学习</center></h2><a id="more"></a>
-<p>学习地址: <a href="https://www.rabbitmq.com/tutorials/tutorial-one-python.html" target="_blank" rel="noopener">rabbitmq在python中的使用</a> </p>
-<p>AMQP消息路由必须有三部分:交换器，队列和绑定；</p>
-<p>生产者将消息发布到交换器上，消息最终到达队列，并被消费者接收；绑定决定了消息如何从交换器路由到特定的队列。</p>
-<p>1.目录结构</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">study_rabbitmq/</span><br><span class="line">├── receive_message.py</span><br><span class="line">└── send_message.py</span><br></pre></td></tr></table></figure>
+        <h1 id="Django缓存框架"><a href="#Django缓存框架" class="headerlink" title="Django缓存框架"></a><center>Django缓存框架</center></h1><a id="more"></a>
 
-<ol start="2">
-<li>receive_message.py</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="comment">#!/usr/bin/env python</span></span><br><span class="line"> <span class="number">2</span> <span class="comment"># -*- coding=utf-8 -*-</span></span><br><span class="line"> <span class="number">3</span> <span class="keyword">import</span> pika</span><br><span class="line"> <span class="number">4</span>  </span><br><span class="line"> <span class="number">5</span> connection = pika.BlockingConnection(pika.ConnectionParameters(<span class="string">'localhost'</span>))</span><br><span class="line"> <span class="number">6</span>  </span><br><span class="line"> <span class="number">7</span> channel = connection.channel()　＃发送消息都要通过信道</span><br><span class="line"> <span class="number">8</span> <span class="comment"># 这个code不必重复使用，如果我们已经确定这个hello队列已经存在的话，如果不确定，那么就需要写上(可重复使用，只在第一次被创建)</span></span><br><span class="line"> <span class="number">9</span> channel.queue_declare(queue=<span class="string">'hello'</span>)　＃创建队列</span><br><span class="line"><span class="number">10</span>  </span><br><span class="line"><span class="number">11</span>  </span><br><span class="line"><span class="number">12</span> <span class="comment"># 无论何时接收到消息，回调函数都将被调用</span></span><br><span class="line"><span class="number">13</span> <span class="function"><span class="keyword">def</span> <span class="title">callback</span><span class="params">(ch, method, properties, body)</span>:</span></span><br><span class="line"><span class="number">14</span>     print(<span class="string">"[x] Received %r"</span> % body)</span><br><span class="line"><span class="number">15</span>  </span><br><span class="line"><span class="number">16</span> <span class="comment"># 从'hello'这个队列中接收消息，同时对于接收到的消息都要确认(通过auto_ack=True自动确认)</span></span><br><span class="line">＃ 确认之后rabbitmq 才会把这条消息从队列中删除掉；</span><br><span class="line"><span class="number">17</span> channel.basic_consume(queue=<span class="string">'hello'</span>, on_message_callback=callback, auto_ack=<span class="literal">True</span>)</span><br><span class="line"><span class="number">18</span>  </span><br><span class="line"><span class="number">19</span> print(<span class="string">"[*] Waiting for messages.To exit press CTRL+C"</span>)</span><br><span class="line"><span class="number">20</span> <span class="comment"># 开启循环等待消息到来,调用回调函数</span></span><br><span class="line"><span class="number">21</span> channel.start_consuming()</span><br></pre></td></tr></table></figure>
+<h2 id="1-Django官方文档位置-django缓存"><a href="#1-Django官方文档位置-django缓存" class="headerlink" title="1. Django官方文档位置 django缓存"></a>1. Django官方文档位置 <a href="https://docs.djangoproject.com/en/3.1/topics/cache/" target="_blank" rel="noopener">django缓存</a></h2><h2 id="2-Django提供的内置缓存后端"><a href="#2-Django提供的内置缓存后端" class="headerlink" title="2. Django提供的内置缓存后端"></a>2. Django提供的内置缓存后端</h2><ul>
+<li>database cache</li>
+<li>filesystem cache</li>
+<li>dummy cache</li>
+<li>memcache </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用数据库缓存</span></span><br><span class="line">CACHES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django.core.cache.backends.db.DatabaseCache'</span>,</span><br><span class="line">        <span class="string">'LOCATION'</span>: <span class="string">'test_cache'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立缓存表</span></span><br><span class="line">python manage.py createcachetable test_cache --dry-run <span class="comment">#查看建表语句</span></span><br><span class="line">python manage.py createcachetable test_cache  <span class="comment"># 创建缓存表</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 缓存使用</span></span><br><span class="line"><span class="comment"># 针对视图函数的使用</span></span><br><span class="line"><span class="comment"># timeout位置参数，时间s</span></span><br><span class="line"><span class="comment"># cache缓存后端，默认值 default</span></span><br><span class="line"><span class="comment"># key_prefix: 缓存key前缀</span></span><br><span class="line"><span class="meta">@cache_page(timeout, cache=default, key_prefix=None)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 缓存某个key的使用</span></span><br><span class="line">value = cache.get(<span class="string">'key'</span>)</span><br><span class="line"><span class="keyword">if</span> value:</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(value)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    cache.set(<span class="string">'key'</span>, <span class="string">'hello, world'</span>, timeout=DEFAULT_TIMEOUT, version=<span class="literal">None</span>)</span><br><span class="line">    </span><br><span class="line">cache.add(<span class="string">'test_key'</span>, <span class="string">'new value'</span>) </span><br><span class="line"><span class="comment"># 当test_key不存在，添加这个key,返回True,</span></span><br><span class="line"><span class="comment"># 当test_key存在，返回False,不会添加或者修改已存在的test_key</span></span><br><span class="line">cache.get_many</span><br><span class="line">cache.set_many</span><br><span class="line">cache.delete(key, version=<span class="literal">None</span>) <span class="comment"># 删除指定的key，返回None,当key不存在，也返回None</span></span><br><span class="line">cache.delete_many()</span><br><span class="line">cache.clear() <span class="comment"># 删除所有key</span></span><br></pre></td></tr></table></figure>
 
-<ol start="3">
-<li>send_message.py</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="comment">#!/usr/bin/env python</span></span><br><span class="line"> <span class="number">2</span> <span class="comment"># -*- coding=utf-8 -*-</span></span><br><span class="line"> <span class="number">3</span> <span class="keyword">import</span> time</span><br><span class="line"> <span class="number">4</span> <span class="keyword">import</span> pika</span><br><span class="line"> <span class="number">5</span>  </span><br><span class="line"> <span class="number">6</span> <span class="comment"># 建立与rabbitmq server的连接</span></span><br><span class="line"> <span class="number">7</span> connection = pika.BlockingConnection(pika.ConnectionParameters(<span class="string">'localhost'</span>))</span><br><span class="line"> <span class="number">8</span> channel = connection.channel()</span><br><span class="line"> <span class="number">9</span> <span class="comment"># 创建一个接收我们消息的queue</span></span><br><span class="line"><span class="number">10</span> channel.queue_declare(queue=<span class="string">'hello'</span>)</span><br><span class="line"><span class="number">11</span> <span class="comment"># rabbitmq 不能直接发送消息到队列中，必须通过exchange,这里使用默认exchange(一个空字符串)</span></span><br><span class="line"><span class="number">12</span> <span class="comment"># routing_key 指定队列的名字，使用这个交换器根据routing_key决定将消息发送到哪个队列中</span></span><br><span class="line"><span class="number">13</span> channel.basic_publish(exchange=<span class="string">''</span>, routing_key=<span class="string">'hello'</span>, body=<span class="string">'hello world!'</span>)</span><br><span class="line"><span class="number">14</span>  </span><br><span class="line"><span class="number">15</span> print(<span class="string">"[x] Sent 'hello world!'"</span>)</span><br><span class="line"><span class="number">16</span> connection.close()</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li>执行过程</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.启动 consumer</span></span><br><span class="line">cgn@cgn-Lenovo-S40<span class="number">-70</span>:~/study_rabbitmq$ python receive_message.py </span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages.To exit press CTRL+C</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.打开另一个终端启动　producer</span></span><br><span class="line">cgn@cgn-Lenovo-S40<span class="number">-70</span>:~/study_rabbitmq$ python send_message.py </span><br><span class="line">[x] Sent <span class="string">'hello world!'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 查看队列情况</span></span><br><span class="line"> sudo rabbitmqctl list_queues</span><br><span class="line"> hello	<span class="number">0</span></span><br><span class="line"></span><br><span class="line">＃４．查看消息是否被接收，消息被处理后是否发送确认标志</span><br><span class="line">~/study_rabbitmq$ sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged</span><br><span class="line">hello	<span class="number">0</span>	<span class="number">0</span></span><br><span class="line">＃ <span class="number">5.</span> 可以使用如下命令删除这个没有意义的队列</span><br><span class="line">sudo rabbitmqctl stop_app</span><br><span class="line">sudo rabbitmqctl reset</span><br><span class="line">sudo rabbitmqctl start_app</span><br></pre></td></tr></table></figure>
-
-
-
-
+<h2 id="3-Django使用第三方-django-redis-作为缓存后端"><a href="#3-Django使用第三方-django-redis-作为缓存后端" class="headerlink" title="3. Django使用第三方 django-redis 作为缓存后端"></a>3. Django使用第三方 django-redis 作为缓存后端</h2><p> 查看<a href="https://github.com/jazzband/django-redis/blob/master/CHANGES.rst" target="_blank" rel="noopener">django-redis各个版本的改变</a>，找到适合Django版本的django-redis</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 django-redis为了支持 django1.11版本的使用，使用4.8.0版本</span></span><br><span class="line"><span class="comment"># 最新的django-redis 至少需要 django 2.2</span></span><br><span class="line"> pipenv install django-redis==<span class="number">4.8</span><span class="number">.0</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">#配置</span></span><br><span class="line">CACHES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="comment"># 'BACKEND': 'django.core.cache.backends.db.DatabaseCache',</span></span><br><span class="line">        <span class="comment"># 'LOCATION': 'test_cache',</span></span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django_redis.cache.RedisCache'</span>,</span><br><span class="line">        <span class="string">'LOCATION'</span>: <span class="string">'redis://127.0.0.1:6379/1'</span>,</span><br><span class="line">        <span class="string">'OPTIONS'</span>: &#123;</span><br><span class="line">            <span class="string">'CLIENT_CLASS'</span>: <span class="string">'django_redis.client.DefaultClient'</span>,</span><br><span class="line">            <span class="string">'PASSWORD'</span>: <span class="string">'test'</span>,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#其他的不需要改变，</span></span><br></pre></td></tr></table></figure>
 
 
     </div>
@@ -309,7 +296,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/MQ/" rel="tag"># MQ</a>
+              <a href="/tags/django/" rel="tag"># django</a>
           </div>
 
         
@@ -318,12 +305,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/08/celery%E5%88%9D%E8%AE%A4%E8%AF%86/" rel="prev" title="celery初认识">
-      <i class="fa fa-chevron-left"></i> celery初认识
+    <a href="/2020/08/29/django%E4%B8%ADcsrf%E4%BD%BF%E7%94%A8/" rel="prev" title="django中csrf使用">
+      <i class="fa fa-chevron-left"></i> django中csrf使用
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/02/15/django-with-celery%E4%BD%BF%E7%94%A8/" rel="next" title="Django with celery使用">
-      Django with celery使用 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/09/08/django%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="next" title="django中间件">
+      django中间件 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -384,7 +371,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rabbitmq初学习"><span class="nav-number">1.</span> <span class="nav-text"> rabbitmq初学习</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Django缓存框架"><span class="nav-number">1.</span> <span class="nav-text">Django缓存框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Django官方文档位置-django缓存"><span class="nav-number">1.1.</span> <span class="nav-text">1. Django官方文档位置 django缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Django提供的内置缓存后端"><span class="nav-number">1.2.</span> <span class="nav-text">2. Django提供的内置缓存后端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Django使用第三方-django-redis-作为缓存后端"><span class="nav-number">1.3.</span> <span class="nav-text">3. Django使用第三方 django-redis 作为缓存后端</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
