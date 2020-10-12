@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/cloudauth.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/cloudauth-small.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="redis 再学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis 再学习">
+<meta property="og:url" content="http://yoursite.com/2020/10/12/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="redis 再学习">
+<meta property="article:published_time" content="2020-10-12T09:56:32.792Z">
+<meta property="article:modified_time" content="2020-10-12T09:56:32.792Z">
+<meta property="article:author" content="cgn">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/10/12/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>redis 再学习 | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">22</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/lioncgn" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/sister.jpeg">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis 再学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-12 17:56:32" itemprop="dateCreated datePublished" datetime="2020-10-12T17:56:32+08:00">2020-10-12</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="redis-再学习"><a href="#redis-再学习" class="headerlink" title=" redis 再学习 "></a><center> redis 再学习 </center></h1><a id="more"></a>
+
+<h2 id="1-基本命令"><a href="#1-基本命令" class="headerlink" title="1. 基本命令"></a>1. 基本命令</h2><ul>
+<li><p>通过命令行方式查看和设置配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; info server</span><br><span class="line"><span class="meta">#</span><span class="bash"> Server</span></span><br><span class="line">redis_version:4.0.14</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:a3801984392ceb27</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 4.4.0-185-generic x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">atomicvar_api:atomic-builtin</span><br><span class="line">gcc_version:5.4.0</span><br><span class="line">process_id:1082</span><br><span class="line">run_id:dfb262a4f02219cbc26efe68852bf8d1424cb1ad</span><br><span class="line">tcp_port:6379</span><br><span class="line">uptime_in_seconds:-9640</span><br><span class="line">uptime_in_days:0</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:1474142</span><br><span class="line">executable:/usr/local/bin/redis-server</span><br><span class="line">config_file:/etc/redis/6379.conf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get requirepass</span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "studyredis"</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; config set requirepass test</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; config get requirepass </span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "test"</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以通过测试了解下redis在本机上的性能</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-benchmark -t get,spop -q -p 6379</span><br><span class="line">GET: 77639.75 requests per second</span><br><span class="line">SPOP: 82304.52 requests per second</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>exists key :是否存在指定的key, 存在返回1， 不存在返回0</p>
+</li>
+<li><p>del key: 删除key，当key存在，删除返回1；当key不存在，删除返回0</p>
+</li>
+<li><p>ttl key: 不存在返回-2， 存在但没有过期时间，返回-1，否则返回剩余时间的秒数</p>
+</li>
+<li><p>persist key: 取消过期时间</p>
+</li>
+<li><p>select 1: 选择1号数据库</p>
+</li>
+<li><p>move key dbindex: 移动某个key到指定的数据库</p>
+</li>
+<li><p>randomkey: 随机返回一个key</p>
+</li>
+<li><p>rename key key2: 将key重命名为key2</p>
+</li>
+<li><p>echo message: 打印message</p>
+</li>
+<li><p>dbsize: 查看当前数据库的key数量 –&gt;O(1)</p>
+</li>
+<li><p>keys:查看所有key —&gt;O(n) 不建议在线上大量key使用</p>
+</li>
+<li><p>info server: 查看数据库信息</p>
+</li>
+<li><p>flushdb: 清空当前数据库</p>
+</li>
+<li><p>flushall:清空所有数据库</p>
+</li>
+<li><p>type key:返回key存储值得数据类型 </p>
+</li>
+</ul>
+<h2 id="2-redis-配置"><a href="#2-redis-配置" class="headerlink" title="2. redis 配置"></a>2. redis 配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">daemonize yes # 默认是no, 设置为yes,redis-server 将以守护进程在后台运行</span><br><span class="line">pidfile &quot;&#x2F;var&#x2F;run&#x2F;redis&#x2F;redis_6379.pid&quot; # 将redis-server 进程id写入到这个文件中</span><br><span class="line">port 6379 #默认端口</span><br><span class="line">tcp-backlog 511</span><br><span class="line">timeout 0 # 客户端闲置多少s后关闭连接，0代表关闭此功能</span><br><span class="line">tcp-keepalive 0</span><br><span class="line">loglevel notice # 日志级别</span><br><span class="line">logfile &quot;&#x2F;var&#x2F;log&#x2F;redis&#x2F;redis-server.log&quot; # 记录日志的文件位置</span><br><span class="line">databases 16 # 默认有16个数据库，从0到15</span><br><span class="line">save 900 1 # 指定在多少时间内，有多少次更新操作，将数据同步到磁盘文件中，900s内有1次更新</span><br><span class="line">save 300 10 #300s内有10个更新</span><br><span class="line">save 60 10000# 60s内有10000个更新</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line">rdbcompression yes # 存到数据库文件中，是否压缩，默认使用LZF压缩算法，如果为了节约cpu时间，可以关闭此选项</span><br><span class="line">rdbchecksum yes</span><br><span class="line">dbfilename &quot;dump.rdb&quot; # 指定数据库文件名</span><br><span class="line">dir &quot;&#x2F;var&#x2F;lib&#x2F;redis&quot;  # redis的工作目录，用于存放 dump.rdb</span><br><span class="line">slave-serve-stale-data yes</span><br><span class="line">slave-read-only yes</span><br><span class="line">repl-diskless-sync no</span><br><span class="line">repl-diskless-sync-delay 5</span><br><span class="line">repl-disable-tcp-nodelay no</span><br><span class="line">slave-priority 100</span><br><span class="line">requirepass &quot;test&quot; # 设置密码</span><br><span class="line">appendonly no # 指定是否在每次更新操作后进行日志记录</span><br><span class="line">appendfilename &quot;appendonly.aof&quot; #指定更新日志文件名</span><br><span class="line">appendfsync everysec # 指定更新日志条件</span><br><span class="line">no-appendfsync-on-rewrite no</span><br><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br><span class="line">aof-load-truncated yes</span><br><span class="line">lua-time-limit 5000</span><br><span class="line">slowlog-log-slower-than 10000</span><br><span class="line">slowlog-max-len 128</span><br><span class="line">latency-monitor-threshold 0</span><br><span class="line">notify-keyspace-events &quot;&quot;</span><br><span class="line">hash-max-ziplist-entries 512</span><br><span class="line">hash-max-ziplist-value 64</span><br><span class="line">list-max-ziplist-entries 512</span><br><span class="line">list-max-ziplist-value 64</span><br><span class="line">set-max-intset-entries 512</span><br><span class="line">zset-max-ziplist-entries 128</span><br><span class="line">zset-max-ziplist-value 64</span><br><span class="line">hll-sparse-max-bytes 3000</span><br><span class="line">activerehashing yes</span><br><span class="line">client-output-buffer-limit normal 0 0 0</span><br><span class="line">client-output-buffer-limit slave 256mb 64mb 60</span><br><span class="line">client-output-buffer-limit pubsub 32mb 8mb 60</span><br><span class="line">hz 10</span><br><span class="line">aof-rewrite-incremental-fsync yes</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-redis内存维护策略"><a href="#3-redis内存维护策略" class="headerlink" title="3. redis内存维护策略"></a>3. redis内存维护策略</h2><h2 id="4-数据类型"><a href="#4-数据类型" class="headerlink" title="4. 数据类型"></a>4. 数据类型</h2><h3 id="4-1-String命令"><a href="#4-1-String命令" class="headerlink" title="4.1 String命令"></a>4.1 String命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">set key_name value</span><br><span class="line">setnx key_name value</span><br><span class="line">setex key_name expire value: 设置key_name的值为value,expire值为过期秒数</span><br><span class="line">setrange key_name offset value: 对于key_name 的值，从下标是offset开始替换为value</span><br><span class="line"></span><br><span class="line">get key_name</span><br><span class="line">getrange key start end:提取出指定范围的值</span><br><span class="line">getbit key offset:  这个暂时不理解</span><br><span class="line">getset key_name value:</span><br><span class="line">strlen key:</span><br><span class="line"></span><br><span class="line">mget key1 key2: ---&gt;  O(n)</span><br><span class="line">mset key1 key2 value1 value2  --&gt;O(n)</span><br><span class="line"></span><br><span class="line">针对数字字符串操作，否则报错</span><br><span class="line">incr key1: 自增</span><br><span class="line">incrby key1 增量值： </span><br><span class="line">decr key1: 自减</span><br><span class="line">decrby key1 减量值</span><br><span class="line"></span><br><span class="line">append key_name value：</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>应用场景：</p>
+<ul>
+<li><p>string通常用于保存单个字符串或者json字符串数据</p>
+</li>
+<li><p>因为string是二进制安全的，完全可以把图片文件的内容作为字符串来存储</p>
+</li>
+<li><p>计数器（incr等指令本身具有原子操作特性，因为完全可以利用redis的incr,incrby, decr, decrby等指令实现原子计数效果）</p>
+<p>例如：某种场景下有3个客户端同时读取了num的值（假定值为2），然后对其同时进行了加1操作，那么num的值最后一定是5</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-2-Hash类型"><a href="#4-2-Hash类型" class="headerlink" title="4.2 Hash类型"></a>4.2 Hash类型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">添加</span><br><span class="line">hset key field value</span><br><span class="line">hmset key field1 value1 field2 value2</span><br><span class="line">获取</span><br><span class="line">hget key field</span><br><span class="line">hmget key field1 field2</span><br><span class="line">hgetall key</span><br><span class="line">查看：</span><br><span class="line">hkeys key: key中存放的所有字段</span><br><span class="line">hlen key: 字段的数量</span><br><span class="line">删除</span><br><span class="line">hdel key field [field]:删除key中一个或者多个字段</span><br><span class="line"></span><br><span class="line">hsetnx key field value: key中不存在 字段field时才进行设置字段和值</span><br><span class="line">hexists key field: 检查key中字段是否存在</span><br><span class="line"></span><br><span class="line">hincrby key field increment:为整形字段的值加值</span><br><span class="line">hincrbyfloat key field incrment: 为浮点值加上增量</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>应用场景：</p>
+<ul>
+<li>常用于存储一个对象</li>
+</ul>
+</li>
+<li><p>为什么不用string存储一个对象？</p>
+<ul>
+<li><p>hash是最接近关系数据结构的数据类型，可以将一条数据库记录转化成hashmap存放到redis中</p>
+</li>
+<li><p>用户id为查找的key,存储的值包含姓名，年龄，生日等等，如果用string结构来存储，主要有两种方式</p>
+</li>
+<li><p>第一种：将用户id作为查找key,把其他信息封装成一个对象序列化的方式存储，缺点是增加了序列化和反序列化的开销，</p>
+<p>并且需要修改一项信息时，需要将整个对象取回，修改操作时需要对并发进行保护</p>
+</li>
+<li><p>第二种：用户对象信息有多少成员就创建多少个key/value,使用 用户id+对应的属性名作为唯一标识来取得对应属性的值，</p>
+<p>虽然省去了序列化和反序列化的开销和并发问题，但是用户id重复存储，如果存放大量这样的数据，内存浪费；而hash存放这种对象会占用很少的磁盘空间；</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-3-List类型"><a href="#4-3-List类型" class="headerlink" title="4.3 List类型"></a>4.3 List类型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">添加元素</span><br><span class="line">lpush key value1 value2 value3 [value]:</span><br><span class="line">rpush key value1 value2 value3 :</span><br><span class="line">lpushx key value: key不存在，返回0; 存在的话，在左侧插入</span><br><span class="line">rpushx key value: key 不存在，返回0；存在，在右侧插入</span><br><span class="line"></span><br><span class="line">查看元素</span><br><span class="line">lrange key start end: 返回指定范围内置</span><br><span class="line">llen key: 返回列表元素</span><br><span class="line">lindex key index: 根据下标取值</span><br><span class="line"></span><br><span class="line">删除：</span><br><span class="line">lpop key</span><br><span class="line">rpop key</span><br><span class="line">blpop key1 [key2] timeout: 左删除一个元素，如果列表没有元素将阻塞直到有元素弹出或者超时；</span><br><span class="line">rlpop key1 [key2] timeout: 右删除一个元素,</span><br><span class="line">ltrim key start end: 保留start到end之间的元素，其他元素删除；</span><br><span class="line">修改：</span><br><span class="line">lset key index value: 根据下标修改一个元素值</span><br><span class="line">linsert key before|after world value: 在指定的列表元素的前面或者后面插入一个值</span><br><span class="line"></span><br><span class="line">rpoplpush source destination: 从source中移除最后一个元素，然后添加到destination的头部</span><br><span class="line">brpoplpush source destination timeout: 从source 中移除最后一个元素，如果没有，将阻塞等待timeout或者直到有元素弹出</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>对数据量大的集合进行操作</li>
+<li>任务队列</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-4-set类型"><a href="#4-4-set类型" class="headerlink" title="4.4 set类型"></a>4.4 set类型</h3><ul>
+<li>set是string类型的无序集合，集合成员是唯一的，通过哈希表来实现的，集合中最大的成员数是 $2^{32}$ -1（40多亿个成员）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">添加成员：</span><br><span class="line">sadd key memeber1 [member2]</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">scard key:获取成员数量</span><br><span class="line">smembers key: 返回集合所有成员</span><br><span class="line">sismember key member:判断member是否是集合key的成员；</span><br><span class="line">srandmember key [count]:返回集合中一个或者多个随机成员；</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">srem key member1 [member2]：移除集合中一个或者多个成员</span><br><span class="line">spop key [count]: 移除并返回集合中的一个随机元素</span><br><span class="line">smove source destination member :将member元素从source 集合移动到destination集合</span><br><span class="line"></span><br><span class="line">差集：</span><br><span class="line">sdiff key1 key2 :返回只属于key1中的元素</span><br><span class="line">sdiffstore destination key1 key2:</span><br><span class="line">交集：</span><br><span class="line">sinter key1 key2:返回同时属于key1和key2的元素</span><br><span class="line">sinterstore destination key1 key2:将结果放到destination中</span><br><span class="line">并集：</span><br><span class="line">sunion key1 key2:返回s1和s2集合中所有元素</span><br><span class="line">sunionstore destination key1 key2:</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>利用集合交集，并集，差集操作，实现共同关注，共同爱好，二度好友功能；</li>
+<li>利用唯一性，统计访问网站的所有独立ip,存取当天的活跃用户列表；</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-5-Zset（有序集合）"><a href="#4-5-Zset（有序集合）" class="headerlink" title="4.5 Zset（有序集合）"></a>4.5 Zset（有序集合）</h3><ul>
+<li>Redis有序集合和集合一样也是String类型元素的集合，且不允许有重复成员，不同的是每个元素会关联一个double类型的分数，redis通过分数为集合中的成员进行从小到大的排序，成员唯一，但是分数可以相同；集合中成员数也是$2^{32}$ - 1(40多亿个成员)</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">增加：</span><br><span class="line">zadd key score1 member1 [score2 member2]: 向有序集合添加一个或者多个成员，或者更新已存在成员的分数</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">zcard key: 成员数量</span><br><span class="line">zcount key min max:计算有序集合指定区间分数的成员数量</span><br><span class="line">zrank key member:返回有序集合中指定成员的索引；</span><br><span class="line">zrange key start stop [withscores]: 取出索引之间的元素，带参数withscores将分数也一并输出</span><br><span class="line">zrangebyscore key min max [withscores] [limit offset count]:根据分数区间进行取值，如果设置了limit，那么会再将结果根据</span><br><span class="line">offset(从哪个下标开始) 取出count个数量的值;一旦使用了limit参数，后面的两个参数必须设置；</span><br><span class="line">zrevrange key start stop [withscores]:倒序输出(通过下标设置区间)</span><br><span class="line">zrevrangebyscore key max min [withscores] [limit offset count]:倒序输出(根据分数从高到低的区间)</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">zrem key member [member]</span><br><span class="line">zremrangebyrank by start stop:移除指定索引区间的元素</span><br><span class="line">zremrangebyscore by min max: 移除给定分数区间的元素</span><br><span class="line">修改</span><br><span class="line">zincrby by increment member: 增加member成员的分数，返回修改后的分数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>排行榜</li>
+<li>文章发布时间作为分数值，自带排序功能</li>
+<li>设置任务分数值高低作为任务权重的依据，按照权重大小执行任务；</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-6-HyperLogLog-类型"><a href="#4-6-HyperLogLog-类型" class="headerlink" title="4.6 HyperLogLog 类型"></a>4.6 HyperLogLog 类型</h3><ul>
+<li>HyperLogLog是一种算法，并非redis独有，目的是做基数统计(不同数的个数),只记录数量，不记录具体的内容</li>
+<li>耗费空间极小，支持输入非常大体积的数据量(计算接近 $2^{64}$个不同元素的基数，这和元素越多耗费内存就越多的集合形成鲜明的对比)</li>
+<li>redis中每个HyperLogLog key占用了12k的内存用于记录基数</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">添加：</span><br><span class="line">pfadd key element [element]</span><br><span class="line">计算基数</span><br><span class="line">pfcount key [key]:返回给定HyperLogLog的基数估算值</span><br><span class="line">pfmerge destkey sourcekey [sourekey]:将多个HyperLogLog合并为一个 HyperLogLOg</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：（只用来统计基数数量，不知道具体内容是什么）<ul>
+<li>真实文章阅读量</li>
+<li>统计注册ip</li>
+<li>统计每日访问Ip数</li>
+<li>统计页面实时UV数</li>
+<li>统计在线用户数</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-redis-发布订阅"><a href="#5-redis-发布订阅" class="headerlink" title="5.redis 发布订阅"></a>5.redis 发布订阅</h2><ul>
+<li>redis发布、订阅是一种消息通信模式，发布者向频道发布消息，订阅者通过订阅频道接收消息；</li>
+<li>redis客户端可以订阅任意数量的频道</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">subscribe channel [channel]:</span><br><span class="line">psubscribe pattern [pattern]:订阅一个或者多个符合给定模式的频道</span><br><span class="line"></span><br><span class="line">publish channel message: 发布消息</span><br><span class="line"></span><br><span class="line">退订：</span><br><span class="line">unsubscribe channel </span><br><span class="line">punsubscribe [pattern]</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-redis-事务"><a href="#6-redis-事务" class="headerlink" title="6.redis 事务"></a>6.redis 事务</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">multi: 事务开启</span><br><span class="line">exec: 事务开始执行，按照命令顺序执行；</span><br><span class="line">discard: 事务取消</span><br><span class="line"></span><br><span class="line">命令执行过程中出错, 其他命令执行，出错的命令不执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa hello</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; incr aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">1) OK</span><br><span class="line">2) "hello"</span><br><span class="line">3) (error) ERR value is not an integer or out of range</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"hello"</span><br><span class="line"></span><br><span class="line">命令执行前出错，那么所有命令都不能被执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set bbb test</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; sadfasdf</span><br><span class="line">(error) ERR unknown command `sadfasdf`, with args beginning with: </span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">(error) EXECABORT Transaction discarded because of previous errors.</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">watch key [key] :监视key的变化，当在开始事务之后，有其他进程修改了key的话，那么事务不能成功执行</span><br><span class="line">127.0.0.1:6379&gt; watch aaa</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa 30</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec   # 另一个客户端修改了aaa 值为40,这里没有执行成功；</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"40"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>针对一组命令要么同时执行成功，要么执行失败；</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-redis持久化"><a href="#7-redis持久化" class="headerlink" title="7. redis持久化"></a>7. redis持久化</h2><ul>
+<li>redis持久化就是将内存中的数据写到磁盘中，防止服务宕机内存数据丢失</li>
+<li>redis提供了两种持久化方式：RDB(默认) 和 AOF</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">RDB: redis默认持久化机制，这种方式就是将内存中的数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb</span><br><span class="line">优点：保存数据极快，还原数据极快，适用于灾难备份</span><br><span class="line">缺点：小内存机器不适合使用</span><br><span class="line">快照条件：</span><br><span class="line">- 服务器正常关闭时， redis-cli shutdown</span><br><span class="line">- key 满足条件时，默认配置中</span><br><span class="line">	save 900 1 # 每900s(15分钟) 至少1个key发生变化，产生快照</span><br><span class="line">	save 300 10# 每300s(5分钟) 至少10个key发生变化，产生快照</span><br><span class="line">	save 60 10000   </span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">AOF(append only file):应用不能丢失任何修改的话，可以采用aof持久化方式</span><br><span class="line">redis每接收到一个写命令都通过write函数追加到文件中(默认是appendonly.aof),当redis重启时会通过重新执行文件中保存的写命令来在在内存中重建整个数据库</span><br><span class="line">配置：</span><br><span class="line"></span><br><span class="line">appendonly yes: 开启aof持久化方式</span><br><span class="line">有三种方式(默认appendfsynceverysec)</span><br><span class="line">appendfsync always: 收到写命令就立即写入磁盘，最慢，保证完全的持久化</span><br><span class="line">appendfsynceverysec: 每秒写入磁盘一次，在性能和持久化方面折中</span><br><span class="line">appendfsync no:完全依赖os,性能最好，持久化没有保证</span><br><span class="line">缺点：</span><br><span class="line">aof文件会变得越来越大；</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-redis作为缓存，如何保证与数据库的一致性："><a href="#8-redis作为缓存，如何保证与数据库的一致性：" class="headerlink" title="8. redis作为缓存，如何保证与数据库的一致性："></a>8. redis作为缓存，如何保证与数据库的一致性：</h2><h3 id="8-1-实时同步："><a href="#8-1-实时同步：" class="headerlink" title="8.1 实时同步："></a>8.1 实时同步：</h3><p>对强一致要求比较高的，应采用实时同步方案：查询缓存没有时再从数据库查询，然后保存到缓存；更新缓存时，先更新数据库，再将缓存的设置过期</p>
+<h3 id="8-2-异步队列"><a href="#8-2-异步队列" class="headerlink" title="8.2 异步队列"></a>8.2 异步队列</h3><p>对于并发程度较高的，可采用异步队列方式同步，可采用kafka等消息队列处理消息。</p>
+<p>消息队列有哪些呢？</p>
+<p>ActiveMQ, RabbitMQ, RocketMQ, Kafka等</p>
+<h3 id="8-3-使用阿里的同步工具canal"><a href="#8-3-使用阿里的同步工具canal" class="headerlink" title="8.3 使用阿里的同步工具canal"></a>8.3 使用阿里的同步工具canal</h3><h3 id="8-4-采用UDF自定义函数方式"><a href="#8-4-采用UDF自定义函数方式" class="headerlink" title="8.4 采用UDF自定义函数方式"></a>8.4 采用UDF自定义函数方式</h3><p>面对mysql的API进行编程，利用触发器进行缓存同步</p>
+<h3 id="8-5-缓存问题"><a href="#8-5-缓存问题" class="headerlink" title="8.5 缓存问题()"></a>8.5 缓存问题()</h3><ul>
+<li><p>正常的缓存查询流程：数据查询先进行缓存查询，如果key不存在或者key过期那么就去查询数据库，并把查询的对象放进缓存，如果数据库查询对象为空，则不放进缓存直接返回</p>
+</li>
+<li><p>缓存穿透</p>
+<ul>
+<li>当到缓存中查询一个一定不存在的数据时，由于缓存不命中，就会去数据库中查询，查不到数据则不写入缓存，这将导致这个不存在的数据每次都要到数据库中查询，造成缓存穿透（缓存没有起作用）</li>
+<li>解决方案：数据库查询不到就缓存空结果。同时需要注意当对数据库执行插入操作时，清除缓存中的key,或者为空缓存设置过期时间。</li>
+<li>发生穿透的原因可能有：对查询条件进行加密。</li>
+</ul>
+</li>
+<li><p>缓存雪崩：当缓存集中过期的时候，那么当并发访问这些key的时候，就会直接到数据库访问，造成压力波峰。</p>
+<ul>
+<li>可以采用设置不同的缓存时间，让缓存过期时间尽量均匀发布</li>
+</ul>
+</li>
+<li><p>缓存击穿：指的是一个key非常热，查询量非常大，当这个key到了过期时间瞬间，持续的大并发穿透缓存，直接请求数据库，对于商品而言，也就是所谓的”爆款”</p>
+<ul>
+<li>缓存不过期</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-Redis-高级配置"><a href="#9-Redis-高级配置" class="headerlink" title="9. Redis 高级配置"></a>9. Redis 高级配置</h2><ul>
+<li>在实际应用中，单台redis因为内存容量有限(单台redis最大使用内存不应该超过20G), 处理能力有限，无法高可用（一旦发生意外宕机，缓存功能失效）</li>
+<li>使用主从复制的配置（主写从读）（多个从一个主）</li>
+<li>哨兵模式（针对master意外宕机的解决方案）</li>
+<li>集群模式是实际使用最多的模式 （Redis Cluster)<ul>
+<li>从redis3.0 之后的版本开始支持redis-cluster，至少需要（3个master和3个slave)才能建立集群。     </li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/12/Python%20-%20%E5%B1%9E%E6%80%A7%E8%AE%BF%E9%97%AE%E9%A1%BA%E5%BA%8F/" rel="prev" title="Python - 属性访问顺序">
+      <i class="fa fa-chevron-left"></i> Python - 属性访问顺序
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/12/%E5%88%87%E7%89%87%E7%94%A8%E6%B3%95/" rel="next" title="切片用法">
+      切片用法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#redis-再学习"><span class="nav-number">1.</span> <span class="nav-text"> redis 再学习 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-基本命令"><span class="nav-number">1.1.</span> <span class="nav-text">1. 基本命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-redis-配置"><span class="nav-number">1.2.</span> <span class="nav-text">2. redis 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-redis内存维护策略"><span class="nav-number">1.3.</span> <span class="nav-text">3. redis内存维护策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-数据类型"><span class="nav-number">1.4.</span> <span class="nav-text">4. 数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-String命令"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 String命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Hash类型"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 Hash类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-List类型"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 List类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-set类型"><span class="nav-number">1.4.4.</span> <span class="nav-text">4.4 set类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Zset（有序集合）"><span class="nav-number">1.4.5.</span> <span class="nav-text">4.5 Zset（有序集合）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-HyperLogLog-类型"><span class="nav-number">1.4.6.</span> <span class="nav-text">4.6 HyperLogLog 类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-redis-发布订阅"><span class="nav-number">1.5.</span> <span class="nav-text">5.redis 发布订阅</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-redis-事务"><span class="nav-number">1.6.</span> <span class="nav-text">6.redis 事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-redis持久化"><span class="nav-number">1.7.</span> <span class="nav-text">7. redis持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-redis作为缓存，如何保证与数据库的一致性："><span class="nav-number">1.8.</span> <span class="nav-text">8. redis作为缓存，如何保证与数据库的一致性：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-实时同步："><span class="nav-number">1.8.1.</span> <span class="nav-text">8.1 实时同步：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-异步队列"><span class="nav-number">1.8.2.</span> <span class="nav-text">8.2 异步队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-使用阿里的同步工具canal"><span class="nav-number">1.8.3.</span> <span class="nav-text">8.3 使用阿里的同步工具canal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-采用UDF自定义函数方式"><span class="nav-number">1.8.4.</span> <span class="nav-text">8.4 采用UDF自定义函数方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-缓存问题"><span class="nav-number">1.8.5.</span> <span class="nav-text">8.5 缓存问题()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-Redis-高级配置"><span class="nav-number">1.9.</span> <span class="nav-text">9. Redis 高级配置</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="cgn"
+      src="/images/sister.jpeg">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/hong.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script src="/js/src/hong.js"></script>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>

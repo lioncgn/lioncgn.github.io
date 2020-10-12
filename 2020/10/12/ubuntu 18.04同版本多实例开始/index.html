@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/cloudauth.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/cloudauth-small.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="ubuntu 18.04同版本多实例开始1. 创建data目录 sudo mkdir -p &#x2F;space&#x2F;data&#x2F;330{7..9}&#x2F;data  sudo mkdir -p &#x2F;space&#x2F;binlog&#x2F;330{7..9}   2.创建配置文件 cat &gt; &#x2F;space&#x2F;data&#x2F;3307&#x2F;my.cnf &lt;&lt; EOF[mysqld]basedir&#x3D;&#x2F;space&#x2F;database&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu 18.04同版本多实例开始">
+<meta property="og:url" content="http://yoursite.com/2020/10/12/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="ubuntu 18.04同版本多实例开始1. 创建data目录 sudo mkdir -p &#x2F;space&#x2F;data&#x2F;330{7..9}&#x2F;data  sudo mkdir -p &#x2F;space&#x2F;binlog&#x2F;330{7..9}   2.创建配置文件 cat &gt; &#x2F;space&#x2F;data&#x2F;3307&#x2F;my.cnf &lt;&lt; EOF[mysqld]basedir&#x3D;&#x2F;space&#x2F;database&#x2F;">
+<meta property="article:published_time" content="2020-10-12T09:51:51.608Z">
+<meta property="article:modified_time" content="2020-10-12T09:51:51.608Z">
+<meta property="article:author" content="cgn">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/10/12/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>ubuntu 18.04同版本多实例开始 | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">22</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/lioncgn" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/sister.jpeg">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ubuntu 18.04同版本多实例开始
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-12 17:51:51" itemprop="dateCreated datePublished" datetime="2020-10-12T17:51:51+08:00">2020-10-12</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a>ubuntu 18.04同版本多实例开始</h1><h2 id="1-创建data目录"><a href="#1-创建data目录" class="headerlink" title="1. 创建data目录"></a>1. 创建data目录</h2><ul>
+<li><p>sudo mkdir -p /space/data/330{7..9}/data</p>
+</li>
+<li><p>sudo mkdir -p /space/binlog/330{7..9}</p>
+</li>
+</ul>
+<h2 id="2-创建配置文件"><a href="#2-创建配置文件" class="headerlink" title="2.创建配置文件"></a>2.创建配置文件</h2><p> cat &gt; /space/data/3307/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3307/data<br>socket=/tmp/mysql3307.sock<br>log_error=/space/data/3307/mysql.log<br>port=3307<br>server_id=7<br>log_bin=/space/binlog/3307/mysql-bin</p>
+<p> cat &gt; /space/data/3308/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3308/data<br>socket=/tmp/mysql3308.sock<br>log_error=/space/data/3308/mysql.log<br>port=3308<br>server_id=8</p>
+<p> cat &gt; /space/data/3309/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3309/data<br>socket=/tmp/mysql3309.sock<br>log_error=/space/data/3309/mysql.log<br>port=3309<br>server_id=9</p>
+<h2 id="3-修改属主"><a href="#3-修改属主" class="headerlink" title="3. 修改属主"></a>3. 修改属主</h2><p>space/data# chown -R mysql.mysql 330*</p>
+<p>/space/binlog# chown -R mysql.mysql 330*</p>
+<h2 id="4-初始化之前准备"><a href="#4-初始化之前准备" class="headerlink" title="4. 初始化之前准备"></a>4. 初始化之前准备</h2><p>mv /etc/my.cnf  /etc/my.cnf.bak  # 初始化也会读这文件；</p>
+<h2 id="5-初始化数据"><a href="#5-初始化数据" class="headerlink" title="5.初始化数据"></a>5.初始化数据</h2><p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3307/data –basedir=/space/database/mysql</p>
+<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3308/data –basedir=/space/database/mysql</p>
+<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3309/data –basedir=/space/database/mysql</p>
+<h2 id="5-使用systemctl管理"><a href="#5-使用systemctl管理" class="headerlink" title="5. 使用systemctl管理"></a>5. 使用systemctl管理</h2><p>/etc/systemd/system/mysqld3307.service</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1 [Service]                                                                                                                                                                                  </span><br><span class="line">2 User=mysql</span><br><span class="line">3 Group=mysql</span><br><span class="line">4 ExecStart=/space/database/mysql/bin/mysqld --defaults-file=/space/data/3309/my.cnf</span><br><span class="line">5 LimitNOFILE=5000</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="6-开启多实例"><a href="#6-开启多实例" class="headerlink" title="6. 开启多实例"></a>6. 开启多实例</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">1）</span><br><span class="line">systemctl start mysqld3307</span><br><span class="line">systemctl start mysqld3308</span><br><span class="line">systemctl start mysqld3309</span><br><span class="line">2）检查server_id是否不同：</span><br><span class="line">mysql -S /tmp/mysql3307.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3308.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3309.sock  -e 'select @@server_id' -uroot</span><br><span class="line">3）检查主库binlog是否开启</span><br><span class="line"> mysql -S /tmp/mysql3307.sock -e "select @@log_bin" -uroot;</span><br><span class="line"> </span><br><span class="line">4）主库建立复制用户</span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "grant replication slave on *.* to repl@'192.168.0.%' identified by '123'" -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认用户是否建立成功</span></span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "select user,host from mysql.user" -uroot -p </span><br><span class="line">5）主库备份恢复到从库</span><br><span class="line"> </span><br><span class="line"> mysqldump -uroot -p -S /tmp/mysql3307.sock -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; /tmp/full3307.sql</span><br><span class="line"> mysql -uroot -S /tmp/mysql3308.sock &lt; /tmp/full3307.sql </span><br><span class="line"> </span><br><span class="line">6）从库：告知从库复制连接信息和要复制的起点信息</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.111',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3307,</span><br><span class="line">  MASTER_LOG_FILE='mysql-bin.000002',</span><br><span class="line">  MASTER_LOG_POS=691,</span><br><span class="line"><span class="meta">#</span><span class="bash">  MASTER_CONNECT_RETRY=10;(可选参数)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看从库要复制的起点</span></span><br><span class="line">grep "\-- CHANGE MASTER TO" /tmp/full3307.sql </span><br><span class="line">-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=691;</span><br><span class="line">7） 从库：开启专用的复制线程</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> start slave;</span></span><br><span class="line">8) 从库验证主从状态：</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot -e "show slave status\G" |grep Running:</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line">如果搭建失败：，执行以下命令，重新开始</span><br><span class="line">mysql -S /tmp/mysql3308.sock -e "stop slave;reset slave all;"</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-主从复制的原理"><a href="#7-主从复制的原理" class="headerlink" title="7.主从复制的原理"></a>7.主从复制的原理</h2><h3 id="1-从库中有关的文件"><a href="#1-从库中有关的文件" class="headerlink" title="1.从库中有关的文件"></a>1.从库中有关的文件</h3><ul>
+<li>relay_log_basename ：默认在从库的数据目录中，设置此参数可自定义文件名,用来存储接收的binlog;<ul>
+<li>自定义文件名: relay_log_basename=</li>
+</ul>
+</li>
+<li>master.info: 默认在从库的数据目录中，存放的是连接主库的信息和已经接收binlog位置点信息<ul>
+<li>默认以文件的形式，可以存放到表中，进行优化</li>
+<li>master_info_repository=FILE/TABLE</li>
+</ul>
+</li>
+<li>relay-info.log: 记录从库回放到relay-log的位置点，默认在从库数据目录下<ul>
+<li>relay_log_info_repository=FILE/TABLE 进行配置</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL)</span><br><span class="line">2）从库：连接主库；</span><br><span class="line">3）主库：分配dump_thread专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到relay-info.log中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-info.log，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行新的relay-info.log,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-监控主从的状态"><a href="#3-监控主从的状态" class="headerlink" title="3.监控主从的状态"></a>3.监控主从的状态</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">主库：</span><br><span class="line">show processlist</span><br><span class="line">show slave hosts;</span><br><span class="line"></span><br><span class="line">从库：show slave status \G</span><br><span class="line">		从库连接主库的信息，来自于master.info</span><br><span class="line">                  Master_Host: 192.168.0.111</span><br><span class="line">                  Master_User: repl</span><br><span class="line">                  Master_Port: 3307</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000002</span><br><span class="line">          Read_Master_Log_Pos: 866</span><br><span class="line">          </span><br><span class="line">          从库relay-log.info的执行情况，来自于relay-log.info，用来判断主从延时的判断信息</span><br><span class="line">               Relay_Log_File: ubuntu-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 495</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000002</span><br><span class="line">                Exec_Master_Log_Pos: 866</span><br><span class="line">               Seconds_Behind_Master: 0</span><br><span class="line">        </span><br><span class="line">        从库线程状态,具体错误信息</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">                     Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">               </span><br><span class="line">               </span><br><span class="line">         过滤复制相关，只想复制某些库</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">  </span><br><span class="line">        用来设置从库延时复制的相关信息</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">   </span><br><span class="line">           GTID 相关复制信息</span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set:</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/08/%E5%90%84%E7%A7%8D%E7%AE%97%E6%B3%95%E4%BD%BF%E7%94%A8/" rel="prev" title="各种算法使用">
+      <i class="fa fa-chevron-left"></i> 各种算法使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/12/Alembic%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" rel="next" title="Alembic工具使用">
+      Alembic工具使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ubuntu-18-04同版本多实例开始"><span class="nav-number">1.</span> <span class="nav-text">ubuntu 18.04同版本多实例开始</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建data目录"><span class="nav-number">1.1.</span> <span class="nav-text">1. 创建data目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">2.创建配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-修改属主"><span class="nav-number">1.3.</span> <span class="nav-text">3. 修改属主</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-初始化之前准备"><span class="nav-number">1.4.</span> <span class="nav-text">4. 初始化之前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-初始化数据"><span class="nav-number">1.5.</span> <span class="nav-text">5.初始化数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-使用systemctl管理"><span class="nav-number">1.6.</span> <span class="nav-text">5. 使用systemctl管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-开启多实例"><span class="nav-number">1.7.</span> <span class="nav-text">6. 开启多实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-主从复制的原理"><span class="nav-number">1.8.</span> <span class="nav-text">7.主从复制的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-从库中有关的文件"><span class="nav-number">1.8.1.</span> <span class="nav-text">1.从库中有关的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-原理"><span class="nav-number">1.8.2.</span> <span class="nav-text">2. 原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-监控主从的状态"><span class="nav-number">1.8.3.</span> <span class="nav-text">3.监控主从的状态</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="cgn"
+      src="/images/sister.jpeg">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/hong.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script src="/js/src/hong.js"></script>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>

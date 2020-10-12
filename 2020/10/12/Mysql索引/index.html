@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/cloudauth.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/cloudauth-small.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Mysql索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql索引">
+<meta property="og:url" content="http://yoursite.com/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="你的眼神">
+<meta property="og:description" content="Mysql索引">
+<meta property="article:published_time" content="2020-10-12T09:55:09.156Z">
+<meta property="article:modified_time" content="2020-10-12T09:55:09.156Z">
+<meta property="article:author" content="cgn">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Mysql索引 | 你的眼神</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">你的眼神</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一念放恣，则万邪乘衅</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">22</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/lioncgn" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/sister.jpeg">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-12 17:55:09" itemprop="dateCreated datePublished" datetime="2020-10-12T17:55:09+08:00">2020-10-12</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Mysql索引"><a href="#Mysql索引" class="headerlink" title="Mysql索引"></a><center>Mysql索引</center></h1><a id="more"></a>
+
+<h1 id="1-准备测试数据"><a href="#1-准备测试数据" class="headerlink" title="1. 准备测试数据"></a>1. 准备测试数据</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter $$</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> create procedure auto_insert()</span></span><br><span class="line">    -&gt; begin</span><br><span class="line">    -&gt; declare i int default 1;</span><br><span class="line">    -&gt; while(i&lt;3000000) do</span><br><span class="line">    -&gt; insert into test values(i, 'eva', 'female', concat('eva', i, '@oldboy'));</span><br><span class="line">    -&gt; set i=i+1;</span><br><span class="line">    -&gt; end while;</span><br><span class="line">    -&gt; end$$</span><br><span class="line">Query OK, 0 rows affected (0.14 sec)</span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> call auto_insert();</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Query OK, 1 row affected (3 days 47 min 3.30 sec)</strong>， 使用默认配置，插入3000000 条数据用到的时间。</p>
+<h1 id="2-使用索引进行优化"><a href="#2-使用索引进行优化" class="headerlink" title="2. 使用索引进行优化"></a>2. 使用索引进行优化</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1. 使用联合索引时，查询条件中必须包含建立索引时最左列字段，并且多个字段时，不能跳过中间字段进行查询，否则，不能使用索引，这是联合索引的最左前缀法则；</span><br><span class="line">2. 索引列上不能作为表达式的一部分，或者作为函数的参数，保证索引列独立；</span><br><span class="line">3. 存储引擎不能使用范围条件右边的索引列；</span><br><span class="line">4.尽量使用覆盖索引获取查询的结果(覆盖索引是指查询结果的列在建立索引列的范围)</span><br><span class="line">5.使用like 进行模糊查询时，如果%在前面，索引不生效，如果想使用%xx% 而且还想使索引生效，则可以考虑使用覆盖索引，解决它，只要使用</span><br><span class="line">select name, age from user where user like &#39;%cgn%&#39;;  建立联合索引(name, age); </span><br><span class="line">或者通过 elasticsearch + mongodb;</span><br><span class="line">6.字符串不加引号，将导致默认做类型转换，不符合第二条索引原则，也有可能导致索引失效；</span><br><span class="line">7.&lt;&gt;, not in 不走索引，</span><br><span class="line">8.单独的&gt;,&lt;,in 有可能走，有可能不走，和结果集(15%-30%)有关，尽量结合业务使用Limit;</span><br><span class="line">9. or或者in 尽量改成union, union all,可以使用，要测试,看数据唯一性如何，是否有太多的重复性；</span><br><span class="line">10.!&#x3D;不走索引，但是对于主键 走索引。。。。。。not in也是</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-优化的过程"><a href="#3-优化的过程" class="headerlink" title="3. 优化的过程"></a>3. 优化的过程</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 开始慢查询日志，设置阈值。</span><br><span class="line">2. 使用explain 工具分析是否命中索引；</span><br><span class="line">3. show profile</span><br><span class="line">4. mysql服务器端的参数调优；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">查询优化：</span><br><span class="line">	小表驱动大表</span><br><span class="line">	select * from A where id in (select id from B)</span><br><span class="line">	当B表的数据集必须小于A表的数据集时，用in优于exists</span><br><span class="line">	</span><br><span class="line">	select * from A where exists (select 1 from B where B.id = A.id);</span><br><span class="line">	当A表的数据集小于B表的数据集时，用exists优于in;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">order by 优化：尽可能在索引列上进行排序</span><br><span class="line"></span><br><span class="line">两种排序：文件排序或者扫描有序索引排序</span><br><span class="line">能够使用索引排序的情况有：(a,b,c)联合索引</span><br><span class="line"> - order by a</span><br><span class="line"> - order by a,b</span><br><span class="line"> - order by a,b,c</span><br><span class="line"> - order by a desc, b desc, c desc</span><br><span class="line"> </span><br><span class="line"> 使用where的最左前缀定义为常量，</span><br><span class="line">  - where a = const order by b,c</span><br><span class="line">  - where a = const and b = const order by c</span><br><span class="line">  - where a = const and b &gt; const order by b,c</span><br><span class="line"> 不能使用索引排序的情况：</span><br><span class="line">  - order by a asc,b desc, c desc  - 排序不一致</span><br><span class="line">  - where g = const order by b,c   - 丢失a</span><br><span class="line">  - where a = const order by c    - 丢失b索引</span><br><span class="line">  - where a = const order by a,d  - d 不是索引的一部分</span><br><span class="line">  - where a in () order by b,c    - 多个相等条件也是范围查询</span><br><span class="line"></span><br><span class="line">针对产生 using filesort的情况来说：(age,birth)作为联合索引来用；</span><br><span class="line">explain select * from A where age &gt; 20 order by birth;</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A <span class="built_in">where</span> age &gt; 20 order by birth,age;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by birth;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by age asc, birth desc;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line"></span><br><span class="line">两种排序： </span><br><span class="line">using index ,using filesort ; using index使用索引带来的排序，using filesort需要再做排序，相当于没有使用索引带来的排序；</span><br><span class="line">要想使用using index, 要求排序字段需要使用最左索引列；</span><br><span class="line"></span><br><span class="line">提高order by的查询速度方式：</span><br><span class="line">当有order by 查询时，使用select * 是大忌：因为，有可能取出的数据超过sort_buffer_size的容量，会导致创建tmp文件进行合并排序，</span><br><span class="line">导致多次I/O</span><br><span class="line">改进的点： </span><br><span class="line">尝试提高sort_buffer_size容量大小；</span><br><span class="line">尝试提高max_length_for_sort_data,会增加使用改进算法的概率；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">group by 优化：</span><br><span class="line">实质是先排序再进行分组，遵照索引的最左前缀</span><br><span class="line">当无法使用索引时，可以通过设置 sort_buffer_size，max_length_for_sort_data </span><br><span class="line">where高于having,能在where中限定的条件不要去having中限定；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">慢查询日志：</span><br><span class="line">- 默认情况下，mysql没有开启慢查询，可以通过 show variables like '%slow_query_log%' 查看，因为开启会带来一定的性能影响；</span><br><span class="line">- 如何开启：</span><br><span class="line">    set global slow_query_log =1 进行开启，仅仅对当前数据库生效，mysql重启会失效；</span><br><span class="line">     show variables like '%query_time%';  默认是10s,</span><br><span class="line">    set global long_query_time=3 修改慢sql的阈值为3s;</span><br><span class="line">    # show global variables like '%query_time%'查看设置是否成功，或者 通过重开一个新连接进行查看；</span><br><span class="line">    show global status like '%slow_queries%'; #查询当前慢查询日志的个数；</span><br><span class="line">    </span><br><span class="line">- 永久生效：配置到配置文件中</span><br><span class="line"> [mysqld]</span><br><span class="line">  slow_query_log=1;</span><br><span class="line">  slow_query_log_file=/var/lib/mysql/slow_query.log;</span><br><span class="line">  long_query_time=3;</span><br><span class="line">  log_output=FILE</span><br><span class="line">  </span><br><span class="line">-mysqldumpslow 工具查看慢查询日志的详细信息</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">show profile 进行mysql语句的资源消耗分析</span><br><span class="line"> - show variables like 'profiling'; 默认情况下关闭 </span><br><span class="line"> - set profiling=on; # 开启后将记录下每条SQL语句的执行情况，并编号；</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 根据编号查询cpu，以及io情况</span></span><br><span class="line"> show profiles;</span><br><span class="line"> </span><br><span class="line"> show profile cpu, block io for query Quey_id;</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 当分析出的列中含有：就需要仔细分析了</span></span><br><span class="line"> converting HEAP to MyISAM表示查询结果太大，内存不够用，</span><br><span class="line"> creating tmp table 创建临时表，拷贝数据到临时表，用完再删除；</span><br><span class="line"> copying to tmp table on disk 把内存中的临时表复制到磁盘，危险!!!!!!!!!!</span><br><span class="line"> locked</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">全局日志</span><br><span class="line">set global general_log =1;</span><br><span class="line">set global log_output='TABLE';</span><br><span class="line">select * from mysql.general_log;   # 只能在测试环境下开启！！！！！！！！！！！！！，</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="4-锁机制"><a href="#4-锁机制" class="headerlink" title="4.锁机制"></a>4.锁机制</h1><ul>
+<li><p>查看表上加过的锁</p>
+<ul>
+<li><p>show open tables;</p>
+</li>
+<li><p>手动增加锁： lock table table_name read, table_name write;</p>
+</li>
+<li><p>释放锁： unlock tables;</p>
+</li>
+</ul>
+</li>
+<li><p>表锁 MyISAM 如下：</p>
+</li>
+<li><p>读锁（读共享锁，写阻塞）</p>
+<ul>
+<li>lock table table_name read;</li>
+<li>当前会话加读锁后的现象:<ul>
+<li>当前会话只能读这个表，不能对这个表修改,同时也不能对没有加锁的其他表进行读写，对锁定的表进行插入或者更新都会报错；</li>
+<li>其他会话也可以读这个表，但是对此次表的更新操作将阻塞，其他会话可以读写其他未锁定的表；</li>
+<li>一旦这个表锁释放，其他会话对这个表的操作会立即执行；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>写锁：</p>
+<ul>
+<li>lock table table_name write;</li>
+<li>写锁后的现象：<ul>
+<li>当前会话，可以对当前加的锁表进行读写操作，不能对没有加锁的表进行读写操作；</li>
+<li>其他会话，可以对未加锁的表进行读写操作，但是不能对加锁的表进行读写操作，会阻塞；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>总结：</p>
+<ul>
+<li>加上读锁，会阻塞写；而写锁会阻塞读写；</li>
+</ul>
+</li>
+<li><p>分析</p>
+<ul>
+<li><p>show statue like ‘table%’  查看table_locks_waited 和table_locks_immediate状态变量分析</p>
+</li>
+<li><p><strong>table_locks_waited</strong>表示出现表级锁争用而等待的次数，不能立即获取锁的次数；</p>
+</li>
+<li><p>table_locks_immediate:表示表级锁定的次数，表示可以立即获取锁的查询次数，每立即获取锁值加1；</p>
+</li>
+<li><p>Myisam的读写锁调度是写优先，不适合做写为主表的引擎，因为写表后，其他线程不能做任何操作；</p>
+</li>
+</ul>
+</li>
+<li><p>InnoDB 使用行锁：</p>
+<ul>
+<li><p>使用方式如下：</p>
+<ul>
+<li><p>select *  from test_inno where name=’hello’ for update;</p>
+<ul>
+<li>当为name列设置索引了话，那么这时候就是行锁， 其他事务可以对其他行进行读写;</li>
+<li>当没有为name列设置索引了话，那么这时候就是表锁，其他事务将不能对其他行进行写；</li>
+</ul>
+</li>
+<li><p><a href="https://blog.csdn.net/sanyuesan0000/article/details/90235335" target="_blank" rel="noopener">可重复读如何实现的</a></p>
+</li>
+</ul>
+</li>
+<li><p>问题！！！！！！！！！！！！！！！！！！！！！！！！！！！！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">并发下单时，仓库中的库存量发生了意外的变化？？？？？</span><br><span class="line">在默认的可重复读事务隔离级别下，两个事务在快照读的情况下，都不能访问其他事务的插入，更新，和删除操作，而实际需要一个事务提交后，需要及时的获取更新后的值，因此，将事务的隔离级别设置为读提交；之所以mysql使用默认的可重复读的隔离级别，因为binlog的主从复制在读提交的隔离级别下，出现过bug,mysql5.0版本；</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="5-Innodb核心特性"><a href="#5-Innodb核心特性" class="headerlink" title="5. Innodb核心特性"></a>5. Innodb核心特性</h1><ul>
+<li><p>MVCC</p>
+</li>
+<li><p>Clustered Index</p>
+</li>
+<li><p>更改缓冲</p>
+</li>
+<li><p>多个缓冲区</p>
+</li>
+<li><p>行级锁</p>
+</li>
+<li><p>事务</p>
+</li>
+<li><p>查询高速缓存</p>
+</li>
+<li><p>复制</p>
+</li>
+<li><p>备份（热备份）</p>
+</li>
+<li><p>自动故障恢复</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">select @@default_storage_engine;  #默认存储引擎</span><br><span class="line">set default_storage_engine=innodb; #修改当前会话引擎</span><br><span class="line">set global default_storage_engine=innodb; #修改全局，在新的会话中表现出来</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">set</span>命令在mysql重启后，失效，如果需要永久配置，设置到配置文件；</span></span><br><span class="line">/etc/my.cnf</span><br><span class="line">[mysqld]</span><br><span class="line">default_storage_engine=myisam;</span><br><span class="line">存储引擎是表级别的，可以在建表的时候指定某个存储引擎，同时也可以将一个表引擎修改成其他引擎；</span><br><span class="line">select table_schema, table_name, engine from information_schema.tables where table_shcema not in ('sys', 'mysql', 'information_schema', 'performance_schema'); # 查询所有库下表的表引擎；</span><br><span class="line"></span><br><span class="line">处理的mysql问题：碎片整理（delete操作产生的，经常删除数据，导致磁盘占用空间大，不释放）</span><br><span class="line">select table_schema, table_name, data_free from information_schema.tables; #查询碎片data_free</span><br><span class="line">可以通过 alter table table_name engine=innodb; </span><br><span class="line">方案： 对表归档(pt-archive工具），使用truncate方式</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何批量修改表引擎,将zabbix库中所有表 innodb替换成tokudb</span></span><br><span class="line">select concat('alter table zabbix.', table_name, " engine tokudb;") from information_schema.tables where</span><br><span class="line">table_schema='zabbix' into outfile '/tmp/tokudb.sql';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何将所有非innodb业务表查询出来，并修改为innodb;</span></span><br><span class="line">select concat("alter table ", table_schema, ".", table_name, " engine=innodb;") from information_schema.tables where engine != 'InnoDB' and table_schema not in ('sys', 'performance_schema'， ‘information_schema', 'mysql') into outfile '/tmp/alter.sql';</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">InnoDB 将为每张表构建聚集索引（优化主键列的查询）</span><br><span class="line">一个表就是一个段，1个段由1个或者多个区组成，这些区不一定连续；	·1</span><br><span class="line">一个区就是连续的64page，1M</span><br><span class="line">一个page就是连续的4个block,16KB</span><br><span class="line">一个block就是连续的8个扇区；512B</span><br><span class="line">1）首先主键列，</span><br><span class="line">2）再次unique列</span><br><span class="line">3）最后是根据row id构建隐藏的列；</span><br><span class="line">作用：有了聚集索引之后，以后插入数据的时候，在同一个区内，按照id的顺序，有序的在磁盘存储数据，那么将来利用了聚集索引查找数据的时候，就是顺序I/O,查找的更快；</span><br><span class="line">构建聚集索引的过程：</span><br><span class="line"></span><br><span class="line">直接将数据行所在的数据页作为叶子结点，然后根据每个叶子结点中的最小值组成的范围构建枝结点，最后构建根节点；</span><br><span class="line">当我们使用主键作为查询条件时，会从根节点的范围公平的查找记录（找到每个主键使用的i/O次数一样）;</span><br><span class="line">而没有建立索引的情况下，会把全表所有页加载到内存，遍历查询，对于大表来说，非常低效；</span><br><span class="line"></span><br><span class="line">那么非主键列的查询如何优化？通过建立  辅助索引来优化非聚集索引列的查询；</span><br><span class="line">辅助索引建立的过程：</span><br><span class="line">	将主键和辅助索引列单独申请空间，先按照辅助索引列进行排序，建立叶子节点，然后构建枝节点，最后根节点，查询时候根据辅助索引列查询到辅助索引列和id,如果辅助索引能够完全覆盖查询结果时，不需要回表；如果想查询一条记录，不能完全覆盖到，那么需要回到聚集索引树结构根据id进行再次查询，这称之为回表操作，回表操作增加了磁盘I/O,将顺序I/O变成了随机I/O,数据页不在一个区，变成随机I/O；</span><br><span class="line">- 如何减少回表：</span><br><span class="line">	1）查询尽可能使用id主键查询；</span><br><span class="line">	2）设计合理的联合索引；完全覆盖查询结果；</span><br><span class="line">辅助索引的分类：</span><br><span class="line">	单列索引</span><br><span class="line">	联合索引</span><br><span class="line">		将id和多列拿出来构建索引树，然后先对第一列进行排序，如果第一列相同，再按照第二列进行排序，排好序后构建叶子节点，然后	   根据第一列的值的范围构建枝节点，最后构建根节点；比如(a,b,c)构建了联合索引，那么实际上是建立了，a,ab,abc的索引；</span><br><span class="line">	联合索引的注意点：</span><br><span class="line">		1）查询条件中，必须要包含联合索引最左列，至于是使用的部分根据查询不同而不同，要么所有列都走索引，要么部分列走索引；</span><br><span class="line">		2）构建联合索引，一定将值重复最少的列，作为联合索引的最左列；</span><br><span class="line">	前缀索引：</span><br><span class="line">		前缀索引，针对得是对列的值长度非常长建立索引时，可能导致索引数高度增高。</span><br><span class="line">		mysql建议索引树高度3-4层，最少2层(根节点和叶子节点)。容纳的数据量800w-1000w行，表的列有20-30列。</span><br><span class="line">		这时候，可以取前面部分字符作为索引生成条件；</span><br><span class="line">	b+tree的高度影响因素：</span><br><span class="line">		1）索引字段值较长：前缀索引</span><br><span class="line">		2）数据行过多： 建立分区表，归档表（pt-archive), 分布式架构</span><br><span class="line">		3）选择合适的数据类型：变长使用varchar,能使用enum的，使用它；</span><br><span class="line">		</span><br><span class="line">索引的建立是按照业务的需求来建立的，不能建立太多的索引原因有2：</span><br><span class="line">1）：更新，和删除的时候，可能影响索引树的结构</span><br><span class="line">2）：优化器选择索引上可能出现偏差，导致没有按照预期列走索引；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">查询索引：</span><br><span class="line">	desc table_name;</span><br><span class="line">	Key列：  PRI(聚集索引)  UML(辅助索引)   UNI(唯一索引)</span><br><span class="line">	show index from table_name;</span><br><span class="line">建立索引：</span><br><span class="line">	alter table table_name add index idx_name(name);</span><br><span class="line">	alter table table_name add index idx_n_c(name, country);联合索引</span><br><span class="line">	alter table table_name add index idx_d(district(5)); # 大字段100个字符，取前5个，主要用于like的查询；前缀索引</span><br><span class="line">删除索引</span><br><span class="line">	alter table table_name drop index idx_name;</span><br><span class="line">	</span><br><span class="line">压测命令：100个人，并发查询200次</span><br><span class="line">mysqlslap --defaults-file=/etc/my.cnf --concurrency=100 --iterations=1 --create-schema='test'</span><br><span class="line">--query="select * from test.t100w where ke='780p'" engine=innodb</span><br><span class="line">--number-of-queries=200 -uroot -p123456 -verbose</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql InnoDB共享表空间大小查看</span><br><span class="line">select @@innodb_data_file_path;</span><br><span class="line">ibdata1:12M:autoextend</span><br><span class="line">初始化之前，在my.cnf加入配置</span><br><span class="line">innodb_data_file_path = ibdata1:1G;ibdata2:1G:autoextend;</span><br><span class="line">在运行之后，数据库扩展多个ibdata文件方式一样：</span><br><span class="line">innodb_data_file_path=ibdata1:128M;idbdata2:128M;ibdata3:128M:autoextend;</span><br><span class="line">设置过之后，可能报错，因为第一个不一定是128M,已经在使用的共享表空间要按照实际大小来设置，用完之后，使用第二个，然后第三个，使用完后，自动扩展；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">一个表存储分 独立表空间，和共享表空间，每个表空间就是一个段，每个段有多个区，每个区有连续的页，每页就是连续的block,对应于连续的扇区；</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="6-利用拷贝表空间的方式恢复数据"><a href="#6-利用拷贝表空间的方式恢复数据" class="headerlink" title="6. 利用拷贝表空间的方式恢复数据"></a>6. 利用拷贝表空间的方式恢复数据</h1>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">有建表语句和idb文件，就可以恢复里面的数据</span><br><span class="line"></span><br><span class="line">1) 利用建表语句创建一个一模一样的表</span><br><span class="line">   create table table_name</span><br><span class="line">2) 删除这张空表的表空间</span><br><span class="line">	alter table test.t1 discard tablespace;</span><br><span class="line">3) 拷贝准备好的ibd,修改权限，导入表空间</span><br><span class="line">	alter table test.t1 import tablespace;</span><br><span class="line">	</span><br><span class="line">备份建表语句</span><br><span class="line">mysqldump -uroot -p -B test --no-data &gt; test.sql</span><br><span class="line"></span><br><span class="line">表空间删除</span><br><span class="line">select concat(&quot;alter table &quot;, table_schema, &#39;.&#39;)</span><br></pre></td></tr></table></figure>
+<h1 id="7-事务生命周期"><a href="#7-事务生命周期" class="headerlink" title="7. 事务生命周期"></a>7. 事务生命周期</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">select @@autocommit;  # 1.默认提交开启 ，这个功能就是自动添加begin, commit语句在每个操作语句之前，之后；</span><br><span class="line">1）显式开启事务</span><br><span class="line">begin; start transcation; # 都可以</span><br><span class="line">DML(insert, update, delete, select)</span><br><span class="line">commit;</span><br><span class="line">rollback;</span><br><span class="line">2) 一些非事务语句将导致自动隐式提交</span><br><span class="line">DDL语句 （Alter, create, drop)</span><br><span class="line">DCL语句 （grant, revoke, set password)</span><br><span class="line">锁语句（lock tables, unlock tables)</span><br><span class="line">truncate table;</span><br><span class="line">load data infile;</span><br><span class="line">select for update;</span><br><span class="line"></span><br><span class="line">3) 隐式回滚：</span><br><span class="line">会话关闭</span><br><span class="line">数据库宕机</span><br><span class="line">事务语句执行失败；</span><br><span class="line"></span><br><span class="line">事务的隔离级别：</span><br><span class="line">RU:</span><br><span class="line">会引发：脏读，不可重复读，幻读；</span><br><span class="line">脏读：读取到了其他事务没有提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">不可重复读：读取到了其他事务提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">幻读：一个事务更新数据后，出现了其他事务插入数据的幻行； 违背了事务的隔离性，一致性；</span><br><span class="line">RC:</span><br><span class="line">会引发：不可重复读，幻读；</span><br><span class="line">RR:</span><br><span class="line">利用的是Undo的一致性快照读，是MVCC的重要功能；</span><br><span class="line">完美解决幻读的方案：加入GAP锁，next-lock，这些功能是在辅助索引上实现的；</span><br><span class="line">在索引列（name)上  update test set num=25 where num &gt; 25;</span><br><span class="line">另外一个事务插入了一个大于 num&gt;25的值，将因为GAP锁而锁住，</span><br><span class="line">SR:</span><br><span class="line">永久修改隔离级别：</span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">transaction_isolation='read-committed'</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">对象锁：</span><br><span class="line">	MDL:(元数据锁),修改元数据时，DDL(alter) </span><br><span class="line">	table lock: 表锁，DDL,备份（FTWRL全局表锁），lock tables t1 read;(手动加锁)，行级锁升级为表锁；</span><br><span class="line">	row lock:  行级锁，聚集索引上的锁；</span><br><span class="line">	gap lock:  间隙锁，普通辅助索引列的范围锁(也不能是唯一锁),范围超过（15%-30%），可能导致表锁；</span><br><span class="line">	next lock: 下一键锁，普通辅助索引的范围锁（gap lock + row lock)</span><br></pre></td></tr></table></figure>
+
+<h1 id="8-存储引擎核心参数"><a href="#8-存储引擎核心参数" class="headerlink" title="8.存储引擎核心参数"></a>8.存储引擎核心参数</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">innodb_flush_log_at_trx_commit=1/0/2 redo log flush到磁盘的参数</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置1 ：每次事务提交的时候，刷到redo <span class="built_in">log</span> ，同时flsh to disk;</span></span><br><span class="line">innodb_flush_method=fsync/O_DSYNC/O_DIRECT/ ：控制mysql刷写磁盘时，是否使用 os buffer</span><br><span class="line">fsync: （默认值，当buffer pool设置太大时，有可能会发生OOM)</span><br><span class="line">	buffer pool的数据写磁盘的时候，需要先经过os buffer,然后写磁盘(经过os buffer,需要申请buffer pool的大小)</span><br><span class="line">	redo buffer的数据写磁盘的时候，需要先经过os buffer,然后写磁盘</span><br><span class="line">O_DIRECT:（防止出现问题，设置次选项,生产上设置此选项）</span><br><span class="line">	buffer pool的数据写磁盘的时候，直接写磁盘，跨过OS buffer；</span><br><span class="line">	redo buffer的数据写磁盘的时候，经过os buffer,然后写磁盘；</span><br><span class="line">	</span><br><span class="line">innodb_buffer_pool_size :数据缓冲区大小，缓冲数据也和索引页，mysql最大的内存区域；生产上75%一下；</span><br><span class="line">show engine innodb status\G</span><br></pre></td></tr></table></figure>
+
+<h1 id="9-日志管理"><a href="#9-日志管理" class="headerlink" title="9.日志管理"></a>9.日志管理</h1><h3 id="1-错误日志"><a href="#1-错误日志" class="headerlink" title="1.错误日志"></a>1.错误日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">默认位置 select @@datadir/hostname.err;</span><br><span class="line">配置位置：vim /etc/my.cnf</span><br><span class="line">log_error=/tmp/mysql.log</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志"><a href="#2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志" class="headerlink" title="2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志"></a>2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志</h3><p>应用：数据恢复，主从复制中使用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/my.cnf  # 8.0之前，没有开启，生产上建议开启；8.0之后，默认开启 select @@log_bin;</span><br><span class="line">[mysqld]</span><br><span class="line">server_id=7  #开启binlog需要参数</span><br><span class="line">log_bin=/data/binlog/mysql-bin # 设置和data不同的目录，路径/data/binlog要首先创建，设置mysql.mysql权限；</span><br><span class="line">sync_binlog=1 #binlog日志刷磁盘策略，每次事务提交立即刷写binlog到磁盘</span><br><span class="line">binlog_format=raw # binlog的记录格式为row模式</span><br><span class="line"></span><br><span class="line">binlog 记录sql语句的分类：</span><br><span class="line">DDL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DCL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DML: 只记录已经提交事务DML(insert, update, delete)</span><br><span class="line"></span><br><span class="line">binlog三种记录格式</span><br><span class="line">1）statement（5.6默认）: SBR(statement based replication)，语句模式原封不定的记录当前DML</span><br><span class="line">2) row: (5.7默认)：RBR  :记录数据行的变化（用户看不懂，需要工具分析）</span><br><span class="line">3)mixed:</span><br><span class="line"></span><br><span class="line">statement: 可读性高，日志量少，不够严谨</span><br><span class="line">（statement 只记录update t1 set xxx=xxx where id&gt;1000)</span><br><span class="line">insert into t1 values(1, now())</span><br><span class="line">row: 可读性差，日志量大，足够严谨；（update t1 set xxx=xxx where id&gt;1000  一共500w行，row模式逐行记录）</span><br><span class="line">insert into t1 values(1, 2020-0-28 16:32:06) # 记录行具体变化；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的位置</span></span><br><span class="line">select @@log_bin_basename;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前有几个日志文件</span></span><br><span class="line">show binary logs;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前在使用的binlog;</span></span><br><span class="line">show master status;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的事件行为：</span></span><br><span class="line">show binlog events in 'mysql-bin.000001';</span><br><span class="line"></span><br><span class="line"> mysql -uroot -p123 -e "show binlog events in 'mysql-bin.000001'"|grep DROP 查看binlog中drop的事件；</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog中具体内容</span></span><br><span class="line">mysqlbinlog mysql-bin.000001 &gt; /tmp/a.sql;</span><br><span class="line">vim /tmp/a.sql</span><br><span class="line"></span><br><span class="line">mysqlbinlog --base64-output=decode-rows -vvv mysql-bin.000001 &gt; /tmp/b.sql # 查看加密的DML操作；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 滚动日志</span></span><br><span class="line">flush logs; # 生成一个新的binlog日志文件；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数据恢复：找到起点和终点位置</span></span><br><span class="line">mysql/bin/mysqlbinlog --start-position=219 --stop-position=1356 mysql-bin.000002 &gt; /tmp/b.sql</span><br><span class="line"></span><br><span class="line">set sql_log_bin=0;# 当前会话，临时不记录binlog;</span><br><span class="line">source /tmp/b.sql;</span><br><span class="line">set sql_log_bin=1;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有几点需要注意：</span></span><br><span class="line">1.binlog中如果有对其他库的操作，如何提取出只有目标库的操作？</span><br><span class="line">-d bindb  ：加上参数只提取出bindb库的操作</span><br><span class="line">2.需要的日志在多个文件中分布</span><br><span class="line">用起点时间，终点时间，起点位置，终点位置，混合使用去确定</span><br></pre></td></tr></table></figure>
+
+<h1 id="10-mysqldump"><a href="#10-mysqldump" class="headerlink" title="10. mysqldump"></a>10. mysqldump</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">连接参数： -u,-p,-S</span><br><span class="line">1. 全备参数 -A</span><br><span class="line">mysqldump -uroot -p123 -A &gt; /tmp/all.sql</span><br><span class="line">2. 备份一个或者库 -B</span><br><span class="line">mysqldump -uroot -p123 -B test &gt;/tmp/test.sql #备份test下的所有表，同时自动创建test库，use test;</span><br><span class="line">3. 备份库下一个或者多个表 </span><br><span class="line">mysqldump -uroot -p123 test &gt;/tmp/test.sql   # 备份test下的所有表,这条命令需要自己去创建库，并且use test;</span><br><span class="line">4. 高级参数</span><br><span class="line"></span><br><span class="line">--master-data=2 ：</span><br><span class="line">1. 将binlog 位置和文件名作为注释的方式写入到文件中；</span><br><span class="line">2. 将自动锁表和解锁；</span><br><span class="line">3. 配合single-transaction 减少锁表时间；</span><br><span class="line"></span><br><span class="line">--single-transaction: 对于InnoDB引擎开启一个独立事务，获取一致性快照，进行备份；</span><br><span class="line">-R, -E --triggers :备份存储过程，</span><br><span class="line">--max_allowed_packet=64M： 设置服务端向客户端发送包的大小，防止因表数据太大，导致</span><br><span class="line">1153- 错误 Got a packet bigger than 'max_allowed_packet'</span><br><span class="line"></span><br><span class="line">mysqldump -uroot -p -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; backup/full_bak.sql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">GTID(Global Transaction ID): 已提交事务的编号；GTID= server_uuid: transaction_id</span><br><span class="line">用户记录binlog 中的是事务Id,用于主从复制</span><br><span class="line"></span><br><span class="line">select @@gtid_mode; # 默认关闭</span><br><span class="line">开启 vim /etc/my.inf</span><br><span class="line">gtid-mode=on</span><br><span class="line">enforce-gtid-consistency=true #保证主从数据的一致性；</span><br><span class="line"></span><br><span class="line">如何利用GTID 在多个binlog中截取需要的日志：</span><br><span class="line"></span><br><span class="line">1） 确定截取的GTID范围</span><br><span class="line">mysql-bin.000005 | 356 | Gtid           |      3306 |         421 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:9'</span><br><span class="line"></span><br><span class="line">| mysql-bin.000003 |  586 | Gtid           |      3306 |         651 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:3' |</span><br><span class="line">| mysql-bin.000003 |  651 | Query          |      3306 |         761 | create database gtdb charset utf8mb4  </span><br><span class="line">2）确定在哪些文件中执行这些操作</span><br><span class="line">mysql-bin.000003 mysql-bin.000004 mysql-bin.000005</span><br><span class="line">3) 开始截取</span><br><span class="line">mysql/bin/mysqlbinlog --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid.sql</span><br><span class="line">4)开始执行sql</span><br><span class="line"> set sql_log_bin=0; #先关闭binlog，不记录接下来的操作</span><br><span class="line"> source /tmp/gtid.sql</span><br><span class="line"> 发现并没有执行成功</span><br><span class="line"> </span><br><span class="line">5)关闭gtid的幂等性检查，一旦binlog已经存在gtid,而我们截取出来的也有相同的gtid,那么就不会再次执行，跳过；</span><br><span class="line">使用--skip-gtids 可以截取没有gtid的binlog</span><br><span class="line"></span><br><span class="line">mysql/bin/mysqlbinlog --skip-gtids --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid1.sql</span><br><span class="line">6)重新执行sql,成功恢复gtid数据库</span><br><span class="line">set sql_log_bin=0;</span><br><span class="line">source /tmp/gtid1.sql</span><br><span class="line">set sql_log_bin=1;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/12/Flask_wtf%E7%9A%84%E5%86%8D%E5%AD%A6%E4%B9%A0/" rel="prev" title="Flask_wtf的再学习">
+      <i class="fa fa-chevron-left"></i> Flask_wtf的再学习
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/12/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/" rel="next" title="Mysql继续学习">
+      Mysql继续学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Mysql索引"><span class="nav-number">1.</span> <span class="nav-text">Mysql索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-准备测试数据"><span class="nav-number">2.</span> <span class="nav-text">1. 准备测试数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-使用索引进行优化"><span class="nav-number">3.</span> <span class="nav-text">2. 使用索引进行优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-优化的过程"><span class="nav-number">4.</span> <span class="nav-text">3. 优化的过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-锁机制"><span class="nav-number">5.</span> <span class="nav-text">4.锁机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Innodb核心特性"><span class="nav-number">6.</span> <span class="nav-text">5. Innodb核心特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-利用拷贝表空间的方式恢复数据"><span class="nav-number">7.</span> <span class="nav-text">6. 利用拷贝表空间的方式恢复数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-事务生命周期"><span class="nav-number">8.</span> <span class="nav-text">7. 事务生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-存储引擎核心参数"><span class="nav-number">9.</span> <span class="nav-text">8.存储引擎核心参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-日志管理"><span class="nav-number">10.</span> <span class="nav-text">9.日志管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-错误日志"><span class="nav-number">10.0.1.</span> <span class="nav-text">1.错误日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志"><span class="nav-number">10.0.2.</span> <span class="nav-text">2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-mysqldump"><span class="nav-number">11.</span> <span class="nav-text">10. mysqldump</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="cgn"
+      src="/images/sister.jpeg">
+  <p class="site-author-name" itemprop="name">cgn</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lioncgn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lioncgn" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cgnstudyflask@gmail.com" title="E-Mail → mailto:cgnstudyflask@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cgn</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/hong.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script src="/js/src/hong.js"></script>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"log":false,"model":{"jsonPath":"/live2dw/assets/Epsilon2.1.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true}});</script></body>
+</html>
