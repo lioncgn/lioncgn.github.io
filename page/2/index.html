@@ -207,6 +207,71 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/sister.jpeg">
+      <meta itemprop="name" content="cgn">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="你的眼神">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">Mysql索引</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-12 17:55:09" itemprop="dateCreated datePublished" datetime="2020-10-12T17:55:09+08:00">2020-10-12</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Mysql索引"><a href="#Mysql索引" class="headerlink" title="Mysql索引"></a><center>Mysql索引</center></h1>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/Flask_wtf%E7%9A%84%E5%86%8D%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -337,104 +402,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/sister.jpeg">
-      <meta itemprop="name" content="cgn">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="你的眼神">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/10/12/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/" class="post-title-link" itemprop="url">ubuntu 18.04同版本多实例开始</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-10-12 17:51:51" itemprop="dateCreated datePublished" datetime="2020-10-12T17:51:51+08:00">2020-10-12</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a>ubuntu 18.04同版本多实例开始</h1><h2 id="1-创建data目录"><a href="#1-创建data目录" class="headerlink" title="1. 创建data目录"></a>1. 创建data目录</h2><ul>
-<li><p>sudo mkdir -p /space/data/330{7..9}/data</p>
-</li>
-<li><p>sudo mkdir -p /space/binlog/330{7..9}</p>
-</li>
-</ul>
-<h2 id="2-创建配置文件"><a href="#2-创建配置文件" class="headerlink" title="2.创建配置文件"></a>2.创建配置文件</h2><p> cat &gt; /space/data/3307/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3307/data<br>socket=/tmp/mysql3307.sock<br>log_error=/space/data/3307/mysql.log<br>port=3307<br>server_id=7<br>log_bin=/space/binlog/3307/mysql-bin</p>
-<p> cat &gt; /space/data/3308/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3308/data<br>socket=/tmp/mysql3308.sock<br>log_error=/space/data/3308/mysql.log<br>port=3308<br>server_id=8</p>
-<p> cat &gt; /space/data/3309/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3309/data<br>socket=/tmp/mysql3309.sock<br>log_error=/space/data/3309/mysql.log<br>port=3309<br>server_id=9</p>
-<h2 id="3-修改属主"><a href="#3-修改属主" class="headerlink" title="3. 修改属主"></a>3. 修改属主</h2><p>space/data# chown -R mysql.mysql 330*</p>
-<p>/space/binlog# chown -R mysql.mysql 330*</p>
-<h2 id="4-初始化之前准备"><a href="#4-初始化之前准备" class="headerlink" title="4. 初始化之前准备"></a>4. 初始化之前准备</h2><p>mv /etc/my.cnf  /etc/my.cnf.bak  # 初始化也会读这文件；</p>
-<h2 id="5-初始化数据"><a href="#5-初始化数据" class="headerlink" title="5.初始化数据"></a>5.初始化数据</h2><p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3307/data –basedir=/space/database/mysql</p>
-<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3308/data –basedir=/space/database/mysql</p>
-<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3309/data –basedir=/space/database/mysql</p>
-<h2 id="5-使用systemctl管理"><a href="#5-使用systemctl管理" class="headerlink" title="5. 使用systemctl管理"></a>5. 使用systemctl管理</h2><p>/etc/systemd/system/mysqld3307.service</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1 [Service]                                                                                                                                                                                  </span><br><span class="line">2 User=mysql</span><br><span class="line">3 Group=mysql</span><br><span class="line">4 ExecStart=/space/database/mysql/bin/mysqld --defaults-file=/space/data/3309/my.cnf</span><br><span class="line">5 LimitNOFILE=5000</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="6-开启多实例"><a href="#6-开启多实例" class="headerlink" title="6. 开启多实例"></a>6. 开启多实例</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">1）</span><br><span class="line">systemctl start mysqld3307</span><br><span class="line">systemctl start mysqld3308</span><br><span class="line">systemctl start mysqld3309</span><br><span class="line">2）检查server_id是否不同：</span><br><span class="line">mysql -S /tmp/mysql3307.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3308.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3309.sock  -e 'select @@server_id' -uroot</span><br><span class="line">3）检查主库binlog是否开启</span><br><span class="line"> mysql -S /tmp/mysql3307.sock -e "select @@log_bin" -uroot;</span><br><span class="line"> </span><br><span class="line">4）主库建立复制用户</span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "grant replication slave on *.* to repl@'192.168.0.%' identified by '123'" -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认用户是否建立成功</span></span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "select user,host from mysql.user" -uroot -p </span><br><span class="line">5）主库备份恢复到从库</span><br><span class="line"> </span><br><span class="line"> mysqldump -uroot -p -S /tmp/mysql3307.sock -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; /tmp/full3307.sql</span><br><span class="line"> mysql -uroot -S /tmp/mysql3308.sock &lt; /tmp/full3307.sql </span><br><span class="line"> </span><br><span class="line">6）从库：告知从库复制连接信息和要复制的起点信息</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.111',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3307,</span><br><span class="line">  MASTER_LOG_FILE='mysql-bin.000002',</span><br><span class="line">  MASTER_LOG_POS=691,</span><br><span class="line"><span class="meta">#</span><span class="bash">  MASTER_CONNECT_RETRY=10;(可选参数)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看从库要复制的起点</span></span><br><span class="line">grep "\-- CHANGE MASTER TO" /tmp/full3307.sql </span><br><span class="line">-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=691;</span><br><span class="line">7） 从库：开启专用的复制线程</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> start slave;</span></span><br><span class="line">8) 从库验证主从状态：</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot -e "show slave status\G" |grep Running:</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line">如果搭建失败：，执行以下命令，重新开始</span><br><span class="line">mysql -S /tmp/mysql3308.sock -e "stop slave;reset slave all;"</span><br></pre></td></tr></table></figure>
-
-<h2 id="7-主从复制的原理"><a href="#7-主从复制的原理" class="headerlink" title="7.主从复制的原理"></a>7.主从复制的原理</h2><h3 id="1-从库中有关的文件"><a href="#1-从库中有关的文件" class="headerlink" title="1.从库中有关的文件"></a>1.从库中有关的文件</h3><ul>
-<li>relay_log_basename ：默认在从库的数据目录中，设置此参数可自定义文件名,用来存储接收的binlog;<ul>
-<li>自定义文件名: relay_log_basename=</li>
-</ul>
-</li>
-<li>master.info: 默认在从库的数据目录中，存放的是连接主库的信息和已经接收binlog位置点信息<ul>
-<li>默认以文件的形式，可以存放到表中，进行优化</li>
-<li>master_info_repository=FILE/TABLE</li>
-</ul>
-</li>
-<li>relay-info.log: 记录从库回放到relay-log的位置点，默认在从库数据目录下<ul>
-<li>relay_log_info_repository=FILE/TABLE 进行配置</li>
-</ul>
-</li>
-</ul>
-<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL)</span><br><span class="line">2）从库：连接主库；</span><br><span class="line">3）主库：分配dump_thread专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到relay-info.log中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-info.log，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行新的relay-info.log,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-监控主从的状态"><a href="#3-监控主从的状态" class="headerlink" title="3.监控主从的状态"></a>3.监控主从的状态</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">主库：</span><br><span class="line">show processlist</span><br><span class="line">show slave hosts;</span><br><span class="line"></span><br><span class="line">从库：show slave status \G</span><br><span class="line">		从库连接主库的信息，来自于master.info</span><br><span class="line">                  Master_Host: 192.168.0.111</span><br><span class="line">                  Master_User: repl</span><br><span class="line">                  Master_Port: 3307</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000002</span><br><span class="line">          Read_Master_Log_Pos: 866</span><br><span class="line">          </span><br><span class="line">          从库relay-log.info的执行情况，来自于relay-log.info，用来判断主从延时的判断信息</span><br><span class="line">               Relay_Log_File: ubuntu-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 495</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000002</span><br><span class="line">                Exec_Master_Log_Pos: 866</span><br><span class="line">               Seconds_Behind_Master: 0</span><br><span class="line">        </span><br><span class="line">        从库线程状态,具体错误信息</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">                     Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">               </span><br><span class="line">               </span><br><span class="line">         过滤复制相关，只想复制某些库</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">  </span><br><span class="line">        用来设置从库延时复制的相关信息</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">   </span><br><span class="line">           GTID 相关复制信息</span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set:</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/08/%E5%90%84%E7%A7%8D%E7%AE%97%E6%B3%95%E4%BD%BF%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -466,7 +433,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-10-09 21:32:16" itemprop="dateModified" datetime="2020-10-09T21:32:16+08:00">2020-10-09</time>
+                <time title="修改时间：2020-10-13 11:48:21" itemprop="dateModified" datetime="2020-10-13T11:48:21+08:00">2020-10-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -491,42 +458,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="算法使用"><a href="#算法使用" class="headerlink" title="算法使用"></a><center>算法使用<center></h1><h2 id="1-查找算法"><a href="#1-查找算法" class="headerlink" title="1. 查找算法"></a>1. 查找算法</h2><ul>
-<li><p>顺序查找，对于默认的列表方法<strong>index</strong>, 就是使用此方法</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 时间复杂度： O(n)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">line_search</span><span class="params">(li, val)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> ind, v <span class="keyword">in</span> enumerate(li):</span><br><span class="line">        <span class="keyword">if</span> v == val:</span><br><span class="line">            <span class="keyword">return</span> ind</span><br><span class="line"></span><br><span class="line">alist = range(<span class="number">10</span>)</span><br><span class="line">print(line_search(alist, <span class="number">3</span>))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>二分查找算法, 时间复杂度 $O(log_2n)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 前提条件：列表必须有序，才能使用.</span></span><br><span class="line"><span class="comment"># 时间复杂度 O(logn)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search</span><span class="params">(li, val)</span>:</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    j = len(li) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> i &lt;= j:</span><br><span class="line">        mid = (i + j) // <span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> li[mid] == val:</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="keyword">elif</span> li[mid] &gt; val:</span><br><span class="line">            j = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            i = mid + <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="2-排序算法"><a href="#2-排序算法" class="headerlink" title="2. 排序算法"></a>2. 排序算法</h2><h3 id="1-Low-算法"><a href="#1-Low-算法" class="headerlink" title="1. Low 算法"></a>1. Low 算法</h3><ul>
-<li><p>冒泡排序, 时间复杂度:    $O(n^2)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bubble_sort</span><span class="params">(li)</span>:</span></span><br><span class="line">    num = len(li)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num - <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(num -i - <span class="number">1</span>):</span><br><span class="line">            <span class="keyword">if</span> li[j] &gt; li[j + <span class="number">1</span>]:</span><br><span class="line">                li[j], li[j + <span class="number">1</span>] = li[j + <span class="number">1</span>], li[j]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>选择排序, 时间复杂度: $O(n^2)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">select_sort</span><span class="params">(li)</span>:</span></span><br><span class="line">    num = len(li)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num - <span class="number">1</span>): <span class="comment"># 要循环多少趟，n个元素要循环 n - 1趟</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i + <span class="number">1</span>, num):<span class="comment"># 从第一个元素开始，遍历到最后一个元素，和待比较区域中的第一个元素进行比较</span></span><br><span class="line">           <span class="keyword">if</span> li[j] &lt; li[i]:</span><br><span class="line">               li[i], li[j] = li[j], li[i]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>插入排序，时间复杂度$O(n^2)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">insert_sort</span><span class="params">(li)</span>:</span></span><br><span class="line">    num = len(li)</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, num): <span class="comment"># 从第一个元素开始，遍历到最后一个元素，将每个元素都插入到手中牌中响应的位置上</span></span><br><span class="line">        i = j - <span class="number">1</span>  <span class="comment"># 手中牌中最大牌的下标</span></span><br><span class="line">        tmp = li[j]</span><br><span class="line">        <span class="keyword">while</span> i &gt;= <span class="number">0</span> <span class="keyword">and</span> li[i] &gt; tmp: <span class="comment"># 不超过界限同时，如果大于tmp时</span></span><br><span class="line">            li[i + <span class="number">1</span>] = li[i] <span class="comment"># 将li[i] 往后移，</span></span><br><span class="line">            i -= <span class="number">1</span> <span class="comment"># i向前移位</span></span><br><span class="line">        li[i + <span class="number">1</span>] = tmp <span class="comment"># 跳出循环后，将tmp值放回到对应的位置</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h3 id="2-厉害的算法"><a href="#2-厉害的算法" class="headerlink" title="2. 厉害的算法"></a>2. 厉害的算法</h3><ul>
-<li><p>快速排序,时间复杂度 $O(nlog_2n)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">partition</span><span class="params">(li, start, end)</span>:</span></span><br><span class="line">    i = start</span><br><span class="line">    j = end</span><br><span class="line">    tmp = li[start]</span><br><span class="line">    <span class="keyword">while</span> i &lt; j:</span><br><span class="line">        <span class="keyword">while</span> li[j] &gt;= tmp <span class="keyword">and</span> i &lt; j:</span><br><span class="line">            j -= <span class="number">1</span></span><br><span class="line">        li[i] = li[j]</span><br><span class="line">        <span class="keyword">while</span> li[i] &lt;= tmp <span class="keyword">and</span> i &lt; j:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">        li[j] = li[i]</span><br><span class="line">    li[i] = tmp</span><br><span class="line">    <span class="keyword">return</span> i</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick_sort</span><span class="params">(li, start, end)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> start &lt; end:</span><br><span class="line">        mid = partition(li, start, end)</span><br><span class="line">        quick_sort(li, start, mid - <span class="number">1</span>)</span><br><span class="line">        quick_sort(li, mid + <span class="number">1</span>, end)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>堆排序，时间复杂度 $O(nlog_2n)$</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 向下调整函数，用来使堆结构重新成为大根堆或者小根堆 ,就是用来给堆顶元素找到一个合适的位置</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sift_down</span><span class="params">(li, low, high)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param li: 列表结构</span></span><br><span class="line"><span class="string">    :param low: 堆顶元素</span></span><br><span class="line"><span class="string">    :param high: 堆的最后一个元素</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    i = low   <span class="comment"># i指向它的堆顶</span></span><br><span class="line">    j = <span class="number">2</span> * i + <span class="number">1</span> <span class="comment"># j指向它的左孩子节点</span></span><br><span class="line">    tmp = li[low]  <span class="comment"># 先将堆顶元素取出</span></span><br><span class="line">    <span class="keyword">while</span> j &lt;= high:  <span class="comment">#循环条件，不能让它的孩子节点超过最后一个元素</span></span><br><span class="line">        <span class="comment"># 在它的孩子节点中找到最大的节点</span></span><br><span class="line">        <span class="keyword">if</span> j + <span class="number">1</span> &lt;= high <span class="keyword">and</span> li[j + <span class="number">1</span>] &gt; li[j]: <span class="comment">#保证孩子右节点存在</span></span><br><span class="line">            j = j + <span class="number">1</span> <span class="comment"># 让j 指向右孩子</span></span><br><span class="line">        <span class="comment"># 让tmp 与他的孩子节点进行比较，</span></span><br><span class="line">        <span class="keyword">if</span> li[j] &gt; tmp:</span><br><span class="line">            li[i] = li[j]</span><br><span class="line">            i = j  <span class="comment"># i指向下一层，也就是j指向的位置</span></span><br><span class="line">            j = <span class="number">2</span> * i + <span class="number">1</span> <span class="comment"># 重新更新他的孩子节点位置</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    li[i] = tmp  <span class="comment"># tmp值归位</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_sort</span><span class="params">(li)</span>:</span></span><br><span class="line">    <span class="comment"># 1. 建立堆</span></span><br><span class="line">    num = len(li)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range((num - <span class="number">2</span>) // <span class="number">2</span>, <span class="number">-1</span>, <span class="number">-1</span>):   <span class="comment">#从最后一个叶子节点的父节点开始，倒序循环</span></span><br><span class="line">        sift_down(li, i, num - <span class="number">1</span>)  <span class="comment"># 构建大根堆</span></span><br><span class="line">    <span class="comment"># 2. 循环取出堆顶元素</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num - <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>):</span><br><span class="line">        li[i], li[<span class="number">0</span>] = li[<span class="number">0</span>], li[i] <span class="comment"># 将堆顶和最后一个元素交换</span></span><br><span class="line">        sift_down(li, <span class="number">0</span>, i - <span class="number">1</span>) <span class="comment"># 交换后，重新构建大根堆</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line">alist = range(<span class="number">30</span>)</span><br><span class="line">random.shuffle(alist)</span><br><span class="line">print(alist)</span><br><span class="line"></span><br><span class="line">heap_sort(alist)</span><br><span class="line">print(alist)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>合并排序</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> </span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-
+          <h1 id="算法使用"><a href="#算法使用" class="headerlink" title="算法使用"></a><center>算法使用<center></h1>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/08/%E5%90%84%E7%A7%8D%E7%AE%97%E6%B3%95%E4%BD%BF%E7%94%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
