@@ -3,7 +3,7 @@
   <entry>
     <title>ubuntu 18.04同版本多实例开始</title>
     <url>/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/</url>
-    <content><![CDATA[<h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a>ubuntu 18.04同版本多实例开始</h1><a id="more"></a>
+    <content><![CDATA[<h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a><center>ubuntu 18.04同版本多实例开始</center></h1><a id="more"></a>
 
 <h2 id="1-创建data目录"><a href="#1-创建data目录" class="headerlink" title="1. 创建data目录"></a>1. 创建data目录</h2><ul>
 <li><p>sudo mkdir -p /space/data/330{7..9}/data</p>
