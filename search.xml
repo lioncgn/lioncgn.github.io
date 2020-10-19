@@ -1,6 +1,358 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>elasticsearch学习</title>
+    <url>/2020/10/18/elasticsearch%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="elasticsearch学习"><a href="#elasticsearch学习" class="headerlink" title="elasticsearch学习"></a><center>elasticsearch学习</center></h1><a id="more"></a>
+
+<h2 id="1-下载并安装elasticsearch-注意版本区别"><a href="#1-下载并安装elasticsearch-注意版本区别" class="headerlink" title="1.下载并安装elasticsearch,注意版本区别"></a>1.下载并安装elasticsearch,注意版本区别</h2><h2 id="2-测试是否安装成功"><a href="#2-测试是否安装成功" class="headerlink" title="2. 测试是否安装成功"></a>2. 测试是否安装成功</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl localhost:9200</span><br><span class="line">curl localhost:9200/_cluster/health?pretty  #查看是否运行正常</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建索引库</span></span><br><span class="line">curl -XPUT 'localhost:9200/myindex'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">创建类型</span></span><br><span class="line">curl -XPOST "localhost:9200/myindex/_doc/1" -H "Content-Type: application/json" -d '&#123;"name": "cgn", "age": 31&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">查询</span></span><br><span class="line"> curl -XGET "localhost:9200/myindex/_doc/1?pretty"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">查询所有的数据</span></span><br><span class="line">curl -XGET "localhost:9200/myindex/_search?pretty"</span><br><span class="line"><span class="meta">#</span><span class="bash">删除索引库</span></span><br><span class="line">curl -XDELETE "localhost:9200/myindex"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看有多少条记录</span></span><br><span class="line"> curl -XGET "localhost:9200/myindex/_count?pretty"</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-当修改了绑定地址后，修改配置"><a href="#3-当修改了绑定地址后，修改配置" class="headerlink" title="3. 当修改了绑定地址后，修改配置"></a>3. 当修改了绑定地址后，修改配置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1. /etc/sysctl.conf 中添加</span><br><span class="line">vm.max_map_count=655300</span><br><span class="line">然后执行sudo sysctl -p</span><br><span class="line"></span><br><span class="line">2. 在/etc/security/limits.conf中增加一下内容： </span><br><span class="line">增加系统打开文件数，打开线程数，允许E锁定内存</span><br><span class="line">* soft nofile 65536</span><br><span class="line">* hard nofile 65536</span><br><span class="line">* soft nproc 10240</span><br><span class="line">* hard nproc 10240</span><br><span class="line">* soft memlock unlimited</span><br><span class="line">* hard memlock unlimited</span><br><span class="line"></span><br><span class="line">ulimit -HSn 65535 &amp;&amp; ulimit -HSu 10240 &amp;&amp; ulimit -HSl unlimited</span><br><span class="line">通过ulimit -a 查看是否生效，不生效重启</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-集群配置"><a href="#4-集群配置" class="headerlink" title="4. 集群配置"></a>4. 集群配置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cluster.name: es-study</span><br><span class="line">node.name: es-studynode-1</span><br><span class="line">bootstrap.memory_lock: true</span><br><span class="line">network.host: 0.0.0.0</span><br><span class="line">http.port: 9200</span><br><span class="line">discovery.zen.ping.unicast.hosts: ["0.0.0.0:9300", "0.0.0.0:9301", "0.0.0.0:9302"]</span><br><span class="line">discovery.zen.minimum_master_nodes: 2</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-启动集群"><a href="#5-启动集群" class="headerlink" title="5. 启动集群"></a>5. 启动集群</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"> elasticsearch-6.5.4/bin/elasticsearch elasticsearch-6.5.4-1/bin/elasticsearch elasticsearch-6.5.4-2/bin/elasticsearch</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看集群状态</span></span><br><span class="line">192.168.0.114:9200/_cluster/health?pretty</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-安装插件中文分析器"><a href="#6-安装插件中文分析器" class="headerlink" title="6.安装插件中文分析器"></a>6.安装插件中文分析器</h2><p><a href="https://github.com/medcl/elasticsearch-analysis-ik" target="_blank" rel="noopener">https://github.com/medcl/elasticsearch-analysis-ik</a></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./elasticsearch-6.5.4/bin/elasticsearch-plugin install file:///home/cgn/elasticsearch-analysis-ik-6.5.4.zip </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">测试是否安装成功</span></span><br><span class="line"> curl -XGET "localhost:9200/_analyze?pretty" -H "Content-Type: application/json" -d '</span><br><span class="line">&#123;"analyzer": "ik_max_word", "text": "我是&amp;中国人"&#125;'</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-索引库"><a href="#7-索引库" class="headerlink" title="7. 索引库"></a>7. 索引库</h2><ul>
+<li><p>创建索引库</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XPUT localhost:9200/articles -H 'Content-Type: application/json' -d '</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;<span class="string">"settings"</span> : &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"index"</span>: &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"number_of_shards"</span>: 3,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"number_of_replicas"</span>: 1</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;<span class="string">'</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看索引库</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/_cat/indices</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除索引库</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XDELETE /my_index</span><br><span class="line">curl -XDELETE /my_index_one, my_index_two # 删除多个</span><br><span class="line">curl -XDELETE /my_index* #支持模糊删除</span><br><span class="line">curl -XDELETE /all # 删除所有</span><br><span class="line">curl -XDELETE /* # 删除所有</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="8-类型和映射"><a href="#8-类型和映射" class="headerlink" title="8. 类型和映射"></a>8. 类型和映射</h2><p>类型表示一类相似的文档，由名称和映射组成，映射描述了文档可能具有的字段和属性，就像关系型数据库中的表似得</p>
+<p>字段类型：</p>
+<ul>
+<li>整数： byte, short, integer, long</li>
+<li>浮点数： float, double</li>
+<li>布尔型： boolean</li>
+<li>日期： date</li>
+<li>字符串：text,  (2.x版本中，为string类型)</li>
+</ul>
+<h3 id="8-1-创建映射"><a href="#8-1-创建映射" class="headerlink" title="8.1 创建映射"></a>8.1 创建映射</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XPUT localhost:9200/articles/_mapping/article -H "Content-Type: application/json" -d '&#123;</span><br><span class="line">	"_all": &#123;   # 将下面所有的字段用空格分割组成大的字段，用于查询时从哪些字段进行查询  5.x版本使用的语法，6.x已经不再使用</span><br><span class="line">		"analyzer": "ik_max_word"</span><br><span class="line">	&#125;,</span><br><span class="line">	"properties" &#123;</span><br><span class="line">		"article_id": &#123;     # 字段名 </span><br><span class="line">			"type": "long",  # 字段数据类型</span><br><span class="line">			"include_in_all": "false" # 不将此字段加入到_all中，不参与字段查询</span><br><span class="line">		&#125;,</span><br><span class="line">		"user_id": &#123;</span><br><span class="line">			"type": "long",</span><br><span class="line">			"include_in_all": "false"</span><br><span class="line">		&#125;,</span><br><span class="line">		"title": &#123;</span><br><span class="line">			"type": "text",</span><br><span class="line">			"analyzer": "ik_max_word", # 此字段使用的分析器，没有指定，默认使用standard，建立倒排索引时，使用的分析器</span><br><span class="line">			"include_in_all": "true",</span><br><span class="line">			"boost": 2  # 相关性排序时，将计算排序权重的结果增加一倍，干预排序的权重</span><br><span class="line">		&#125;,</span><br><span class="line">		"content": &#123;</span><br><span class="line">			"type": "text",</span><br><span class="line">			"store": "false",</span><br><span class="line">			"analyzer": "ik_max_word",</span><br><span class="line">			"include_in_all": "true",</span><br><span class="line">		&#125;,</span><br><span class="line">		"status": &#123;</span><br><span class="line">			"type": "integer",</span><br><span class="line">			"include_in_all": "false"</span><br><span class="line">		&#125;,</span><br><span class="line">		"create_time": &#123;</span><br><span class="line">			"type": "date",</span><br><span class="line">			"include_in_all": "false"</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-2-查看映射中字段及其类型"><a href="#8-2-查看映射中字段及其类型" class="headerlink" title="8.2 查看映射中字段及其类型"></a>8.2 查看映射中字段及其类型</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/_mapping/article?pretty</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-3-修改映射中字段及其类型"><a href="#8-3-修改映射中字段及其类型" class="headerlink" title="8.3 修改映射中字段及其类型"></a>8.3 修改映射中字段及其类型</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在原有映射中添加一个字段</span></span><br><span class="line">curl -XPUT localhost:9200/articles/_mapping/article -H "Content-Type: application/json" -d '</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"properties"</span>: &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"new_tag"</span>: &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"type"</span>: <span class="string">"text"</span></span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;<span class="string">'</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 不能修改已经有的字段及其类型</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想修改原有索引字段的类型，只有创建新库</span></span><br><span class="line">curl -XPUT localhost:9200/articles_v2 -H "Content-Type:application/json" -d '</span><br><span class="line">&#123;</span><br><span class="line">	"settings": &#123;</span><br><span class="line">		"index": &#123;</span><br><span class="line">			"number_of_shards": 3,</span><br><span class="line">			"number_of_replicas": 1</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建新的映射</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将原来索引库中的数据迁移到新的库</span></span><br><span class="line">curl -XPOST localhost:9200/_reindex -H "Content-Type:application/json" -d '</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;<span class="string">"source"</span>: &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"index"</span>: <span class="string">"articles"</span></span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"dest"</span>: &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"index"</span>: <span class="string">"articles_v2"</span></span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;<span class="string">'</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后删除原来的库</span></span><br><span class="line">curl -XDELETE localhost:9200/articles</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将新库起别名，不改变原有调用方式</span></span><br><span class="line">curl -XPUT localhost:9200/articles_v2/_alias/articles</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前库状态</span></span><br><span class="line">curl -XGET localhost:9200/articles?pretty</span><br><span class="line">&#123;</span><br><span class="line">  "articles_v2" : &#123;</span><br><span class="line">    "aliases" : &#123;</span><br><span class="line">      "articles" : &#123; &#125;   #别名</span><br><span class="line">    &#125;,</span><br><span class="line">    "mappings" : &#123;</span><br><span class="line">      "article" : &#123;</span><br><span class="line">        "properties" : &#123;</span><br><span class="line">          "content" : &#123;</span><br><span class="line">            "type" : "text",</span><br><span class="line">            "analyzer" : "ik_max_word"</span><br><span class="line">          &#125;,</span><br><span class="line">          "new_tag" : &#123;</span><br><span class="line">            "type" : "byte"</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    "settings" : &#123;</span><br><span class="line">      "index" : &#123;</span><br><span class="line">        "creation_date" : "1603082576665",</span><br><span class="line">        "number_of_shards" : "3",</span><br><span class="line">        "number_of_replicas" : "1",</span><br><span class="line">        "uuid" : "e9sg55VkQq-RcyyfettmVA",</span><br><span class="line">        "version" : &#123;</span><br><span class="line">          "created" : "6050499"</span><br><span class="line">        &#125;,</span><br><span class="line">        "provided_name" : "articles_v2"</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前库的别名</span></span><br><span class="line">curl localhost:9200/articles_v2/_alias/*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看哪个库的别名是当前库</span></span><br><span class="line">curl localhost:9200/*/_alias/articles</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 工程实践方式</span></span><br><span class="line">创建库时带上版本号articles_v1-----&gt;起个别名 articles</span><br><span class="line">创建新库时带上版本号articles_v2 ----&gt;起别名 articles,上面的就会失效，不用再去删除上面的库</span><br></pre></td></tr></table></figure>
+
+<h2 id="9-文档的增删改查"><a href="#9-文档的增删改查" class="headerlink" title="9. 文档的增删改查"></a>9. 文档的增删改查</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 增加一条文档，文档的必须有的三个元数据元素为_index, _type, _id</span></span><br><span class="line">_index: 文档在哪存放，也就是索引库</span><br><span class="line">_type:文档表示的对象类别，也就是表</span><br><span class="line">_id: 文档唯一标识，可以由自己维护或者由 elasticsearch维护</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">创建方式</span></span><br><span class="line">POST  /&#123;index&#125;/&#123;type&#125;/&#123;id&#125;</span><br><span class="line">POST /&#123;index&#125;/&#123;type&#125;  # elasticsearch自动生成id</span><br><span class="line"></span><br><span class="line">curl -XPOST localhost:9200/articles/article/1 -H "Content-Type:application/json" -d '</span><br><span class="line">&#123;"content": "中国是一个古老的国家","new_tag": "OK"&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看id是1文档的内容</span></span><br><span class="line">curl localhost:9200/articles/article/1?pretty</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看指定字段的内容</span></span><br><span class="line">curl localhost:9200/articles/article/1?_source=content,new_tag\&amp;pretty</span><br><span class="line">&#123;</span><br><span class="line">  "_index" : "articles_v3",</span><br><span class="line">  "_type" : "article",</span><br><span class="line">  "_id" : "1",</span><br><span class="line">  "_version" : 1,</span><br><span class="line">  "found" : true,</span><br><span class="line">  "_source" : &#123;</span><br><span class="line">    "new_tag" : "OK",</span><br><span class="line">    "content" : "中国是一个古老的国家"</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看文档是否存在</span></span><br><span class="line">curl -I -XHEAD localhost:9200/articles/article/1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 更新文档某个字段，必须携带上所有字段，因为更新的处理是：先删除，再更新</span></span><br><span class="line"></span><br><span class="line">curl -XPUT localhost:9200/articles/article/1 -H "Content-Type:application/json" -d '</span><br><span class="line">&#123;</span><br><span class="line">"content": "我爱python",</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"new_tag"</span>: <span class="string">"OK"</span></span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;<span class="string">'</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除文档</span></span><br><span class="line">curl -XDELETE localhost:9200/articles/article/1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取多个文档</span></span><br><span class="line">curl localhost:9200/_mget -H "Content-Type:application/json" -d '</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"docs"</span>: [</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"_index"</span>: <span class="string">"articles"</span>,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"_type"</span>: <span class="string">"article"</span>,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"_id"</span>: 1</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#123;<span class="string">"_index"</span>: <span class="string">"articles"</span>,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"_type"</span>: <span class="string">"article"</span>,</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">"_id"</span>: 2</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ]</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> &#125;</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> <span class="string">'</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="9-1-基本查询"><a href="#9-1-基本查询" class="headerlink" title="9.1 基本查询"></a>9.1 基本查询</h3><ul>
+<li><p>根据文档id</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl localhost:9200/articles/article/1</span><br><span class="line">curl localhost:9200/articles/article/1?_source=filed1,filed2</span><br><span class="line">curl localhost:9200/articles/article/1?_source=false  # 不查询任何字段</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询所有</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">查询所有数据，只查看出title,user_id字段,如果数据量太多，默认输出10条数据</span></span><br><span class="line">curl localhost:9200/articles/article/_search?_source=title, user_id\&amp;pretty</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>分页</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl localhost:9200/articles/article/_search?_source=title,user_id\&amp;size=3 </span><br><span class="line"><span class="meta">#</span><span class="bash"> size 表示每页数量为3</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> from 从哪个位置开始</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>全文检索</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">查询条件 content:python web(从content字段中查询python web)</span></span><br><span class="line">curl localhost:9200/articles/article/_search?q=content:python%20web\&amp;_source=title, article_id\&amp;pretty</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="9-2-高级查询"><a href="#9-2-高级查询" class="headerlink" title="9.2 高级查询"></a>9.2 高级查询</h3><ul>
+<li><p>全文检索match: 先分词，再查询</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/article/_search -d '</span><br><span class="line">&#123;</span><br><span class="line">	"from": 0,</span><br><span class="line">	"size": 5,</span><br><span class="line">	"_source": ["article_id", "title"],</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"match": &#123;</span><br><span class="line">			"title": "python web"</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>短语搜索 match_phrase</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/article/_search?pretty -d '</span><br><span class="line">&#123;</span><br><span class="line">	"size": 5,</span><br><span class="line">	"_source": ["article_id", "title"],</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"match_phrase": &#123;</span><br><span class="line">			"content": "python web"  # 不分词，将python web作为一个整体去检索</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>精确搜索</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/article/_search?pretty -d '</span><br><span class="line">&#123;</span><br><span class="line">	"size": 5,</span><br><span class="line">	"_source": ["article_id", "title", "user_di"],</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"term": &#123;</span><br><span class="line">			"user_id": 1  #只查找 user_id是1 的数据</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>范围查找 range</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/article/_search?pretty -d '</span><br><span class="line">&#123;</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"range": &#123;</span><br><span class="line">			"article_id": &#123;</span><br><span class="line">				"gte": 3,</span><br><span class="line">				"lte": 5</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>高亮搜索 highlight</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XGET localhost:9200/articles/article/_search?pretty -d '</span><br><span class="line">&#123;</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"match": &#123;</span><br><span class="line">			"title": "python web 编程"</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	"highlight": &#123;</span><br><span class="line">		"fields": &#123;</span><br><span class="line">			"title": &#123;&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>组合搜索</p>
+<ul>
+<li>must: 必须满足条件</li>
+<li>must not :不满足什么条件</li>
+<li>should</li>
+<li>filter：只对结果过滤</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"bool": &#123;</span><br><span class="line">			"must": [</span><br><span class="line">				&#123;"match": &#123;"content": "python web"&#125;&#125;</span><br><span class="line">			],</span><br><span class="line">			"filter": [</span><br><span class="line">				&#123;</span><br><span class="line">					"term": &#123;</span><br><span class="line">						"status": 2</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			]</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>排序</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"sort": [</span><br><span class="line">		&#123;</span><br><span class="line">			"create_time": &#123;"order": "desc"&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>boost，提升权重，优化排序</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"query": &#123;</span><br><span class="line">		"match": &#123;</span><br><span class="line">			"title": &#123;</span><br><span class="line">				"query": "python web",</span><br><span class="line">				"boost": 4</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="10-程序运行中新产生的数据添加到es库"><a href="#10-程序运行中新产生的数据添加到es库" class="headerlink" title="10. 程序运行中新产生的数据添加到es库"></a>10. 程序运行中新产生的数据添加到es库</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">django中使用haystack管理es</span><br><span class="line">HAYSTACK_CONNECTIONS = &#123;</span><br><span class="line">    'default': &#123;</span><br><span class="line">        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',</span><br><span class="line">        'URL': 'http://192.168.0.103:9200/', # 默认使用9200端口</span><br><span class="line">        'INDEX_NAME': 'meiduo',</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当添加，修改，删除数据时，自动生成索引</span></span><br><span class="line">HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> HAYSTACK 分页</span></span><br><span class="line">HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当使用Flask,通过安装elasticsearch包，操作es库</span><br><span class="line">当保存数据到数据库的时候，同时也将文章数据写入到es库</span><br><span class="line">doc = &#123;</span><br><span class="line">	'article_id': article.id,</span><br><span class="line">	'user_id': article.user_id,</span><br><span class="line">	'title': article.title,</span><br><span class="line">	'content': article.content,</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">current_app.es.index(index="articles", doc_type="article", body=doc, id=article.id)</span><br></pre></td></tr></table></figure>
+
+<h2 id="11-使用logstash-工具从mysql中导入数据"><a href="#11-使用logstash-工具从mysql中导入数据" class="headerlink" title="11. 使用logstash 工具从mysql中导入数据"></a>11. 使用logstash 工具从mysql中导入数据</h2><ul>
+<li>在django中，使用haystack 提供的命令从Mysql中导出命令</li>
+</ul>
+<h2 id="12-联想查询功能"><a href="#12-联想查询功能" class="headerlink" title="12. 联想查询功能"></a>12. 联想查询功能</h2><ul>
+<li><p>拼写纠错，对已经建立的articles索引库，elasticsearch还提供了一种查询模式，suggest建议查询模式</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl localhost:9200/articles/article/_search?pretty -H "Content-Type:application/json" -d '</span><br><span class="line">&#123;</span><br><span class="line">	"from": 0, # 偏移</span><br><span class="line">	"size": 10, # 一页10条数据</span><br><span class="line">	"_source": false,</span><br><span class="line">	"suggest": &#123;</span><br><span class="line">		"text": "phtyon web",</span><br><span class="line">		"word-phrase": &#123;  # 自定义输出结果字段名</span><br><span class="line">			"phrase": &#123;   # 结果类型 词组</span><br><span class="line">				"filed": "content", # 从哪个字段中查找</span><br><span class="line">				"size": 1  # 输出一条建议就性</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动补全功能，以前建立的文章索引库不能用于自动补全，需要再建立一个自动补全的索引库</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -XPUT localhost:9200/completions -H "Content-Type: application/json" -d '</span><br><span class="line">&#123;</span><br><span class="line">	"settings": &#123;</span><br><span class="line">		"index": &#123;</span><br><span class="line">			"number_of_shards": 3, # 分片3 个</span><br><span class="line">			"number_of_replicas": 1 # 每个分片1个副本</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">curl -XPUT localhost:9200/completions/_mapping/words -H 'Content-Type:application/json' -d '</span><br><span class="line">&#123;</span><br><span class="line">	"words": &#123;</span><br><span class="line">		"properties": &#123;</span><br><span class="line">			"suggest": &#123;</span><br><span class="line">				"type": "completion",</span><br><span class="line">				"analyzer": "ik_max_word"</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后通过工具从mysql中将某些字段导入到这个索引库</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动补全查询</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl localhost:9200/completions/words/_search?pretty -H 'Content-Type: application/json' -d '</span><br><span class="line">&#123;</span><br><span class="line">	"suggest": &#123;    # 建议类型查询</span><br><span class="line">		"title-suggest": &#123;  # 自定义返回字段名</span><br><span class="line">			"prefix": "pyth",  # 查询前缀</span><br><span class="line">			"completion": &#123;</span><br><span class="line">				"field": "suggest"  # 从哪个字段中获取数据</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 自动补全功能的实现：</span></span><br><span class="line">首先从自动补全库中查询，如果没有查询到，再根据建议查询进行纠错查询；</span><br><span class="line">current_app.es.search(index='completions', body=query)</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>elasticsearch</category>
+      </categories>
+      <tags>
+        <tag>elasticsearch</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>redis 再学习</title>
+    <url>/2020/10/16/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="redis-再学习"><a href="#redis-再学习" class="headerlink" title=" redis 再学习 "></a><center> redis 再学习 </center></h1><a id="more"></a>
+
+<h2 id="1-基本命令"><a href="#1-基本命令" class="headerlink" title="1. 基本命令"></a>1. 基本命令</h2><ul>
+<li><p>通过命令行方式查看和设置配置</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; info server</span><br><span class="line"><span class="meta">#</span><span class="bash"> Server</span></span><br><span class="line">redis_version:4.0.14</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:a3801984392ceb27</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 4.4.0-185-generic x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">atomicvar_api:atomic-builtin</span><br><span class="line">gcc_version:5.4.0</span><br><span class="line">process_id:1082</span><br><span class="line">run_id:dfb262a4f02219cbc26efe68852bf8d1424cb1ad</span><br><span class="line">tcp_port:6379</span><br><span class="line">uptime_in_seconds:-9640</span><br><span class="line">uptime_in_days:0</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:1474142</span><br><span class="line">executable:/usr/local/bin/redis-server</span><br><span class="line">config_file:/etc/redis/6379.conf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get requirepass</span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "studyredis"</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; config set requirepass test</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; config get requirepass </span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "test"</span><br><span class="line"></span><br><span class="line">config get *  # 获取所有参数</span><br><span class="line">config get requ*  # 支持模糊查询</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以通过测试了解下redis在本机上的性能</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">redis-benchmark -t get,spop -q -p 6379</span><br><span class="line">GET: 77639.75 requests per second</span><br><span class="line">SPOP: 82304.52 requests per second</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>exists key :是否存在指定的key, 存在返回1， 不存在返回0</p>
+</li>
+<li><p>del key: 删除key，当key存在，删除返回1；当key不存在，删除返回0</p>
+</li>
+<li><p>ttl key: 不存在返回-2， 存在但没有过期时间，返回-1，否则返回剩余时间的秒数</p>
+</li>
+<li><p>persist key: 取消过期时间</p>
+</li>
+<li><p>select 1: 选择1号数据库</p>
+</li>
+<li><p>move key dbindex: 移动某个key到指定的数据库</p>
+</li>
+<li><p>randomkey: 随机返回一个key</p>
+</li>
+<li><p>rename key key2: 将key重命名为key2</p>
+</li>
+<li><p>echo message: 打印message</p>
+</li>
+<li><p>dbsize: 查看当前数据库的key数量 –&gt;O(1)</p>
+</li>
+<li><p>keys:查看所有key —&gt;O(n) 不建议在线上大量key使用</p>
+</li>
+<li><p>info server: 查看数据库信息</p>
+</li>
+<li><p>flushdb: 清空当前数据库</p>
+</li>
+<li><p>flushall:清空所有数据库</p>
+</li>
+<li><p>type key:返回key存储值得数据类型 </p>
+</li>
+<li><p>expire：设置过期时间</p>
+</li>
+<li><p>实时监控命令 monitor </p>
+</li>
+<li><p><code>redis-cli -a test monitor &gt;&gt; monitor.log &amp;</code></p>
+</li>
+</ul>
+<h2 id="2-redis-配置"><a href="#2-redis-配置" class="headerlink" title="2. redis 配置"></a>2. redis 配置</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">daemonize yes # 默认是no, 设置为yes,redis-server 将以守护进程在后台运行</span><br><span class="line">pidfile &quot;&#x2F;var&#x2F;run&#x2F;redis&#x2F;redis_6379.pid&quot; # 将redis-server 进程id写入到这个文件中</span><br><span class="line">port 6379 #默认端口</span><br><span class="line">tcp-backlog 511</span><br><span class="line">timeout 0 # 客户端闲置多少s后关闭连接，0代表关闭此功能</span><br><span class="line">tcp-keepalive 0</span><br><span class="line">loglevel notice # 日志级别</span><br><span class="line">logfile &quot;&#x2F;var&#x2F;log&#x2F;redis&#x2F;redis-server.log&quot; # 记录日志的文件位置</span><br><span class="line">databases 16 # 默认有16个数据库，从0到15</span><br><span class="line"></span><br><span class="line">save 900 1 # 指定在多少时间内，有多少次更新操作，将数据同步到磁盘文件中，900s内有1次更新</span><br><span class="line">save 300 10 #300s内有10个更新</span><br><span class="line">save 60 10000# 60s内有10000个更新</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line">rdbcompression yes # 存到数据库文件中，是否压缩，默认使用LZF压缩算法，如果为了节约cpu时间，可以关闭此选项</span><br><span class="line">rdbchecksum yes</span><br><span class="line">dbfilename &quot;dump.rdb&quot; # 指定数据库文件名</span><br><span class="line">dir &quot;&#x2F;var&#x2F;lib&#x2F;redis&quot;  # redis的工作目录，用于存放 dump.rdb</span><br><span class="line">slave-serve-stale-data yes</span><br><span class="line">slave-read-only yes</span><br><span class="line">repl-diskless-sync no</span><br><span class="line">repl-diskless-sync-delay 5</span><br><span class="line">repl-disable-tcp-nodelay no</span><br><span class="line">slave-priority 100</span><br><span class="line">bind 127.0.0.1 192.168.0.111 # 绑定地址</span><br><span class="line">requirepass &quot;test&quot; # 设置密码</span><br><span class="line">appendonly no # 指定是否在每次更新操作后进行日志记录</span><br><span class="line">appendfilename &quot;appendonly.aof&quot; #指定更新日志文件名</span><br><span class="line">appendfsync everysec # 指定更新日志条件</span><br><span class="line">no-appendfsync-on-rewrite no</span><br><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br><span class="line">aof-load-truncated yes</span><br><span class="line">lua-time-limit 5000</span><br><span class="line">slowlog-log-slower-than 10000</span><br><span class="line">slowlog-max-len 128</span><br><span class="line">latency-monitor-threshold 0</span><br><span class="line">notify-keyspace-events &quot;&quot;</span><br><span class="line">hash-max-ziplist-entries 512</span><br><span class="line">hash-max-ziplist-value 64</span><br><span class="line">list-max-ziplist-entries 512</span><br><span class="line">list-max-ziplist-value 64</span><br><span class="line">set-max-intset-entries 512</span><br><span class="line">zset-max-ziplist-entries 128</span><br><span class="line">zset-max-ziplist-value 64</span><br><span class="line">hll-sparse-max-bytes 3000</span><br><span class="line">activerehashing yes</span><br><span class="line">client-output-buffer-limit normal 0 0 0</span><br><span class="line">client-output-buffer-limit slave 256mb 64mb 60</span><br><span class="line">client-output-buffer-limit pubsub 32mb 8mb 60</span><br><span class="line">hz 10</span><br><span class="line">aof-rewrite-incremental-fsync yes</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-redis内存维护策略"><a href="#3-redis内存维护策略" class="headerlink" title="3. redis内存维护策略"></a>3. redis内存维护策略</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">缓存设置过期时间的作用：</span><br><span class="line">- 节省内存空间</span><br><span class="line">- 与数据库保持一致性</span><br><span class="line">redis的缓存策略</span><br><span class="line">- 定时过期--》不采用，占用大量资源</span><br><span class="line">- 惰性过期：当访问它的时候，才去校验是否过期</span><br><span class="line">- 定期过期：每隔一段时间，随机扫描一些键，是否到达过期时间</span><br><span class="line">redis采用惰性过期和定期过期</span><br><span class="line">redis内存淘汰策略</span><br><span class="line">LRU：按照最近是否访问过，进行淘汰</span><br><span class="line">设置参数：（这些参数都可以在配置文件中设置，也可以在启动后就行修改）</span><br><span class="line">maxmemory  100mb：使用的最大内存</span><br><span class="line">maxmemory-policy: 淘汰策略（当到达最大内存后，采用的驱逐key的策略）</span><br><span class="line">- noeviction：直接报错</span><br><span class="line">- allkeys-lru：根据LRU算法驱逐key,腾出内存空间为新的key使用</span><br><span class="line">- volatile-lru：在设置的过期集中的key中，根据LRU算法进行驱逐-----》经常被使用</span><br><span class="line">- allkeys-random：随机驱逐key</span><br><span class="line">- volatile-random:在设置的过期集的key中，随机驱逐key</span><br><span class="line">- volatile-ttl:在设置的过期集的key中，驱逐ttl快结束的key</span><br><span class="line">LFU(4.0 之后写增加的策略):按照经常访问的频率进行淘汰,会占用更多的资源，使用计数器和衰减期。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-数据类型"><a href="#4-数据类型" class="headerlink" title="4. 数据类型"></a>4. 数据类型</h2><h3 id="4-1-String命令"><a href="#4-1-String命令" class="headerlink" title="4.1 String命令"></a>4.1 String命令</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">set key_name value</span><br><span class="line">setnx key_name value</span><br><span class="line">setex key_name expire value: 设置key_name的值为value,expire值为过期秒数</span><br><span class="line">setrange key_name offset value: 对于key_name 的值，从下标是offset开始替换为value</span><br><span class="line"></span><br><span class="line">get key_name</span><br><span class="line">getrange key start end:提取出指定范围的值</span><br><span class="line">getbit key offset:  这个暂时不理解</span><br><span class="line">getset key_name value:</span><br><span class="line">strlen key:</span><br><span class="line"></span><br><span class="line">mget key1 key2: ---&gt;  O(n)</span><br><span class="line">mset key1 key2 value1 value2  --&gt;O(n)</span><br><span class="line"></span><br><span class="line">针对数字字符串操作，否则报错</span><br><span class="line">incr key1: 自增</span><br><span class="line">incrby key1 增量值： </span><br><span class="line">decr key1: 自减</span><br><span class="line">decrby key1 减量值</span><br><span class="line"></span><br><span class="line">append key_name value：</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>应用场景：</p>
+<ul>
+<li><p>string通常用于保存单个字符串或者json字符串数据</p>
+</li>
+<li><p>因为string是二进制安全的，完全可以把图片文件的内容作为字符串来存储</p>
+</li>
+<li><p>会话缓存</p>
+</li>
+<li><p>计数器（incr等指令本身具有原子操作特性，因为完全可以利用redis的incr,incrby, decr, decrby等指令实现原子计数效果）</p>
+<p>例如：某种场景下有3个客户端同时读取了num的值（假定值为2），然后对其同时进行了加1操作，那么num的值最后一定是5</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-2-Hash类型"><a href="#4-2-Hash类型" class="headerlink" title="4.2 Hash类型"></a>4.2 Hash类型</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加</span><br><span class="line">hset key field value</span><br><span class="line">hmset key field1 value1 field2 value2</span><br><span class="line">获取</span><br><span class="line">hget key field</span><br><span class="line">hmget key field1 field2</span><br><span class="line">hgetall key</span><br><span class="line">查看：</span><br><span class="line">hkeys key: key中存放的所有字段</span><br><span class="line">hlen key: 字段的数量</span><br><span class="line">删除</span><br><span class="line">hdel key field [field]:删除key中一个或者多个字段</span><br><span class="line"></span><br><span class="line">hsetnx key field value: key中不存在 字段field时才进行设置字段和值</span><br><span class="line">hexists key field: 检查key中字段是否存在</span><br><span class="line"></span><br><span class="line">hincrby key field increment:为整形字段的值加值</span><br><span class="line">hincrbyfloat key field incrment: 为浮点值加上增量</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>应用场景：</p>
+<ul>
+<li><p>常用于存储一个对象，缓存数据库中记录</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 构造redis命令</span></span><br><span class="line">select concat("hmset message_",id, " id ", id, " body ", body, " timestamp ", timestamp) from message limit 10 into outfile '/var/lib/mysql-files/redis.txt';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将mysql数据导入到redis</span></span><br><span class="line">cat redis.txt |redis-cli -a test &amp;&gt; redis.log</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>为什么不用string存储一个对象？</p>
+<ul>
+<li><p>hash是最接近关系数据结构的数据类型，可以将一条数据库记录转化成hashmap存放到redis中</p>
+</li>
+<li><p>用户id为查找的key,存储的值包含姓名，年龄，生日等等，如果用string结构来存储，主要有两种方式</p>
+</li>
+<li><p>第一种：将用户id作为查找key,把其他信息封装成一个对象序列化的方式存储，缺点是增加了序列化和反序列化的开销，</p>
+<p>并且需要修改一项信息时，需要将整个对象取回，修改操作时需要对并发进行保护</p>
+</li>
+<li><p>第二种：用户对象信息有多少成员就创建多少个key/value,使用 用户id+对应的属性名作为唯一标识来取得对应属性的值，</p>
+<p>虽然省去了序列化和反序列化的开销和并发问题，但是用户id重复存储，如果存放大量这样的数据，内存浪费；而hash存放这种对象会占用很少的磁盘空间；</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-3-List类型"><a href="#4-3-List类型" class="headerlink" title="4.3 List类型"></a>4.3 List类型</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加元素</span><br><span class="line">lpush key value1 value2 value3 [value]:</span><br><span class="line">rpush key value1 value2 value3 :</span><br><span class="line">lpushx key value: key不存在，返回0; 存在的话，在左侧插入</span><br><span class="line">rpushx key value: key 不存在，返回0；存在，在右侧插入</span><br><span class="line"></span><br><span class="line">查看元素</span><br><span class="line">lrange key start end: 返回指定范围内置</span><br><span class="line">llen key: 返回列表元素</span><br><span class="line">lindex key index: 根据下标取值</span><br><span class="line"></span><br><span class="line">删除：</span><br><span class="line">lpop key</span><br><span class="line">rpop key</span><br><span class="line">blpop key1 [key2] timeout: 左删除一个元素，如果列表没有元素将阻塞直到有元素弹出或者超时；</span><br><span class="line">rlpop key1 [key2] timeout: 右删除一个元素,</span><br><span class="line">ltrim key start end: 保留start到end之间的元素，其他元素删除；</span><br><span class="line">修改：</span><br><span class="line">lset key index value: 根据下标修改一个元素值</span><br><span class="line">linsert key before|after world value: 在指定的列表元素的前面或者后面插入一个值</span><br><span class="line"></span><br><span class="line">rpoplpush source destination: 从source中移除最后一个元素，然后添加到destination的头部</span><br><span class="line">brpoplpush source destination timeout: 从source 中移除最后一个元素，如果没有，将阻塞等待timeout或者直到有元素弹出</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>对数据量大的集合进行操作</li>
+<li>任务队列</li>
+<li>热销榜 </li>
+</ul>
+</li>
+</ul>
+<h3 id="4-4-set类型"><a href="#4-4-set类型" class="headerlink" title="4.4 set类型"></a>4.4 set类型</h3><ul>
+<li>set是string类型的无序集合，集合成员是唯一的，通过哈希表来实现的，集合中最大的成员数是 $2^{32}$ -1（40多亿个成员）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加成员：</span><br><span class="line">sadd key memeber1 [member2]</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">scard key:获取成员数量</span><br><span class="line">smembers key: 返回集合所有成员</span><br><span class="line">sismember key member:判断member是否是集合key的成员；</span><br><span class="line">srandmember key [count]:返回集合中一个或者多个随机成员；</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">srem key member1 [member2]：移除集合中一个或者多个成员</span><br><span class="line">spop key [count]: 移除并返回集合中的一个随机元素</span><br><span class="line">smove source destination member :将member元素从source 集合移动到destination集合</span><br><span class="line"></span><br><span class="line">差集：</span><br><span class="line">sdiff key1 key2 :返回只属于key1中的元素</span><br><span class="line">sdiffstore destination key1 key2:</span><br><span class="line">交集：</span><br><span class="line">sinter key1 key2:返回同时属于key1和key2的元素</span><br><span class="line">sinterstore destination key1 key2:将结果放到destination中</span><br><span class="line">并集：</span><br><span class="line">sunion key1 key2:返回s1和s2集合中所有元素</span><br><span class="line">sunionstore destination key1 key2:</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>利用集合交集，并集，差集操作，实现共同关注，共同爱好，二度好友功能；</li>
+<li>利用唯一性，统计访问网站的所有独立ip,存取当天的活跃用户列表；</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-5-Zset（有序集合）"><a href="#4-5-Zset（有序集合）" class="headerlink" title="4.5 Zset（有序集合）"></a>4.5 Zset（有序集合）</h3><ul>
+<li>Redis有序集合和集合一样也是String类型元素的集合，且不允许有重复成员，不同的是每个元素会关联一个double类型的分数，redis通过分数为集合中的成员进行从小到大的排序，成员唯一，但是分数可以相同；集合中成员数也是$2^{32}$ - 1(40多亿个成员)</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">增加：</span><br><span class="line">zadd key score1 member1 [score2 member2]: 向有序集合添加一个或者多个成员，或者更新已存在成员的分数</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">zcard key: 成员数量</span><br><span class="line">zcount key min max:计算有序集合指定区间分数的成员数量</span><br><span class="line">zrank key member:返回有序集合中指定成员的索引；</span><br><span class="line">zrange key start stop [withscores]: 取出索引之间的元素，带参数withscores将分数也一并输出</span><br><span class="line">zrangebyscore key min max [withscores] [limit offset count]:根据分数区间进行取值，如果设置了limit，那么会再将结果根据</span><br><span class="line">offset(从哪个下标开始) 取出count个数量的值;一旦使用了limit参数，后面的两个参数必须设置；</span><br><span class="line">zrevrange key start stop [withscores]:倒序输出(通过下标设置区间)</span><br><span class="line">zrevrangebyscore key max min [withscores] [limit offset count]:倒序输出(根据分数从高到低的区间)</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">zrem key member [member]</span><br><span class="line">zremrangebyrank by start stop:移除指定索引区间的元素</span><br><span class="line">zremrangebyscore by min max: 移除给定分数区间的元素</span><br><span class="line">修改</span><br><span class="line">zincrby increment member: 增加member成员的分数，返回修改后的分数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>排行榜</li>
+<li>文章发布时间作为分数值，自带排序功能</li>
+<li>设置任务分数值高低作为任务权重的依据，按照权重大小执行任务；</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-6-HyperLogLog-类型"><a href="#4-6-HyperLogLog-类型" class="headerlink" title="4.6 HyperLogLog 类型"></a>4.6 HyperLogLog 类型</h3><ul>
+<li>HyperLogLog是一种算法，并非redis独有，目的是做基数统计(不同数的个数),只记录数量，不记录具体的内容</li>
+<li>耗费空间极小，支持输入非常大体积的数据量(计算接近 $2^{64}$个不同元素的基数，这和元素越多耗费内存就越多的集合形成鲜明的对比)</li>
+<li>redis中每个HyperLogLog key占用了12k的内存用于记录基数</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">添加：</span><br><span class="line">pfadd key element [element]</span><br><span class="line">计算基数</span><br><span class="line">pfcount key [key]:返回给定HyperLogLog的基数估算值</span><br><span class="line">pfmerge destkey sourcekey [sourekey]:将多个HyperLogLog合并为一个 HyperLogLOg</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：（只用来统计基数数量，不知道具体内容是什么）<ul>
+<li>真实文章阅读量</li>
+<li>统计注册ip</li>
+<li>统计每日访问Ip数</li>
+<li>统计页面实时UV数</li>
+<li>统计在线用户数</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-redis-发布订阅"><a href="#5-redis-发布订阅" class="headerlink" title="5.redis 发布订阅"></a>5.redis 发布订阅</h2><ul>
+<li>redis发布、订阅是一种消息通信模式，发布者向频道发布消息，订阅者通过订阅频道接收消息；</li>
+<li>redis客户端可以订阅任意数量的频道</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">subscribe channel [channel]:</span><br><span class="line">psubscribe pattern [pattern]:订阅一个或者多个符合给定模式的频道</span><br><span class="line"></span><br><span class="line">publish channel message: 发布消息</span><br><span class="line"></span><br><span class="line">退订：</span><br><span class="line">unsubscribe channel </span><br><span class="line">punsubscribe [pattern]</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-redis-事务"><a href="#6-redis-事务" class="headerlink" title="6.redis 事务"></a>6.redis 事务</h2><p>redis事务基于队列实现的，仅仅实现了原子性的保证，属于弱事务支持</p>
+<p>mysql事务基于事务日志，悲观锁，MVCC，事务隔离级别实现ACID，属于强事务支持。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">multi: 事务开启</span><br><span class="line">exec: 事务开始执行，按照命令顺序执行；</span><br><span class="line">discard: 事务取消</span><br><span class="line"></span><br><span class="line">命令执行过程中出错, 其他命令执行，出错的命令不执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa hello</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; incr aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">1) OK</span><br><span class="line">2) "hello"</span><br><span class="line">3) (error) ERR value is not an integer or out of range</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"hello"</span><br><span class="line"></span><br><span class="line">命令执行前出错，那么所有命令都不能被执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set bbb test</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; sadfasdf</span><br><span class="line">(error) ERR unknown command `sadfasdf`, with args beginning with: </span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">(error) EXECABORT Transaction discarded because of previous errors.</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">watch key [key] :监视key的变化，当在开始事务之后，有其他进程修改了key的话，那么事务不能成功执行</span><br><span class="line">127.0.0.1:6379&gt; watch aaa</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa 30</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec   # 另一个客户端修改了aaa 值为40,这里没有执行成功；</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"40"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>应用场景：<ul>
+<li>针对一组命令要么同时执行成功，要么执行失败；</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-redis持久化"><a href="#7-redis持久化" class="headerlink" title="7. redis持久化"></a>7. redis持久化</h2><ul>
+<li>redis持久化就是将内存中的数据写到磁盘中，防止服务宕机内存数据丢失</li>
+<li>redis提供了两种持久化方式：RDB(默认) 和 AOF</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RDB: redis默认持久化机制，这种方式就是将内存中的数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb，在指定的时间间隔内生成数据集的时间点快照，新快照将覆盖旧快照。</span><br><span class="line">优点：保存数据极快，还原数据极快，适用于灾难备份，主从复制依赖于这个配置</span><br><span class="line">缺点：小内存机器不适合使用，数据会丢失</span><br><span class="line">快照条件：</span><br><span class="line">- 服务器正常关闭时， redis-cli shutdown</span><br><span class="line">- key 满足条件时，默认配置中</span><br><span class="line">	save 900 1 # 每900s(15分钟) 至少1个key发生变化，产生快照</span><br><span class="line">	save 300 10# 每300s(5分钟) 至少10个key发生变化，产生快照</span><br><span class="line">	save 60 10000   </span><br><span class="line">	</span><br><span class="line"># 主动save，将触发保存到磁盘文件中</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">AOF(append only file):最大限制的保存数据，可以采用aof持久化方式</span><br><span class="line">redis每接收到一个写命令都通过write函数追加到文件中(默认是appendonly.aof),当redis重启时会通过重新执行文件中保存的写命令来在在内存中重建整个数据库</span><br><span class="line">配置：</span><br><span class="line"></span><br><span class="line">appendonly yes: 开启aof持久化方式</span><br><span class="line">有三种方式(默认appendfsynceverysec)</span><br><span class="line">appendfsync always: 收到写命令就立即写入磁盘，最慢，保证完全的持久化</span><br><span class="line">appendfsync everysec: 每秒写入磁盘一次，在性能和持久化方面折中</span><br><span class="line">appendfsync no:完全依赖os,性能最好，持久化没有保证</span><br><span class="line">缺点：</span><br><span class="line">aof文件会变得越来越大，持久化时间较长；</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-redis作为缓存，如何保证与数据库的一致性："><a href="#8-redis作为缓存，如何保证与数据库的一致性：" class="headerlink" title="8. redis作为缓存，如何保证与数据库的一致性："></a>8. redis作为缓存，如何保证与数据库的一致性：</h2><h3 id="8-1-实时同步："><a href="#8-1-实时同步：" class="headerlink" title="8.1 实时同步："></a>8.1 实时同步：</h3><p>对强一致要求比较高的，应采用实时同步方案：查询缓存没有时再从数据库查询，然后保存到缓存；更新缓存时，先更新数据库，再将缓存的设置过期</p>
+<h3 id="8-2-异步队列"><a href="#8-2-异步队列" class="headerlink" title="8.2 异步队列"></a>8.2 异步队列</h3><p>对于并发程度较高的，可采用异步队列方式同步，可采用kafka等消息队列处理消息。</p>
+<p>消息队列有哪些呢？</p>
+<p>ActiveMQ, RabbitMQ, RocketMQ, Kafka等</p>
+<h3 id="8-3-使用阿里的同步工具canal"><a href="#8-3-使用阿里的同步工具canal" class="headerlink" title="8.3 使用阿里的同步工具canal"></a>8.3 使用阿里的同步工具canal</h3><h3 id="8-4-采用UDF自定义函数方式"><a href="#8-4-采用UDF自定义函数方式" class="headerlink" title="8.4 采用UDF自定义函数方式"></a>8.4 采用UDF自定义函数方式</h3><p>面对mysql的API进行编程，利用触发器进行缓存同步</p>
+<h3 id="8-5-缓存问题"><a href="#8-5-缓存问题" class="headerlink" title="8.5 缓存问题()"></a>8.5 缓存问题()</h3><ul>
+<li><p>正常的缓存查询流程：数据查询先进行缓存查询，如果key不存在或者key过期那么就去查询数据库，并把查询的对象放进缓存，如果数据库查询对象为空，则不放进缓存直接返回</p>
+</li>
+<li><p>缓存穿透</p>
+<ul>
+<li>当到缓存中查询一个一定不存在的数据时，由于缓存不命中，就会去数据库中查询，查不到数据则不写入缓存，这将导致这个不存在的数据每次都要到数据库中查询，造成缓存穿透（缓存没有起作用）</li>
+<li>解决方案：数据库查询不到就缓存空结果。同时需要注意当对数据库执行插入操作时，清除缓存中的key,或者为空缓存设置过期时间。</li>
+<li>发生穿透的原因可能有：对查询条件进行加密。</li>
+</ul>
+</li>
+<li><p>缓存雪崩：当缓存集中过期的时候，那么当并发访问这些key的时候，就会直接到数据库访问，造成压力波峰。</p>
+<ul>
+<li>可以采用设置不同的缓存时间，让缓存过期时间尽量均匀发布</li>
+<li>也可以通过设置加锁或者队列的方式，牺牲性能保证mysql顶住压力；<ul>
+<li>加锁，通过setnx指令进行加锁</li>
+<li>队列，生产消费者模型</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>缓存击穿：指的是一个key非常热，查询量非常大，当这个key到了过期时间瞬间，持续的大并发穿透缓存，直接请求数据库，对于商品而言，也就是所谓的”爆款”</p>
+<ul>
+<li>缓存不过期</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-Redis-高级配置"><a href="#9-Redis-高级配置" class="headerlink" title="9. Redis 高级配置"></a>9. Redis 高级配置</h2><ul>
+<li>在实际应用中，单台redis因为内存容量有限(单台redis最大使用内存不应该超过20G), 处理能力有限，无法高可用（一旦发生意外宕机，缓存功能失效）</li>
+<li>使用主从复制的配置（主写从读）（多个从一个主）</li>
+<li>哨兵模式（针对master意外宕机的解决方案）</li>
+<li>集群模式是实际使用最多的模式 （Redis Cluster)<ul>
+<li>从redis3.0 之后的版本开始支持redis-cluster，至少需要（3个master和3个slave)才能建立集群。     </li>
+</ul>
+</li>
+</ul>
+<h2 id="10-save与bgsave区别"><a href="#10-save与bgsave区别" class="headerlink" title="10. save与bgsave区别"></a>10. save与bgsave区别</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 共同点：</span></span><br><span class="line">都能实现RDB持久化功能</span><br><span class="line"><span class="meta">#</span><span class="bash"> 不同点</span></span><br><span class="line">save :阻塞redis正常写入，直到持久化完成</span><br><span class="line">bgsave: 开启子线程，异步的持久化功能，不会阻塞redis的正常写入；</span><br></pre></td></tr></table></figure>
+
+<h2 id="11-重启redis"><a href="#11-重启redis" class="headerlink" title="11. 重启redis"></a>11. 重启redis</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">redis-cli -a password shutdown</span><br><span class="line">redis-server /path/to/redis.conf</span><br></pre></td></tr></table></figure>
+
+<h2 id="12-主从复制的原理"><a href="#12-主从复制的原理" class="headerlink" title="12. 主从复制的原理"></a>12. 主从复制的原理</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1. 副本库通过slaveof 192.168.0.111 6379 命令，连接主库，并发送sync给主库</span><br><span class="line">2. 主库收到sync，立即触发bgsave,后台保存RDB,发送给副本库</span><br><span class="line">3. 副本库接收后会应用RDB快照</span><br><span class="line">4. 主库会陆续将中间产生的新的操作，保存并发送给副本库</span><br><span class="line">5. 这时，主从复制集就正常工作</span><br><span class="line">6. 主库只要发生新的操作，都会以命令传播的方式自动发送给副本库</span><br><span class="line">7. 所有复制相关信息，从info中都可以查到，即使节点发生重启，主从依然存在</span><br><span class="line"></span><br><span class="line">8.如果发生主从关系断开，从库数据没有任何损坏，在下次重连之后，从库发送PSYNC给主库，</span><br><span class="line">9.主库只会将从库缺少部分的数据同步给从库应用，达到快速恢复主从的目的；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">搭建主从</span><br><span class="line">1. mkdir 638&#123;0..2&#125;</span><br><span class="line">cat &gt;&gt; 6380/redis.conf &lt;&lt;EOF</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">port 6380</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">daemonize yes</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">pidfile /space/redis_data/6380/redis.pid</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">logfile /space/redis_data/6380/redis.log</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">loglevel notice</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dbfilename dump.rdb</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dir /space/redis_data/6380</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">requirepass 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">masterauth 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">EOF</span></span><br><span class="line"></span><br><span class="line">cat &gt;&gt; 6381/redis.conf &lt;&lt;EOF</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">port 6381</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">daemonize yes</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">pidfile /space/redis_data/6381/redis.pid</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">logfile /space/redis_data/6381/redis.log</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">loglevel notice</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dbfilename dump.rdb</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dir /space/redis_data/6381</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">requirepass 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">masterauth 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">EOF</span></span><br><span class="line"></span><br><span class="line">cat &gt;&gt; 6382/redis.conf &lt;&lt;EOF</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">port 6382</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">daemonize yes</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">pidfile /space/redis_data/6382/redis.pid</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">logfile /space/redis_data/6382/redis.log</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">loglevel notice</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dbfilename dump.rdb</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">dir /space/redis_data/6380</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">requirepass 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">masterauth 123456</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">EOF</span></span><br><span class="line">2. 启动</span><br><span class="line">redis-server 6380/redis.conf</span><br><span class="line">redis-server 6381/redis.conf</span><br><span class="line">redis-server 6382/redis.conf</span><br><span class="line">3. 6380 作为主,建立主从</span><br><span class="line">redis-cli -p 6381 -a 123456 SLAVEOF 127.0.0.1 6380</span><br><span class="line">redis-cli -p 6382 -a 123456 SLAVEOF 127.0.0.1 6380</span><br><span class="line"></span><br><span class="line">4.查询主从状态</span><br><span class="line">redis-cli -p 6380 -a 123456 info replication</span><br><span class="line">redis-cli -p 6381 -a 123456 info replication</span><br><span class="line">redis-cli -p 6382 -a 123456 info replication</span><br><span class="line"></span><br><span class="line">5. 将某个从库解除</span><br><span class="line">redis-cli -p 6381 -a 123456 SLAVEOF no one</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 开启哨兵，实现高可用</span></span><br><span class="line">1. mkdir 26380</span><br><span class="line">cd 26380</span><br><span class="line">vim sentinel.conf</span><br><span class="line">   port 26380</span><br><span class="line">   dir /space/redis_data/26380</span><br><span class="line">   sentinel monitor mymaster 127.0.0.1 6380 1 # 监视master,至少1个哨兵发现没有了心跳，那么就执行换主，如果有3个哨兵，那么就设置为2;如果有4个哨兵，那么就设置为3，就是 num/2 + 1;</span><br><span class="line">   sentinel down-after-milliseconds mymaster 5000# 哨兵监视的时间是 5s</span><br><span class="line">   sentinel auth-pass mymaster 123456 # 监视主库的密码</span><br><span class="line"></span><br><span class="line">2.开始哨兵</span><br><span class="line">redis-sentinel sentinel.conf  &amp;&gt;/tmp/sentinel.log &amp;</span><br><span class="line"></span><br><span class="line">3.停止哨兵</span><br><span class="line">redis-cli -p 26380 shutdown</span><br></pre></td></tr></table></figure>
+
+<h2 id="13-redis-cluster分布式集群"><a href="#13-redis-cluster分布式集群" class="headerlink" title="13. redis cluster分布式集群"></a>13. redis cluster分布式集群</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">将键值对均匀的分布到slot中，slot总共有16384个，平均分配在各个分片节点上，slot编号0-16383</span><br><span class="line"></span><br><span class="line">当存数据时，通过对key执行 crc16(key)计算出hash值，然后对 16384取余，分配到对应的slot中；</span><br><span class="line">取数据时，也是通过crc16(key)找到对应的slot,取出值</span><br><span class="line"></span><br><span class="line">一组高可用节点（1主+1从）应该分布到不同的物理机上，至少三组（6个节点）</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 安装ruby</span><br><span class="line">sudo apt install ruby</span><br><span class="line">2. 更改gem源</span><br><span class="line">gem sources -l :查看gem 源</span><br><span class="line">gem sources -a http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;rubygems&#x2F; # 添加国内源</span><br><span class="line">gem sources --remove https:&#x2F;&#x2F;rubygems.org&#x2F;  # 删除默认源</span><br><span class="line">gem sources -l:查看gem源</span><br><span class="line">sudo gem install redis -v 3.3.3  # 安装redis驱动</span><br><span class="line">3.集群搭建准备</span><br><span class="line">mkdir redis_cluster&#x2F;700&#123;0..5&#125;</span><br><span class="line">cat &gt;&gt; redis_cluster&#x2F;redis.conf &lt;&lt;EOF</span><br><span class="line">port 7000</span><br><span class="line">daemonize yes</span><br><span class="line">pidfile &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7000&#x2F;redis.pid</span><br><span class="line">loglevel notice</span><br><span class="line">logfile &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7000&#x2F;redis.log</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line">dir &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7000</span><br><span class="line">protected-mode no</span><br><span class="line">cluster-enabled yes</span><br><span class="line">cluster-config-file nodes.conf</span><br><span class="line">cluster-node-timeout 5000</span><br><span class="line">appendonly yes</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">4.启动节点</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7000&#x2F;redis.conf</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7001&#x2F;redis.conf</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7002&#x2F;redis.conf</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7003&#x2F;redis.conf</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7004&#x2F;redis.conf</span><br><span class="line">redis-server &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7005&#x2F;redis.conf</span><br><span class="line"></span><br><span class="line">5.将节点加入集群管理</span><br><span class="line">redis-trib.rb create --replicas 1 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005</span><br><span class="line"># replicas 1:表示只有1个从副本集</span><br><span class="line">7000,7001,7002代表3个master</span><br><span class="line">  |    |    |</span><br><span class="line">7003,7004, 7005代表3个slave (应该分布在和主不同的物理主机上)</span><br><span class="line">6. 查看节点状态(7000第一个节点作为管理节点)</span><br><span class="line">redis-cli -p 7000 cluster nodes |grep master #查看主节点状态</span><br><span class="line"></span><br><span class="line">fe228fc4efa3b63d3cd0bae4d9e2150d2ce81a51 127.0.0.1:7001 master - 0 1602724435894 2 connected 5461-10922                      </span><br><span class="line">8baaff74eec9341ea5b3b9bce3c9f4932723bd6b 127.0.0.1:7000 myself,master - 0 0 1 connected 0-5460</span><br><span class="line">0b8ac2039d2f0d4e19588e9a80a2031697a648ae 127.0.0.1:7002 master - 0 1602724435391 3 connected 10923-16383</span><br><span class="line"></span><br><span class="line">redis-cli -p 7000 cluster nodes |grep slave  #查看从节点状态</span><br><span class="line">2a2f8e07579b000406c78fc4ca3368cb27d79b86 127.0.0.1:7003 slave 8baaff74eec9341ea5b3b9bce3c9f4932723bd6b 0 1602724497773 4         connected</span><br><span class="line">35e3f6d9b61b72aa4cdb54a5d53ab3a1a8cf0e64 127.0.0.1:7005 slave 0b8ac2039d2f0d4e19588e9a80a2031697a648ae 0 1602724496264 6         connected</span><br><span class="line">bc35e9e7aa34a7d163d67ef54bbb2ae78ccb4440 127.0.0.1:7004 slave fe228fc4efa3b63d3cd0bae4d9e2150d2ce81a51 0 1602724497271 5         connected</span><br><span class="line"></span><br><span class="line">7. 集群节点管理</span><br><span class="line">7.1 增加新的分片</span><br><span class="line">mkdir redis_cluster&#x2F;700&#123;6..7&#125;</span><br><span class="line">cat &gt;&gt; redis_cluster&#x2F;redis.conf &lt;&lt;EOF</span><br><span class="line">port 7006</span><br><span class="line">daemonize yes</span><br><span class="line">pidfile &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7006&#x2F;redis.pid</span><br><span class="line">loglevel notice</span><br><span class="line">logfile &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7006&#x2F;redis.log</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line">dir &#x2F;space&#x2F;redis_data&#x2F;redis_cluster&#x2F;7006</span><br><span class="line">protected-mode no</span><br><span class="line">cluster-enabled yes</span><br><span class="line">cluster-config-file nodes.conf</span><br><span class="line">cluster-node-timeout 5000</span><br><span class="line">appendonly yes</span><br><span class="line">EOF</span><br><span class="line">7.2启动节点</span><br><span class="line">redis-server redis_cluster&#x2F;7006&#x2F;redis.conf</span><br><span class="line">redis-server redis_cluser&#x2F;7007&#x2F;redis.conf</span><br><span class="line">7.3 添加主节点</span><br><span class="line">redis-trib.rb add-node 127.0.0.1:7006 127.0.0.1:7000</span><br><span class="line">7.4 重新分配slot,将其他节点都分配一些给新的节点 (4分片 13694&#x2F;4 &#x3D; 4096)</span><br><span class="line">redis-trib.rb reshard 127.0.0.1:7000</span><br><span class="line">---&gt;4096</span><br><span class="line">---&gt;输入接收id</span><br><span class="line">---&gt;all</span><br><span class="line">---&gt;yes</span><br><span class="line"></span><br><span class="line">redis-cli -p 7000 cluster nodes|grep master</span><br><span class="line">fe228fc4efa3b63d3cd0bae4d9e2150d2ce81a51 127.0.0.1:7001 master - 0 1602725946662 2 connected 6827-10922                      </span><br><span class="line">87c4d00b0fcfeb9dc420686c8784c8086832f124 127.0.0.1:7006 master - 0 1602725947166 7 connected 0-1364 5461-6826 10923-12287</span><br><span class="line">8baaff74eec9341ea5b3b9bce3c9f4932723bd6b 127.0.0.1:7000 myself,master - 0 0 1 connected 1365-5460</span><br><span class="line">0b8ac2039d2f0d4e19588e9a80a2031697a648ae 127.0.0.1:7002 master - 0 1602725947166 3 connected 12288-16383</span><br><span class="line">7.5 从节点添加</span><br><span class="line">redis-trib.rb add-node --slave --master-id 87c4d00b0fcfeb9dc420686c8784c8086832f124 127.0.0.1:7007 127.0.0.1:7000</span><br><span class="line"></span><br><span class="line">8. 删除节点</span><br><span class="line">8.1 将需要删除的节点上的slot都需要移走,将以前的每段slot分次移走，1365， 1366， 1365</span><br><span class="line">redis-trib.rb reshard 127.0.0.1:7000</span><br><span class="line">  1 [OK] All 16384 slots covered.                                                                                                </span><br><span class="line">  2 How many slots do you want to move (from 1 to 16384)? 1365（移走的slot数量)</span><br><span class="line">  3 What is the receiving node ID? 0b8ac2039d2f0d4e19588e9a80a2031697a648ae（7002）</span><br><span class="line">  4 Please enter all the source node IDs.</span><br><span class="line">  5   Type &#39;all&#39; to use all the nodes as source nodes for the hash slots.</span><br><span class="line">  6   Type &#39;done&#39; once you entered all the source nodes IDs.</span><br><span class="line">  7 Source node #1:87c4d00b0fcfeb9dc420686c8784c8086832f124 （7006）</span><br><span class="line">  8 Source node #2:done</span><br><span class="line"></span><br><span class="line">8.2 执行删除</span><br><span class="line">redis-cli -p 7000 cluster nodes |grep master 查看要移除master节点的状态</span><br><span class="line">fe228fc4efa3b63d3cd0bae4d9e2150d2ce81a51 127.0.0.1:7001 master - 0 1602727164229 9 connected 5461-10922                      </span><br><span class="line">87c4d00b0fcfeb9dc420686c8784c8086832f124 127.0.0.1:7006 master - 0 1602727162720 7 connected  （这里已经没有slot了）</span><br><span class="line">8baaff74eec9341ea5b3b9bce3c9f4932723bd6b 127.0.0.1:7000 myself,master - 0 0 8 connected 0-5460</span><br><span class="line">0b8ac2039d2f0d4e19588e9a80a2031697a648ae 127.0.0.1:7002 master - 0 1602727164230 10 connected 10923-16383</span><br><span class="line"></span><br><span class="line">redis-trib.rb del-node 127.0.0.1:7006 对应的id</span><br><span class="line">redis-trib.rb del-node 127.0.0.1:7007 对应的id</span><br><span class="line"></span><br><span class="line">8.3如果还想添加这些被删除的节点，需要删除数据目录，重新按照新的节点的添加过程；</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>ubuntu 18.04同版本多实例开始</title>
     <url>/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/</url>
     <content><![CDATA[<h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a><center>ubuntu 18.04同版本多实例开始</center></h1><a id="more"></a>
@@ -356,201 +708,6 @@ sudo service apparmor restart
 
 
 
-]]></content>
-  </entry>
-  <entry>
-    <title>redis 再学习</title>
-    <url>/2020/10/12/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<h1 id="redis-再学习"><a href="#redis-再学习" class="headerlink" title=" redis 再学习 "></a><center> redis 再学习 </center></h1><a id="more"></a>
-
-<h2 id="1-基本命令"><a href="#1-基本命令" class="headerlink" title="1. 基本命令"></a>1. 基本命令</h2><ul>
-<li><p>通过命令行方式查看和设置配置</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; info server</span><br><span class="line"><span class="meta">#</span><span class="bash"> Server</span></span><br><span class="line">redis_version:4.0.14</span><br><span class="line">redis_git_sha1:00000000</span><br><span class="line">redis_git_dirty:0</span><br><span class="line">redis_build_id:a3801984392ceb27</span><br><span class="line">redis_mode:standalone</span><br><span class="line">os:Linux 4.4.0-185-generic x86_64</span><br><span class="line">arch_bits:64</span><br><span class="line">multiplexing_api:epoll</span><br><span class="line">atomicvar_api:atomic-builtin</span><br><span class="line">gcc_version:5.4.0</span><br><span class="line">process_id:1082</span><br><span class="line">run_id:dfb262a4f02219cbc26efe68852bf8d1424cb1ad</span><br><span class="line">tcp_port:6379</span><br><span class="line">uptime_in_seconds:-9640</span><br><span class="line">uptime_in_days:0</span><br><span class="line">hz:10</span><br><span class="line">lru_clock:1474142</span><br><span class="line">executable:/usr/local/bin/redis-server</span><br><span class="line">config_file:/etc/redis/6379.conf</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get requirepass</span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "studyredis"</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; config set requirepass test</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; config get requirepass </span><br><span class="line">1) "requirepass"</span><br><span class="line">2) "test"</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>可以通过测试了解下redis在本机上的性能</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">redis-benchmark -t get,spop -q -p 6379</span><br><span class="line">GET: 77639.75 requests per second</span><br><span class="line">SPOP: 82304.52 requests per second</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>exists key :是否存在指定的key, 存在返回1， 不存在返回0</p>
-</li>
-<li><p>del key: 删除key，当key存在，删除返回1；当key不存在，删除返回0</p>
-</li>
-<li><p>ttl key: 不存在返回-2， 存在但没有过期时间，返回-1，否则返回剩余时间的秒数</p>
-</li>
-<li><p>persist key: 取消过期时间</p>
-</li>
-<li><p>select 1: 选择1号数据库</p>
-</li>
-<li><p>move key dbindex: 移动某个key到指定的数据库</p>
-</li>
-<li><p>randomkey: 随机返回一个key</p>
-</li>
-<li><p>rename key key2: 将key重命名为key2</p>
-</li>
-<li><p>echo message: 打印message</p>
-</li>
-<li><p>dbsize: 查看当前数据库的key数量 –&gt;O(1)</p>
-</li>
-<li><p>keys:查看所有key —&gt;O(n) 不建议在线上大量key使用</p>
-</li>
-<li><p>info server: 查看数据库信息</p>
-</li>
-<li><p>flushdb: 清空当前数据库</p>
-</li>
-<li><p>flushall:清空所有数据库</p>
-</li>
-<li><p>type key:返回key存储值得数据类型 </p>
-</li>
-</ul>
-<h2 id="2-redis-配置"><a href="#2-redis-配置" class="headerlink" title="2. redis 配置"></a>2. redis 配置</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">daemonize yes # 默认是no, 设置为yes,redis-server 将以守护进程在后台运行</span><br><span class="line">pidfile &quot;&#x2F;var&#x2F;run&#x2F;redis&#x2F;redis_6379.pid&quot; # 将redis-server 进程id写入到这个文件中</span><br><span class="line">port 6379 #默认端口</span><br><span class="line">tcp-backlog 511</span><br><span class="line">timeout 0 # 客户端闲置多少s后关闭连接，0代表关闭此功能</span><br><span class="line">tcp-keepalive 0</span><br><span class="line">loglevel notice # 日志级别</span><br><span class="line">logfile &quot;&#x2F;var&#x2F;log&#x2F;redis&#x2F;redis-server.log&quot; # 记录日志的文件位置</span><br><span class="line">databases 16 # 默认有16个数据库，从0到15</span><br><span class="line">save 900 1 # 指定在多少时间内，有多少次更新操作，将数据同步到磁盘文件中，900s内有1次更新</span><br><span class="line">save 300 10 #300s内有10个更新</span><br><span class="line">save 60 10000# 60s内有10000个更新</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line">rdbcompression yes # 存到数据库文件中，是否压缩，默认使用LZF压缩算法，如果为了节约cpu时间，可以关闭此选项</span><br><span class="line">rdbchecksum yes</span><br><span class="line">dbfilename &quot;dump.rdb&quot; # 指定数据库文件名</span><br><span class="line">dir &quot;&#x2F;var&#x2F;lib&#x2F;redis&quot;  # redis的工作目录，用于存放 dump.rdb</span><br><span class="line">slave-serve-stale-data yes</span><br><span class="line">slave-read-only yes</span><br><span class="line">repl-diskless-sync no</span><br><span class="line">repl-diskless-sync-delay 5</span><br><span class="line">repl-disable-tcp-nodelay no</span><br><span class="line">slave-priority 100</span><br><span class="line">requirepass &quot;test&quot; # 设置密码</span><br><span class="line">appendonly no # 指定是否在每次更新操作后进行日志记录</span><br><span class="line">appendfilename &quot;appendonly.aof&quot; #指定更新日志文件名</span><br><span class="line">appendfsync everysec # 指定更新日志条件</span><br><span class="line">no-appendfsync-on-rewrite no</span><br><span class="line">auto-aof-rewrite-percentage 100</span><br><span class="line">auto-aof-rewrite-min-size 64mb</span><br><span class="line">aof-load-truncated yes</span><br><span class="line">lua-time-limit 5000</span><br><span class="line">slowlog-log-slower-than 10000</span><br><span class="line">slowlog-max-len 128</span><br><span class="line">latency-monitor-threshold 0</span><br><span class="line">notify-keyspace-events &quot;&quot;</span><br><span class="line">hash-max-ziplist-entries 512</span><br><span class="line">hash-max-ziplist-value 64</span><br><span class="line">list-max-ziplist-entries 512</span><br><span class="line">list-max-ziplist-value 64</span><br><span class="line">set-max-intset-entries 512</span><br><span class="line">zset-max-ziplist-entries 128</span><br><span class="line">zset-max-ziplist-value 64</span><br><span class="line">hll-sparse-max-bytes 3000</span><br><span class="line">activerehashing yes</span><br><span class="line">client-output-buffer-limit normal 0 0 0</span><br><span class="line">client-output-buffer-limit slave 256mb 64mb 60</span><br><span class="line">client-output-buffer-limit pubsub 32mb 8mb 60</span><br><span class="line">hz 10</span><br><span class="line">aof-rewrite-incremental-fsync yes</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-redis内存维护策略"><a href="#3-redis内存维护策略" class="headerlink" title="3. redis内存维护策略"></a>3. redis内存维护策略</h2><h2 id="4-数据类型"><a href="#4-数据类型" class="headerlink" title="4. 数据类型"></a>4. 数据类型</h2><h3 id="4-1-String命令"><a href="#4-1-String命令" class="headerlink" title="4.1 String命令"></a>4.1 String命令</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">set key_name value</span><br><span class="line">setnx key_name value</span><br><span class="line">setex key_name expire value: 设置key_name的值为value,expire值为过期秒数</span><br><span class="line">setrange key_name offset value: 对于key_name 的值，从下标是offset开始替换为value</span><br><span class="line"></span><br><span class="line">get key_name</span><br><span class="line">getrange key start end:提取出指定范围的值</span><br><span class="line">getbit key offset:  这个暂时不理解</span><br><span class="line">getset key_name value:</span><br><span class="line">strlen key:</span><br><span class="line"></span><br><span class="line">mget key1 key2: ---&gt;  O(n)</span><br><span class="line">mset key1 key2 value1 value2  --&gt;O(n)</span><br><span class="line"></span><br><span class="line">针对数字字符串操作，否则报错</span><br><span class="line">incr key1: 自增</span><br><span class="line">incrby key1 增量值： </span><br><span class="line">decr key1: 自减</span><br><span class="line">decrby key1 减量值</span><br><span class="line"></span><br><span class="line">append key_name value：</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>应用场景：</p>
-<ul>
-<li><p>string通常用于保存单个字符串或者json字符串数据</p>
-</li>
-<li><p>因为string是二进制安全的，完全可以把图片文件的内容作为字符串来存储</p>
-</li>
-<li><p>计数器（incr等指令本身具有原子操作特性，因为完全可以利用redis的incr,incrby, decr, decrby等指令实现原子计数效果）</p>
-<p>例如：某种场景下有3个客户端同时读取了num的值（假定值为2），然后对其同时进行了加1操作，那么num的值最后一定是5</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-2-Hash类型"><a href="#4-2-Hash类型" class="headerlink" title="4.2 Hash类型"></a>4.2 Hash类型</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加</span><br><span class="line">hset key field value</span><br><span class="line">hmset key field1 value1 field2 value2</span><br><span class="line">获取</span><br><span class="line">hget key field</span><br><span class="line">hmget key field1 field2</span><br><span class="line">hgetall key</span><br><span class="line">查看：</span><br><span class="line">hkeys key: key中存放的所有字段</span><br><span class="line">hlen key: 字段的数量</span><br><span class="line">删除</span><br><span class="line">hdel key field [field]:删除key中一个或者多个字段</span><br><span class="line"></span><br><span class="line">hsetnx key field value: key中不存在 字段field时才进行设置字段和值</span><br><span class="line">hexists key field: 检查key中字段是否存在</span><br><span class="line"></span><br><span class="line">hincrby key field increment:为整形字段的值加值</span><br><span class="line">hincrbyfloat key field incrment: 为浮点值加上增量</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>应用场景：</p>
-<ul>
-<li>常用于存储一个对象</li>
-</ul>
-</li>
-<li><p>为什么不用string存储一个对象？</p>
-<ul>
-<li><p>hash是最接近关系数据结构的数据类型，可以将一条数据库记录转化成hashmap存放到redis中</p>
-</li>
-<li><p>用户id为查找的key,存储的值包含姓名，年龄，生日等等，如果用string结构来存储，主要有两种方式</p>
-</li>
-<li><p>第一种：将用户id作为查找key,把其他信息封装成一个对象序列化的方式存储，缺点是增加了序列化和反序列化的开销，</p>
-<p>并且需要修改一项信息时，需要将整个对象取回，修改操作时需要对并发进行保护</p>
-</li>
-<li><p>第二种：用户对象信息有多少成员就创建多少个key/value,使用 用户id+对应的属性名作为唯一标识来取得对应属性的值，</p>
-<p>虽然省去了序列化和反序列化的开销和并发问题，但是用户id重复存储，如果存放大量这样的数据，内存浪费；而hash存放这种对象会占用很少的磁盘空间；</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-3-List类型"><a href="#4-3-List类型" class="headerlink" title="4.3 List类型"></a>4.3 List类型</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加元素</span><br><span class="line">lpush key value1 value2 value3 [value]:</span><br><span class="line">rpush key value1 value2 value3 :</span><br><span class="line">lpushx key value: key不存在，返回0; 存在的话，在左侧插入</span><br><span class="line">rpushx key value: key 不存在，返回0；存在，在右侧插入</span><br><span class="line"></span><br><span class="line">查看元素</span><br><span class="line">lrange key start end: 返回指定范围内置</span><br><span class="line">llen key: 返回列表元素</span><br><span class="line">lindex key index: 根据下标取值</span><br><span class="line"></span><br><span class="line">删除：</span><br><span class="line">lpop key</span><br><span class="line">rpop key</span><br><span class="line">blpop key1 [key2] timeout: 左删除一个元素，如果列表没有元素将阻塞直到有元素弹出或者超时；</span><br><span class="line">rlpop key1 [key2] timeout: 右删除一个元素,</span><br><span class="line">ltrim key start end: 保留start到end之间的元素，其他元素删除；</span><br><span class="line">修改：</span><br><span class="line">lset key index value: 根据下标修改一个元素值</span><br><span class="line">linsert key before|after world value: 在指定的列表元素的前面或者后面插入一个值</span><br><span class="line"></span><br><span class="line">rpoplpush source destination: 从source中移除最后一个元素，然后添加到destination的头部</span><br><span class="line">brpoplpush source destination timeout: 从source 中移除最后一个元素，如果没有，将阻塞等待timeout或者直到有元素弹出</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>应用场景：<ul>
-<li>对数据量大的集合进行操作</li>
-<li>任务队列</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-4-set类型"><a href="#4-4-set类型" class="headerlink" title="4.4 set类型"></a>4.4 set类型</h3><ul>
-<li>set是string类型的无序集合，集合成员是唯一的，通过哈希表来实现的，集合中最大的成员数是 $2^{32}$ -1（40多亿个成员）</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">添加成员：</span><br><span class="line">sadd key memeber1 [member2]</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">scard key:获取成员数量</span><br><span class="line">smembers key: 返回集合所有成员</span><br><span class="line">sismember key member:判断member是否是集合key的成员；</span><br><span class="line">srandmember key [count]:返回集合中一个或者多个随机成员；</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">srem key member1 [member2]：移除集合中一个或者多个成员</span><br><span class="line">spop key [count]: 移除并返回集合中的一个随机元素</span><br><span class="line">smove source destination member :将member元素从source 集合移动到destination集合</span><br><span class="line"></span><br><span class="line">差集：</span><br><span class="line">sdiff key1 key2 :返回只属于key1中的元素</span><br><span class="line">sdiffstore destination key1 key2:</span><br><span class="line">交集：</span><br><span class="line">sinter key1 key2:返回同时属于key1和key2的元素</span><br><span class="line">sinterstore destination key1 key2:将结果放到destination中</span><br><span class="line">并集：</span><br><span class="line">sunion key1 key2:返回s1和s2集合中所有元素</span><br><span class="line">sunionstore destination key1 key2:</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>应用场景：<ul>
-<li>利用集合交集，并集，差集操作，实现共同关注，共同爱好，二度好友功能；</li>
-<li>利用唯一性，统计访问网站的所有独立ip,存取当天的活跃用户列表；</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-5-Zset（有序集合）"><a href="#4-5-Zset（有序集合）" class="headerlink" title="4.5 Zset（有序集合）"></a>4.5 Zset（有序集合）</h3><ul>
-<li>Redis有序集合和集合一样也是String类型元素的集合，且不允许有重复成员，不同的是每个元素会关联一个double类型的分数，redis通过分数为集合中的成员进行从小到大的排序，成员唯一，但是分数可以相同；集合中成员数也是$2^{32}$ - 1(40多亿个成员)</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">增加：</span><br><span class="line">zadd key score1 member1 [score2 member2]: 向有序集合添加一个或者多个成员，或者更新已存在成员的分数</span><br><span class="line"></span><br><span class="line">查看：</span><br><span class="line">zcard key: 成员数量</span><br><span class="line">zcount key min max:计算有序集合指定区间分数的成员数量</span><br><span class="line">zrank key member:返回有序集合中指定成员的索引；</span><br><span class="line">zrange key start stop [withscores]: 取出索引之间的元素，带参数withscores将分数也一并输出</span><br><span class="line">zrangebyscore key min max [withscores] [limit offset count]:根据分数区间进行取值，如果设置了limit，那么会再将结果根据</span><br><span class="line">offset(从哪个下标开始) 取出count个数量的值;一旦使用了limit参数，后面的两个参数必须设置；</span><br><span class="line">zrevrange key start stop [withscores]:倒序输出(通过下标设置区间)</span><br><span class="line">zrevrangebyscore key max min [withscores] [limit offset count]:倒序输出(根据分数从高到低的区间)</span><br><span class="line"></span><br><span class="line">删除</span><br><span class="line">zrem key member [member]</span><br><span class="line">zremrangebyrank by start stop:移除指定索引区间的元素</span><br><span class="line">zremrangebyscore by min max: 移除给定分数区间的元素</span><br><span class="line">修改</span><br><span class="line">zincrby by increment member: 增加member成员的分数，返回修改后的分数</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>应用场景：<ul>
-<li>排行榜</li>
-<li>文章发布时间作为分数值，自带排序功能</li>
-<li>设置任务分数值高低作为任务权重的依据，按照权重大小执行任务；</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-6-HyperLogLog-类型"><a href="#4-6-HyperLogLog-类型" class="headerlink" title="4.6 HyperLogLog 类型"></a>4.6 HyperLogLog 类型</h3><ul>
-<li>HyperLogLog是一种算法，并非redis独有，目的是做基数统计(不同数的个数),只记录数量，不记录具体的内容</li>
-<li>耗费空间极小，支持输入非常大体积的数据量(计算接近 $2^{64}$个不同元素的基数，这和元素越多耗费内存就越多的集合形成鲜明的对比)</li>
-<li>redis中每个HyperLogLog key占用了12k的内存用于记录基数</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">添加：</span><br><span class="line">pfadd key element [element]</span><br><span class="line">计算基数</span><br><span class="line">pfcount key [key]:返回给定HyperLogLog的基数估算值</span><br><span class="line">pfmerge destkey sourcekey [sourekey]:将多个HyperLogLog合并为一个 HyperLogLOg</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>应用场景：（只用来统计基数数量，不知道具体内容是什么）<ul>
-<li>真实文章阅读量</li>
-<li>统计注册ip</li>
-<li>统计每日访问Ip数</li>
-<li>统计页面实时UV数</li>
-<li>统计在线用户数</li>
-</ul>
-</li>
-</ul>
-<h2 id="5-redis-发布订阅"><a href="#5-redis-发布订阅" class="headerlink" title="5.redis 发布订阅"></a>5.redis 发布订阅</h2><ul>
-<li>redis发布、订阅是一种消息通信模式，发布者向频道发布消息，订阅者通过订阅频道接收消息；</li>
-<li>redis客户端可以订阅任意数量的频道</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">subscribe channel [channel]:</span><br><span class="line">psubscribe pattern [pattern]:订阅一个或者多个符合给定模式的频道</span><br><span class="line"></span><br><span class="line">publish channel message: 发布消息</span><br><span class="line"></span><br><span class="line">退订：</span><br><span class="line">unsubscribe channel </span><br><span class="line">punsubscribe [pattern]</span><br></pre></td></tr></table></figure>
-
-<h2 id="6-redis-事务"><a href="#6-redis-事务" class="headerlink" title="6.redis 事务"></a>6.redis 事务</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">multi: 事务开启</span><br><span class="line">exec: 事务开始执行，按照命令顺序执行；</span><br><span class="line">discard: 事务取消</span><br><span class="line"></span><br><span class="line">命令执行过程中出错, 其他命令执行，出错的命令不执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa hello</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; incr aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">1) OK</span><br><span class="line">2) "hello"</span><br><span class="line">3) (error) ERR value is not an integer or out of range</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"hello"</span><br><span class="line"></span><br><span class="line">命令执行前出错，那么所有命令都不能被执行</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set bbb test</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; sadfasdf</span><br><span class="line">(error) ERR unknown command `sadfasdf`, with args beginning with: </span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">(error) EXECABORT Transaction discarded because of previous errors.</span><br><span class="line">127.0.0.1:6379&gt; get bbb</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">watch key [key] :监视key的变化，当在开始事务之后，有其他进程修改了key的话，那么事务不能成功执行</span><br><span class="line">127.0.0.1:6379&gt; watch aaa</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set aaa 30</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec   # 另一个客户端修改了aaa 值为40,这里没有执行成功；</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; get aaa</span><br><span class="line">"40"</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>应用场景：<ul>
-<li>针对一组命令要么同时执行成功，要么执行失败；</li>
-</ul>
-</li>
-</ul>
-<h2 id="7-redis持久化"><a href="#7-redis持久化" class="headerlink" title="7. redis持久化"></a>7. redis持久化</h2><ul>
-<li>redis持久化就是将内存中的数据写到磁盘中，防止服务宕机内存数据丢失</li>
-<li>redis提供了两种持久化方式：RDB(默认) 和 AOF</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">RDB: redis默认持久化机制，这种方式就是将内存中的数据以快照的方式写入到二进制文件中，默认的文件名为dump.rdb</span><br><span class="line">优点：保存数据极快，还原数据极快，适用于灾难备份</span><br><span class="line">缺点：小内存机器不适合使用</span><br><span class="line">快照条件：</span><br><span class="line">- 服务器正常关闭时， redis-cli shutdown</span><br><span class="line">- key 满足条件时，默认配置中</span><br><span class="line">	save 900 1 # 每900s(15分钟) 至少1个key发生变化，产生快照</span><br><span class="line">	save 300 10# 每300s(5分钟) 至少10个key发生变化，产生快照</span><br><span class="line">	save 60 10000   </span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">AOF(append only file):应用不能丢失任何修改的话，可以采用aof持久化方式</span><br><span class="line">redis每接收到一个写命令都通过write函数追加到文件中(默认是appendonly.aof),当redis重启时会通过重新执行文件中保存的写命令来在在内存中重建整个数据库</span><br><span class="line">配置：</span><br><span class="line"></span><br><span class="line">appendonly yes: 开启aof持久化方式</span><br><span class="line">有三种方式(默认appendfsynceverysec)</span><br><span class="line">appendfsync always: 收到写命令就立即写入磁盘，最慢，保证完全的持久化</span><br><span class="line">appendfsynceverysec: 每秒写入磁盘一次，在性能和持久化方面折中</span><br><span class="line">appendfsync no:完全依赖os,性能最好，持久化没有保证</span><br><span class="line">缺点：</span><br><span class="line">aof文件会变得越来越大；</span><br></pre></td></tr></table></figure>
-
-<h2 id="8-redis作为缓存，如何保证与数据库的一致性："><a href="#8-redis作为缓存，如何保证与数据库的一致性：" class="headerlink" title="8. redis作为缓存，如何保证与数据库的一致性："></a>8. redis作为缓存，如何保证与数据库的一致性：</h2><h3 id="8-1-实时同步："><a href="#8-1-实时同步：" class="headerlink" title="8.1 实时同步："></a>8.1 实时同步：</h3><p>对强一致要求比较高的，应采用实时同步方案：查询缓存没有时再从数据库查询，然后保存到缓存；更新缓存时，先更新数据库，再将缓存的设置过期</p>
-<h3 id="8-2-异步队列"><a href="#8-2-异步队列" class="headerlink" title="8.2 异步队列"></a>8.2 异步队列</h3><p>对于并发程度较高的，可采用异步队列方式同步，可采用kafka等消息队列处理消息。</p>
-<p>消息队列有哪些呢？</p>
-<p>ActiveMQ, RabbitMQ, RocketMQ, Kafka等</p>
-<h3 id="8-3-使用阿里的同步工具canal"><a href="#8-3-使用阿里的同步工具canal" class="headerlink" title="8.3 使用阿里的同步工具canal"></a>8.3 使用阿里的同步工具canal</h3><h3 id="8-4-采用UDF自定义函数方式"><a href="#8-4-采用UDF自定义函数方式" class="headerlink" title="8.4 采用UDF自定义函数方式"></a>8.4 采用UDF自定义函数方式</h3><p>面对mysql的API进行编程，利用触发器进行缓存同步</p>
-<h3 id="8-5-缓存问题"><a href="#8-5-缓存问题" class="headerlink" title="8.5 缓存问题()"></a>8.5 缓存问题()</h3><ul>
-<li><p>正常的缓存查询流程：数据查询先进行缓存查询，如果key不存在或者key过期那么就去查询数据库，并把查询的对象放进缓存，如果数据库查询对象为空，则不放进缓存直接返回</p>
-</li>
-<li><p>缓存穿透</p>
-<ul>
-<li>当到缓存中查询一个一定不存在的数据时，由于缓存不命中，就会去数据库中查询，查不到数据则不写入缓存，这将导致这个不存在的数据每次都要到数据库中查询，造成缓存穿透（缓存没有起作用）</li>
-<li>解决方案：数据库查询不到就缓存空结果。同时需要注意当对数据库执行插入操作时，清除缓存中的key,或者为空缓存设置过期时间。</li>
-<li>发生穿透的原因可能有：对查询条件进行加密。</li>
-</ul>
-</li>
-<li><p>缓存雪崩：当缓存集中过期的时候，那么当并发访问这些key的时候，就会直接到数据库访问，造成压力波峰。</p>
-<ul>
-<li>可以采用设置不同的缓存时间，让缓存过期时间尽量均匀发布</li>
-</ul>
-</li>
-<li><p>缓存击穿：指的是一个key非常热，查询量非常大，当这个key到了过期时间瞬间，持续的大并发穿透缓存，直接请求数据库，对于商品而言，也就是所谓的”爆款”</p>
-<ul>
-<li>缓存不过期</li>
-</ul>
-</li>
-</ul>
-<h2 id="9-Redis-高级配置"><a href="#9-Redis-高级配置" class="headerlink" title="9. Redis 高级配置"></a>9. Redis 高级配置</h2><ul>
-<li>在实际应用中，单台redis因为内存容量有限(单台redis最大使用内存不应该超过20G), 处理能力有限，无法高可用（一旦发生意外宕机，缓存功能失效）</li>
-<li>使用主从复制的配置（主写从读）（多个从一个主）</li>
-<li>哨兵模式（针对master意外宕机的解决方案）</li>
-<li>集群模式是实际使用最多的模式 （Redis Cluster)<ul>
-<li>从redis3.0 之后的版本开始支持redis-cluster，至少需要（3个master和3个slave)才能建立集群。     </li>
-</ul>
-</li>
-</ul>
 ]]></content>
   </entry>
   <entry>
@@ -1957,6 +2114,8 @@ limit_req_conn:限制同一时间连接数，并发限制
 <li>一次查询的条件依赖于另一个查询的结果时，就是子查询</li>
 </ul>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用两次查询，传统上</span></span><br><span class="line">user = session.query(User).filter_by(username=<span class="string">'李四'</span>).first()</span><br><span class="line">result = session.query(User).filter_by(city=user.city, age=user.age).all()</span><br><span class="line"><span class="keyword">print</span> result</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用子查询， 只查找一次</span></span><br><span class="line">stmt = session.query(User.city.label(<span class="string">'city'</span>), User.age.label(<span class="string">'age'</span>)).filter_by(username=<span class="string">'李四'</span>).subquery()</span><br><span class="line"></span><br><span class="line">result = session.query(User).filter(User.city == stmt.c.city, User.age == stmt.c.age).all()</span><br><span class="line"><span class="keyword">print</span> result</span><br></pre></td></tr></table></figure>
+
+<h3 id="16-仅仅查询某几个字段"><a href="#16-仅仅查询某几个字段" class="headerlink" title="16. 仅仅查询某几个字段"></a>16. 仅仅查询某几个字段</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> load_only</span><br><span class="line">user = User.query.options(load_only(User.name, User.age)).filter_by(id=<span class="number">1</span>).first()</span><br></pre></td></tr></table></figure>
 
 
 
