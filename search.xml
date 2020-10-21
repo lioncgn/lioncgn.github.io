@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>python中__str__与__repr__</title>
+    <url>/2020/10/21/python%E4%B8%AD-str-%E4%B8%8E-repr/</url>
+    <content><![CDATA[<h1 id="python中-str-与-repr"><a href="#python中-str-与-repr" class="headerlink" title="python中__str__ 与__repr__"></a><center>python中<code>__str__</code> 与<code>__repr__</code></center></h1><a id="more"></a>
+
+<p>使用<code>print</code>打印对象时，先去找对象的<code>__str__</code>方法，如果没有的话，再去调用<code>__repr__</code>.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="number">7</span> ----</span><br><span class="line">  <span class="number">8</span>     <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line">  <span class="number">9</span>     |   self.name = name</span><br><span class="line"> <span class="number">10</span>  </span><br><span class="line"> <span class="number">11</span>     <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="number">12</span>     |   <span class="keyword">return</span> self.name</span><br><span class="line"> <span class="number">13</span>  </span><br><span class="line"> <span class="number">14</span>     <span class="comment"># def __repr__(self):</span></span><br><span class="line"> <span class="number">15</span>     |   <span class="comment"># return '&lt;%s&gt;' % self.name</span></span><br><span class="line"> <span class="number">16</span>  </span><br><span class="line"> <span class="number">17</span>  </span><br><span class="line"> <span class="number">18</span> <span class="class"><span class="keyword">class</span> <span class="title">Teacher</span><span class="params">(object)</span>:</span></span><br><span class="line"> <span class="number">19</span> ----</span><br><span class="line"> <span class="number">20</span>     <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line"> <span class="number">21</span>     |   self.name = name</span><br><span class="line"> <span class="number">22</span>     |   self.students = []</span><br><span class="line"> <span class="number">23</span>  </span><br><span class="line"> <span class="number">24</span>  </span><br><span class="line"> <span class="number">25</span> s1 = Student(<span class="string">'cgn'</span>)</span><br><span class="line"> <span class="number">26</span> print(s1)</span><br><span class="line"> <span class="number">27</span>  </span><br><span class="line"> <span class="number">28</span> s2 = Student(<span class="string">'world'</span>)</span><br><span class="line"> <span class="number">29</span> print(s2)</span><br><span class="line"> <span class="number">30</span>  </span><br><span class="line"> <span class="number">31</span> t1 = Teacher(<span class="string">'hello'</span>)</span><br><span class="line"> <span class="number">32</span> t1.students.append(s1)</span><br><span class="line"> <span class="number">33</span> t1.students.append(s2)</span><br><span class="line"> <span class="number">34</span>  </span><br><span class="line"> <span class="number">35</span> print(t1.students)</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>python</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>测试框架学习</title>
     <url>/2020/10/20/%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[<h1 id="测试框架学习"><a href="#测试框架学习" class="headerlink" title="测试框架学习"></a><center>测试框架学习</center></h1><a id="more"></a>
