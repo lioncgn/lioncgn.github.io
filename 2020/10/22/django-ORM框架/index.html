@@ -46,19 +46,19 @@
   };
 </script>
 
-  <meta name="description" content="Flask_restful使用">
+  <meta name="description" content="Django ORM框架">
 <meta property="og:type" content="article">
-<meta property="og:title" content="flask_restful使用">
-<meta property="og:url" content="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:title" content="django ORM框架">
+<meta property="og:url" content="http://yoursite.com/2020/10/22/django-ORM%E6%A1%86%E6%9E%B6/index.html">
 <meta property="og:site_name" content="你的眼神">
-<meta property="og:description" content="Flask_restful使用">
-<meta property="article:published_time" content="2020-08-22T02:59:28.000Z">
-<meta property="article:modified_time" content="2020-08-29T00:03:50.636Z">
+<meta property="og:description" content="Django ORM框架">
+<meta property="article:published_time" content="2020-10-22T11:42:27.000Z">
+<meta property="article:modified_time" content="2020-10-23T01:21:15.556Z">
 <meta property="article:author" content="cgn">
-<meta property="article:tag" content="flask">
+<meta property="article:tag" content="django">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/">
+<link rel="canonical" href="http://yoursite.com/2020/10/22/django-ORM%E6%A1%86%E6%9E%B6/">
 
 
 <script id="page-configurations">
@@ -70,7 +70,7 @@
   };
 </script>
 
-  <title>flask_restful使用 | 你的眼神</title>
+  <title>django ORM框架 | 你的眼神</title>
   
 
 
@@ -212,7 +212,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/22/flask-restful%E4%BD%BF%E7%94%A8/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/22/django-ORM%E6%A1%86%E6%9E%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/sister.jpeg">
@@ -225,7 +225,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          flask_restful使用
+          django ORM框架
         </h1>
 
         <div class="post-meta">
@@ -235,14 +235,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-08-22 10:59:28" itemprop="dateCreated datePublished" datetime="2020-08-22T10:59:28+08:00">2020-08-22</time>
+              <time title="创建时间：2020-10-22 19:42:27" itemprop="dateCreated datePublished" datetime="2020-10-22T19:42:27+08:00">2020-10-22</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-29 08:03:50" itemprop="dateModified" datetime="2020-08-29T08:03:50+08:00">2020-08-29</time>
+                <time title="修改时间：2020-10-23 09:21:15" itemprop="dateModified" datetime="2020-10-23T09:21:15+08:00">2020-10-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -250,8 +250,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/flask/" itemprop="url" rel="index">
-                    <span itemprop="name">flask</span>
+                  <a href="/categories/django/" itemprop="url" rel="index">
+                    <span itemprop="name">django</span>
                   </a>
                 </span>
             </span>
@@ -274,9 +274,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Flask-restful使用"><a href="#Flask-restful使用" class="headerlink" title="Flask_restful使用"></a><center>Flask_restful使用</center></h1><a id="more"></a>
+        <h1 id="Django-ORM框架"><a href="#Django-ORM框架" class="headerlink" title="Django ORM框架"></a><center>Django ORM框架</center></h1><a id="more"></a>
 
-<h2 id="1-Rest-API规范是什么，在falsk中究竟如何实现？"><a href="#1-Rest-API规范是什么，在falsk中究竟如何实现？" class="headerlink" title="1. Rest API规范是什么，在falsk中究竟如何实现？"></a>1. Rest API规范是什么，在falsk中究竟如何实现？</h2><h2 id="2-flask中如何基于蓝图来实现rest-api"><a href="#2-flask中如何基于蓝图来实现rest-api" class="headerlink" title="2. flask中如何基于蓝图来实现rest api"></a>2. flask中如何基于蓝图来实现rest api</h2><h2 id="3-flask-restful如何对请求的数据进行类型检查？"><a href="#3-flask-restful如何对请求的数据进行类型检查？" class="headerlink" title="3. flask restful如何对请求的数据进行类型检查？"></a>3. flask restful如何对请求的数据进行类型检查？</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>使用url定义资源，一般会将api作为url前缀或者将api加入主机名中，作为子域名；</span><br><span class="line"><span class="comment"># http://example.com/api  url前缀</span></span><br><span class="line"><span class="comment"># http://api.example.com  子域名</span></span><br><span class="line"><span class="number">2.</span>使用http方法描述操作</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取资源集合或者集合中某个元素，使用get方法，返回响应： 资源的表现层，200响应</span></span><br><span class="line"><span class="comment"># 集合中创建一个新成员，使用post方法，返回的响应是：指向新地址的表现层，首部Location字段为指向资源的url,201响应</span></span><br><span class="line"><span class="comment"># put方法： 更新某个资源，提供完整的资源数据，返回响应：空数据，204响应</span></span><br><span class="line"><span class="comment"># patch方法： 更新某个资源，只提供更新部分的数据，返回响应：空数据，204响应（No Content)</span></span><br><span class="line"><span class="comment"># delete方法：删除某个资源，(请求被接收，删除操作未执行，返回202（Accepted)响应；删除操作已经执行，返回204响应；删除操作已经执行，返回包含状态信息的表现层，返回200响应；</span></span><br><span class="line"><span class="number">3.</span>使用json交换数据</span><br><span class="line"><span class="number">4.</span>设置api版本</span><br><span class="line"><span class="comment"># 可以通过添加url前缀或者直接使用子域名来实现</span></span><br><span class="line"><span class="comment"># http://example.com/v1</span></span><br><span class="line"><span class="comment"># http://example.com/v2</span></span><br><span class="line"><span class="comment"># http://v1.example.com</span></span><br><span class="line"><span class="comment"># http://v2.example.com</span></span><br></pre></td></tr></table></figure>
+<h2 id="1-Django-模型继承的方式"><a href="#1-Django-模型继承的方式" class="headerlink" title="1. Django 模型继承的方式"></a>1. Django 模型继承的方式</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.抽象类继承，将多个模型类中的共有字段封装到一个基类中，基类不会创建表，子类拥有基类的所有字段</span></span><br><span class="line">基类中需要定义</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">    abstract = <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 2.多表继承</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.代理模型继承，代理类只去管理基类中的数据，不会创建表，不影响父类模型的行为</span></span><br><span class="line">代理类通过定义</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">    proxy = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-聚合和分组"><a href="#2-聚合和分组" class="headerlink" title="2. 聚合和分组"></a>2. 聚合和分组</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db.models <span class="keyword">import</span> Max, Min, Avg, Sum, Count</span><br><span class="line"></span><br><span class="line"><span class="comment"># 自定义显示字段的key,通过设置min,max</span></span><br><span class="line">book = Book.objects.filter(id__gt=<span class="number">3</span>).aggregate(min=Min(<span class="string">'price'</span>)，max=Max(<span class="string">'price'</span>))</span><br><span class="line">print(book)</span><br><span class="line">&#123;<span class="string">'min'</span>: Decimail(<span class="string">'18.00'</span>), <span class="string">'max'</span>: Decimal(<span class="string">'100.00'</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分组查询</span></span><br><span class="line"><span class="number">1.</span> 查询唱每首歌的歌手有几个</span><br><span class="line"></span><br><span class="line">singers = Song.objects.annotate(count=Count(<span class="string">'sg'</span>)).values(<span class="string">'id'</span>, <span class="string">'count'</span>)</span><br><span class="line"><span class="keyword">for</span> singer <span class="keyword">in</span> singers:</span><br><span class="line">    print(singer)</span><br><span class="line">    </span><br><span class="line">&#123;<span class="string">'count'</span>: <span class="number">2</span>, <span class="string">'id'</span>: <span class="number">1</span>&#125;</span><br><span class="line">&#123;<span class="string">'count'</span>: <span class="number">1</span>, <span class="string">'id'</span>: <span class="number">2</span>&#125;</span><br><span class="line">&#123;<span class="string">'count'</span>: <span class="number">5</span>, <span class="string">'id'</span>: <span class="number">3</span>&#125;</span><br><span class="line">&#123;<span class="string">'count'</span>: <span class="number">5</span>, <span class="string">'id'</span>: <span class="number">4</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> 统计每个作者出书的最便宜的价格</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方式一</span></span><br><span class="line">authors = Author.objects.annotate(min=Min(<span class="string">'book__price'</span>)).values()</span><br><span class="line"><span class="keyword">for</span> author <span class="keyword">in</span> authors:</span><br><span class="line">    print(author)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 方式二</span></span><br><span class="line">默认对书进行分组，求出每个分组的最低价格</span><br><span class="line">books = Book.objects.annotate(min=Min(<span class="string">'price'</span>))</span><br><span class="line"><span class="comment"># 通过添加values 指定分组条件 author_id,</span></span><br><span class="line">books = Book.objects.values(<span class="string">'author_id'</span>).annotate(min=Min(<span class="string">'price'</span>))</span><br><span class="line"><span class="keyword">for</span> book <span class="keyword">in</span> books:</span><br><span class="line">    print(book)</span><br><span class="line">    </span><br><span class="line">out: &#123;<span class="string">'min'</span>: Decimal(<span class="string">'32.00'</span>), <span class="string">'author_id'</span>: <span class="number">1</span>&#125;</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 如果只想获取最低价格字段</span></span><br><span class="line">books = Book.objects.values(<span class="string">'author_id'</span>).annotate(min=Min(<span class="string">'price'</span>)).values(<span class="string">'min'</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-F-和-Q"><a href="#3-F-和-Q" class="headerlink" title="3. F 和 Q"></a>3. F 和 Q</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db.models <span class="keyword">import</span> F</span><br><span class="line"></span><br><span class="line">F 用法：</span><br><span class="line"><span class="number">1.</span>比较两个字段的值</span><br><span class="line"><span class="number">2.</span>取出某一列进行运算</span><br><span class="line"></span><br><span class="line">books = Book.object.filter(sale__gt=F(<span class="string">"store"</span>))</span><br><span class="line">books = Book.object.all().update(store=F(<span class="string">"sote"</span>) * <span class="number">2</span> + <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django.db.models <span class="keyword">import</span> Q</span><br><span class="line">Q用法：丰富了逻辑运算</span><br><span class="line">books = Book.object.filer(sale__gt=<span class="number">20</span>, sale_lt=<span class="number">50</span>)</span><br><span class="line">books = Book.object.filter(Q(sale__gt=<span class="number">20</span>), Q(sale__lt=<span class="number">50</span>))</span><br><span class="line">books = Book.object.filter(Q(sale__gt=<span class="number">20</span>)|Q(sale__lt=<span class="number">50</span>))</span><br><span class="line">books = Book.object.filter(Q(sale__gt=<span class="number">20</span>)&amp; Q(store__gt=<span class="number">20</span>))</span><br><span class="line">books = Book.object.filter(~Q(sale__gt=<span class="number">20</span>)|Q(store__gt=<span class="number">20</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-事务"><a href="#4-事务" class="headerlink" title="4. 事务"></a>4. 事务</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> 第一种实现方式</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> transaction.atomic():</span><br><span class="line">        Author.objects.create(name=<span class="string">'hello'</span>)</span><br><span class="line">        int(<span class="string">'sdfsk'</span>)</span><br><span class="line">        Author.objects.create(name=<span class="string">'world'</span>)</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(e)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="number">2.</span>第二种实现方式</span><br><span class="line"><span class="keyword">with</span> transaction.atomic():</span><br><span class="line">    save_id = transaction.savepoint()</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">        Author.objects.create(name=<span class="string">'hello'</span>)</span><br><span class="line">        int(<span class="string">'sdfs'</span>)</span><br><span class="line">        Author.objects.create(name=<span class="string">'world'</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        print(e)</span><br><span class="line">        transaction.savepoint_rollback(save_id)</span><br></pre></td></tr></table></figure>
 
 
     </div>
@@ -287,7 +295,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/flask/" rel="tag"># flask</a>
+              <a href="/tags/django/" rel="tag"># django</a>
           </div>
 
         
@@ -296,13 +304,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/08/21/signal/" rel="prev" title="flask中使用signal">
-      <i class="fa fa-chevron-left"></i> flask中使用signal
+    <a href="/2020/10/22/django%E4%BF%A1%E5%8F%B7/" rel="prev" title="django信号">
+      <i class="fa fa-chevron-left"></i> django信号
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/08/23/django%E4%B8%AD%E7%9A%84%E7%BA%A7%E8%81%94%E6%93%8D%E4%BD%9C/" rel="next" title="django中的级联操作">
-      django中的级联操作 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -362,7 +367,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Flask-restful使用"><span class="nav-number">1.</span> <span class="nav-text">Flask_restful使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Rest-API规范是什么，在falsk中究竟如何实现？"><span class="nav-number">1.1.</span> <span class="nav-text">1. Rest API规范是什么，在falsk中究竟如何实现？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-flask中如何基于蓝图来实现rest-api"><span class="nav-number">1.2.</span> <span class="nav-text">2. flask中如何基于蓝图来实现rest api</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-flask-restful如何对请求的数据进行类型检查？"><span class="nav-number">1.3.</span> <span class="nav-text">3. flask restful如何对请求的数据进行类型检查？</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Django-ORM框架"><span class="nav-number">1.</span> <span class="nav-text">Django ORM框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Django-模型继承的方式"><span class="nav-number">1.1.</span> <span class="nav-text">1. Django 模型继承的方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-聚合和分组"><span class="nav-number">1.2.</span> <span class="nav-text">2. 聚合和分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-F-和-Q"><span class="nav-number">1.3.</span> <span class="nav-text">3. F 和 Q</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-事务"><span class="nav-number">1.4.</span> <span class="nav-text">4. 事务</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
