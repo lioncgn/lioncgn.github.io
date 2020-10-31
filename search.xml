@@ -1,6 +1,566 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Mysql继续学习</title>
+    <url>/2020/10/31/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="Mysql继续学习"><a href="#Mysql继续学习" class="headerlink" title="Mysql继续学习"></a><center>Mysql继续学习</center></h1><a id="more"></a>
+
+<h2 id="1-索引的原理"><a href="#1-索引的原理" class="headerlink" title="1. 索引的原理"></a>1. 索引的原理</h2><p> 索引就是帮助Mysql高效获取数据的数据结构。</p>
+<p>优势：快速查询数据，降低数据库的IO成本；</p>
+<p>劣势：索引也是表，也要占用空间；虽然提高了查询效率，但是降低了更新表的速度，对表进行insert, update, delete等，更新表时，mysql不仅要保存数据，还要保存一下索引文件每次更新添加了索引列的字段，调整更新带来的键值变化后的索引信息；</p>
+<ul>
+<li>索引结构<ul>
+<li>索引是MySQL的存储引擎层中实现的，不是在服务器层实现，每种存储引擎的索引不一定相同，也不是所有的存储引擎都支持所有的索引类型，</li>
+<li>InnoDB引擎支持的索引有：Btree索引，full-text索引（5.6版本后支持），平常所说的索引，没有特别指定，都是指B+树（多路搜索树，不一定是二叉的）结构的索引；其中聚集索引，复合索引，前缀索引，唯一索引默认都是使用B+tree树索引；</li>
+<li>b-tree结构：<ul>
+<li>btree又叫多路平衡搜索树，一个m叉的btree特性：<ul>
+<li>树中每个节点最多包含有m个孩子；</li>
+<li>除根节点和叶子节点外，每个节点至少有（m/2)（向上取整）个孩子</li>
+<li>若根节点不是叶子节点，则至少有两个孩子</li>
+<li>所有叶子节点都在同一层</li>
+<li>每个非叶子节点由n个key与n+1个指针组成，其中 （m/2)（向上取整）- 1 &lt;= n &lt;= m -1;当n大于最大值时，中间节点分裂到父节点，两边节点分裂；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>b+tree与btree区别<ul>
+<li>b+tree的叶子节点保存包含主键的一条记录或者是主键索引，索引从左到右递增排列，而b-tree树每个结点都包含索引和对应的数据，这样的话，会增加树的高度，因而带来更多的磁盘I/O操作；</li>
+<li>b+tree所有的非叶子节点只存储索引，不存储数据；</li>
+<li>b+tree的叶子节点增加了双向链表指针，优化了区间查询的性能，而不像b-tree那样在区间查找时，对于每个元素进行重新查找；</li>
+</ul>
+</li>
+<li>mysql中的b+tree数据结构对经典的b-tree进行了优化，在原有b-tree基础上，增加了一个指向相邻叶子节点的链表指针，形成了带有顺序指针的B+tree,提高区间访问的性能；</li>
+</ul>
+</li>
+<li>索引分类：                                  <ul>
+<li>单值索引：一个索引包含单个列</li>
+<li>唯一索引：索引列的值必须唯一，可以有多个null</li>
+<li>复合索引：多列构成的索引；</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-索引的增删改查"><a href="#2-索引的增删改查" class="headerlink" title="2.索引的增删改查"></a>2.索引的增删改查</h2><ul>
+<li><p>创建索引：create index idx_city_name on city(city_name);</p>
+<ul>
+<li>也可以通过：alter table city add unique idx_city_name(city_name);  创建唯一索引</li>
+</ul>
+</li>
+<li><p>查看索引： show index from city;</p>
+</li>
+<li><p>删除索引： drop index idx_city_name on city;</p>
+</li>
+</ul>
+<h2 id="3-视图"><a href="#3-视图" class="headerlink" title="3. 视图"></a>3. 视图</h2><ul>
+<li>视图：提高复杂SQL语句的复用性和表操作的安全性；</li>
+<li>视图作用<ul>
+<li>安全，创建一个视图，定义好该视图操作的数据，之后将用户权限与视图进行绑定，可以通过grant语句对视图进行授予权限；</li>
+<li>查询性能提高，将查询的结果保存到视图中；</li>
+<li>数据独立： 一个视图就是一个表的查询结果集，相当于一个虚拟的表，可以对这个表再进行查询，</li>
+</ul>
+</li>
+<li>创建视图 <ul>
+<li>create view view_city_country as select c.*, t.country_name from city c, country t where c.country_id = t.country_id;</li>
+<li>create or replace view view_city_country as 新的查询语句；创建或者覆盖已经存在的视图名</li>
+</ul>
+</li>
+<li>修改视图:通过视图能够修改原表；<ul>
+<li>update view_city_country set city_name = ‘西安市’ where city_id =1;</li>
+</ul>
+</li>
+<li>使用视图： <ul>
+<li>select * from view_city_country;</li>
+</ul>
+</li>
+<li>删除视图<ul>
+<li>drop view view_city_country;</li>
+</ul>
+</li>
+<li>查看视图： show tables;</li>
+<li>查看视图创建语句： show  create view view_city_country;</li>
+<li>视图的其他参数：<ul>
+<li>with check option:在插入或者更新数据时，不能插入或者更新不符合限制条件的记录</li>
+<li>algorithm 参数有 merge,temptable,undefined,默认参数为merge<ul>
+<li>merge :直接将视图转化为sql语句执行；修改视图生成表的数据也会直接更新基表；</li>
+<li>temptable:先将视图结果存放到内存，然后创建一个临时表，再从临时表取数据，不能直接更新基表；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>视图中的数据不可更新<ul>
+<li>视图表中的数据不是直接来源于基表，不能修改；</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-存储过程和函数"><a href="#4-存储过程和函数" class="headerlink" title="4. 存储过程和函数"></a>4. 存储过程和函数</h2><ul>
+<li><p>存储过程：实现将一组对表操作的sql语句代码当做一个整体来执行；</p>
+<ul>
+<li>将重复性操作封装到存储过程中，减少对sql的调用；</li>
+<li>批量处理</li>
+</ul>
+</li>
+<li><p>创建存储过程</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test1()</span><br><span class="line">begin</span><br><span class="line">select * from view_city_country;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用存储过程</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">call pro_test1();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询存储过程</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show procedure status; -- 查看数据库中所有存储过程</span><br><span class="line">-- 查看数据库中指定存储过程：</span><br><span class="line">show procedure status where db&#x3D;&#39;use_index&#39;;</span><br><span class="line">-- 查看创建存储过程语句：</span><br><span class="line">show create procedure pro_test1;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除存储过程</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">drop procedure pro_test1;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="4-1-语法"><a href="#4-1-语法" class="headerlink" title="4.1 语法"></a>4.1 语法</h4><h5 id="1-变量"><a href="#1-变量" class="headerlink" title="1.变量"></a>1.变量</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">declare res varchar(100) default &#39;&#39;;</span><br><span class="line">declare x,y int default 0;  -- 变量声明</span><br><span class="line">set x &#x3D; 3; -- 变量赋值 第一种方式</span><br><span class="line">set y &#x3D; 4;</span><br><span class="line">declare avgres double;</span><br><span class="line">select avg(salary) into avgres from test;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; create procedure pro_test2()</span><br><span class="line">    -&gt; begin</span><br><span class="line">    -&gt; declare num int;</span><br><span class="line">    -&gt; select count(*) into num from city; -- 变量赋值 第二种方式</span><br><span class="line">    -&gt; select concat(&#39;city表中的记录数为:&#39;, num);</span><br><span class="line">    -&gt; end$$</span><br></pre></td></tr></table></figure>
+
+<h5 id="2-参数"><a href="#2-参数" class="headerlink" title="2.参数"></a>2.参数</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 输入参数 </span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test3(in height int)</span><br><span class="line">begin</span><br><span class="line">declare description varchar(50) default &#39;&#39;;</span><br><span class="line">if height &gt;&#x3D; 180 then</span><br><span class="line">	set description&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D;170 and height &lt; 180 then</span><br><span class="line">	set description&#x3D;&#39;标准身材&#39;;</span><br><span class="line">else</span><br><span class="line">	set description&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">select concat(&#39;身高&#39;, height, &#39; 对应的身材类型是:&#39;, description);</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test6(height int, out descrip varchar(50))</span><br><span class="line">begin</span><br><span class="line">if height &gt;&#x3D;180 then</span><br><span class="line">	set descrip&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D; 170 and height &lt; 180 then</span><br><span class="line">	set descrip&#x3D;&#39;身材一般&#39;;</span><br><span class="line">else</span><br><span class="line">	set descrip&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line">-- 调用上面的方式有</span><br><span class="line">call(145, @description);</span><br><span class="line">select @description;  @description 用户定义的会话变量</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="3-条件判断语句"><a href="#3-条件判断语句" class="headerlink" title="3.条件判断语句"></a>3.条件判断语句</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test3()</span><br><span class="line">begin</span><br><span class="line">declare height int default 175;</span><br><span class="line">declare description varchar(50) default &#39;&#39;;</span><br><span class="line">if height &gt;&#x3D; 180 then</span><br><span class="line">	set description&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D;170 and height &lt; 180 then</span><br><span class="line">	set description&#x3D;&#39;标准身材&#39;;</span><br><span class="line">else</span><br><span class="line">	set description&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">select concat(&#39;身高&#39;, height, &#39; 对应的身材类型是:&#39;, description);</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
+
+<h5 id="4-case"><a href="#4-case" class="headerlink" title="4. case"></a>4. case</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test8(mon int)</span><br><span class="line">begin</span><br><span class="line">declare result varchar(10);</span><br><span class="line">case </span><br><span class="line">when mon&gt;&#x3D;1 and mon &lt;&#x3D;3 then</span><br><span class="line">	set result&#x3D;&#39;第一季度&#39;;</span><br><span class="line">when mon&gt;&#x3D;4 and mon&lt;&#x3D;6 then</span><br><span class="line">	set result&#x3D;&#39;第二季度&#39;;</span><br><span class="line">when mon&gt;&#x3D;7 and mon&lt;&#x3D;9 then</span><br><span class="line">	set result&#x3D;&#39;第三季度&#39;;</span><br><span class="line">else</span><br><span class="line">	set result&#x3D;&#39;第四季度&#39;;</span><br><span class="line">end case;</span><br><span class="line">select concat(&#39;传递的月份是:&#39;, mon, &#39;,计算出的结果是：&#39;, result) as content;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
+
+<h5 id="5-while-repeat-loop循环"><a href="#5-while-repeat-loop循环" class="headerlink" title="5. while, repeat, loop循环"></a>5. while, repeat, loop循环</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 从1累加到n，求结果</span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test9(n int)</span><br><span class="line">begin </span><br><span class="line">	declare total int default 0;</span><br><span class="line">	declare num int default 1;</span><br><span class="line">	while num &lt;&#x3D; n do</span><br><span class="line">		set total &#x3D; total + num;</span><br><span class="line">		set num &#x3D; num + 1;</span><br><span class="line">	end while;</span><br><span class="line">	select total;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test10(n int)</span><br><span class="line">begin</span><br><span class="line">	declare total int default 0;</span><br><span class="line">	declare num int default 1;</span><br><span class="line">	repeat </span><br><span class="line">		set total&#x3D;total+n;</span><br><span class="line">		set n&#x3D;n-1;</span><br><span class="line">		until n&#x3D;0</span><br><span class="line">	end repeat;</span><br><span class="line">	select total;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test11(n int)</span><br><span class="line">begin</span><br><span class="line">declare total int default 0;</span><br><span class="line">c:loop</span><br><span class="line">	set total &#x3D; total + n;</span><br><span class="line">	set n &#x3D; n - 1;</span><br><span class="line">	if n &lt;&#x3D; 0 then</span><br><span class="line">		leave c;</span><br><span class="line">	end if;</span><br><span class="line">end loop c;</span><br><span class="line">select total;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-循环使用"><a href="#6-循环使用" class="headerlink" title="6. 循环使用"></a>6. 循环使用</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test13()</span><br><span class="line">begin</span><br><span class="line">declare e_id int;</span><br><span class="line">declare e_name varchar(50);</span><br><span class="line">declare e_age int;</span><br><span class="line">declare e_salary int;</span><br><span class="line">declare has_data int default 1;</span><br><span class="line">declare emp_result cursor for select * from emp;</span><br><span class="line">declare exit handler for NOT FOUND set has_data &#x3D; 0;</span><br><span class="line">open emp_result;</span><br><span class="line">repeat</span><br><span class="line">fetch emp_result into e_id, e_name, e_age, e_salary;</span><br><span class="line">select concat(&#39;id&#x3D;&#39;, e_id, &#39;, name&#x3D;&#39;, e_name, &#39;, age&#x3D;&#39;, e_age, &#39;,salary&#x3D;&#39;, e_salary);</span><br><span class="line">until has_data &#x3D; 0</span><br><span class="line">end repeat;</span><br><span class="line">close emp_result;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
+
+<h5 id="7-函数"><a href="#7-函数" class="headerlink" title="7. 函数"></a>7. 函数</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- log_bin_trust_function_creators需要这个参数开启的情况下，才能创建函数</span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create function test_func(c_id int) returns int</span><br><span class="line">begin</span><br><span class="line">declare result int;</span><br><span class="line">select count(*) into result from city where country_id&#x3D;c_id;</span><br><span class="line">return result;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line">-- 调用函数</span><br><span class="line">select test_func(1);</span><br><span class="line">-- 删除函数</span><br><span class="line">drop function test_func;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 返回指定个数的随机字符串</span><br><span class="line">DELIMITER $$</span><br><span class="line"></span><br><span class="line">CREATE FUNCTION rand_str(n INT) RETURNS VARCHAR(255) </span><br><span class="line">BEGIN</span><br><span class="line">DECLARE str VARCHAR(100) DEFAULT &#39;adcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;;</span><br><span class="line">DECLARE i INT DEFAULT 0;</span><br><span class="line">DECLARE result VARCHAR(255) DEFAULT &#39;&#39;;</span><br><span class="line">WHILE i &lt; n DO</span><br><span class="line"></span><br><span class="line">-- 随机返回一个字符串</span><br><span class="line">-- substr(str, floor(1 + rand() * 52), 1);</span><br><span class="line">SET result &#x3D; CONCAT(result, SUBSTR(str, FLOOR(1 + RAND() * 52), 1));</span><br><span class="line">SET i &#x3D; i + 1;</span><br><span class="line">END WHILE;</span><br><span class="line">RETURN result;</span><br><span class="line">END$$</span><br><span class="line">DELIMITER ;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-触发器"><a href="#5-触发器" class="headerlink" title="5.触发器"></a>5.触发器</h2><ul>
+<li>与表相关的数据库对象，在进行insert,update, delete事件之前或者之后，执行触发器中的动作；</li>
+<li>触发器类型： insert, update,delete 只有这三类动作，自动执行触发器</li>
+</ul>
+<h4 id="5-1-创建触发器"><a href="#5-1-创建触发器" class="headerlink" title="5.1 创建触发器"></a>5.1 创建触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create trigger trigger_name -- 触发器命名 trigger_xxx 或者tri_xxx</span><br><span class="line">before|after trigger_event</span><br><span class="line">on table_name -- 哪个表</span><br><span class="line">for each row -- 任何一条记录上的操作满足触发条件就会触发该触发器</span><br><span class="line">trigger_sTMT -- 激活触发器后被执行的语句</span><br><span class="line"></span><br><span class="line">CREATE TRIGGER tri_emp_logs</span><br><span class="line">AFTER INSERT</span><br><span class="line">ON emp</span><br><span class="line">FOR EACH ROW</span><br><span class="line">INSERT INTO emp_logs VALUES(NULL, &#39;insert&#39;, NOW(), new.id, CONCAT(&#39;插入后(id:&#39;, now.id, &#39;, name:&#39;, now.name,&#39;, age:&#39;,now.age,&#39;,salary:&#39;, new.salary, &#39;)&#39;));</span><br><span class="line"></span><br><span class="line">-- 当对emp表执行insert操作后，自动将向emp_logs表中插入一条记录</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 当对emp表执行update操作后，自动向emp_logs表中插入一条记录</span><br><span class="line">CREATE TRIGGER tri_update_emp</span><br><span class="line">AFTER UPDATE</span><br><span class="line">ON emp</span><br><span class="line">FOR EACH ROW</span><br><span class="line">INSERT INTO emp_logs VALUES(NULL, &#39;update&#39;, NOW(), new.id, CONCAT(&#39;修改前(id:&#39;, old.id, &#39;, name:&#39;, old.name,&#39;, age:&#39;,old.age, &#39;,salary:&#39;, old.salary,&#39;),&#39;,&#39;修改后(id:&#39;,</span><br><span class="line">new.id,&#39;, name:&#39;, new.name, &#39;,age:&#39;, new.age, &#39;,salary:&#39;,new.salary,&#39;)&#39;));</span><br><span class="line"></span><br><span class="line">-- 当对emp表执行delete操作后，自动向emp_logs表中插入一条记录</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-删除触发器"><a href="#5-2-删除触发器" class="headerlink" title="5.2 删除触发器"></a>5.2 删除触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">drop trigger trigger_name;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-3-查看触发器"><a href="#5-3-查看触发器" class="headerlink" title="5.3 查看触发器"></a>5.3 查看触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show triggers;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-引擎"><a href="#6-引擎" class="headerlink" title="6. 引擎"></a>6. 引擎</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 查看支持的引擎</span><br><span class="line">show engines;</span><br><span class="line">-- 默认情况下，使用innodb</span><br><span class="line">show variables like &#39;%storage_engine%&#39;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-1-Innodb引擎的特性：（针对表而言的，也是表引擎）"><a href="#6-1-Innodb引擎的特性：（针对表而言的，也是表引擎）" class="headerlink" title="6.1 Innodb引擎的特性：（针对表而言的，也是表引擎）"></a>6.1 Innodb引擎的特性：（针对表而言的，也是表引擎）</h4><ul>
+<li>支持事务</li>
+<li>支持行级锁</li>
+<li>支持外键</li>
+</ul>
+<h4 id="6-2-优化SQL步骤"><a href="#6-2-优化SQL步骤" class="headerlink" title="6.2 优化SQL步骤"></a>6.2 优化SQL步骤</h4><h5 id="6-2-1-查看sql执行频率"><a href="#6-2-1-查看sql执行频率" class="headerlink" title="6.2.1 查看sql执行频率"></a>6.2.1 查看sql执行频率</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 查看全局各个操作的执行次数</span><br><span class="line">show global status like &#39;Com_______&#39;;</span><br><span class="line">-- 比如</span><br><span class="line">-- Com_insert: 执行insert操作的次数，批量插入，只累加一次；</span><br><span class="line">-- 查看针对innodb操作的行数</span><br><span class="line">show global status like &#39;Innodb_rows_%&#39;;</span><br><span class="line">-- Innodb_rows_read :select查询返回的行数</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-2-2-定位低效的sql语句方式"><a href="#6-2-2-定位低效的sql语句方式" class="headerlink" title="6.2.2 定位低效的sql语句方式"></a>6.2.2 定位低效的sql语句方式</h5><ul>
+<li>第一种通过慢查询日志</li>
+<li>第二种通过show processlist命令进行操作，可以实时查看sql的执行情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; show processlist;</span><br><span class="line">+----+-----------------+-----------+------+---------+-------+------------------------+------------------+</span><br><span class="line">| Id | User            | Host      | db   | Command | Time  | State                  | Info             |</span><br><span class="line">+----+-----------------+-----------+------+---------+-------+------------------------+------------------+</span><br><span class="line">|  5 | event_scheduler | localhost | NULL | Daemon  | 48810 | Waiting on empty queue | NULL             |</span><br><span class="line">| 46 | root            | localhost | NULL | Query   |     0 | starting               | show processlist |</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- id: 用户登录mysql，系统分配的connection_id, 可以通过connection_id()查看</span><br><span class="line">-- user: 显示当前用户</span><br><span class="line">-- host: 显示从哪个ip发出的</span><br><span class="line">-- db: 显示这个进程目前连接的是哪个数据库</span><br><span class="line">-- command: 显示当前执行的命令</span><br><span class="line">-- time: 显示状态持续的时间，单位为s</span><br><span class="line">-- state: 显示当前连接的sql语句的状态，描述的是语句执行中的某一个状态，一个sql语句，以查询为例，可能需要经过copying to tmp table, sorting result , sending data 才可以完成</span><br><span class="line">-- info： 显示执行的sql语句；</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-2-3-explain-分析执行计划"><a href="#6-2-3-explain-分析执行计划" class="headerlink" title="6.2.3  explain 分析执行计划"></a>6.2.3  explain 分析执行计划</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">explain sql语句 -- 分析sql语句的执行计划</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="7-mysql-面试题："><a href="#7-mysql-面试题：" class="headerlink" title="7. mysql 面试题："></a>7. mysql 面试题：</h2><ul>
+<li>数据库的索引结构是什么，b-tree 与b+tree有什么区别<ul>
+<li>B+tree中每个叶子节点都包含指向下一个叶子节点的指针，方便叶子节点的范围遍历；</li>
+</ul>
+</li>
+<li>联合索引是什么，如何才能命中联合索引</li>
+<li>数据库的隔离级别，每个级别都有什么问题？<ul>
+<li>读未提交级别，  会造成 脏读；</li>
+<li>读提交级别， 带来不可重复读；</li>
+<li>可重复读级别（InnoDB默认使用的）， 带来幻读问题；</li>
+<li>序列化级别,解决上面所有问题，没有并发可言；</li>
+</ul>
+</li>
+<li>可重复读是怎么实现的？<ul>
+<li>通过MVCC(多版本并发控制) 实现可重复读隔离级别，解决了脏读，不可重复读问题，但是还有幻读问题；<ul>
+<li>幻读问题，是因为执行了对数据修改的操作（update, insert, delete)采用了当前读模式，每次都会读取最新的版本号记录；</li>
+<li>当两个事务都同时操作了同一条记录，那么另一个事务将等待，直到一个事务提交，有等待时间超时限制（更新或者删除）；<ul>
+<li>当同时删除一条记录，一个事务在提交之前，另一个事务处于等待，当这个事务提交后，这个事务才能执行，但是没有任何作用，不会进行删除操作，数据和删除前一样；更新操作一样；</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>分库分表， 基于什么进行拆分，拆分后出现了什么问题，怎么解决的？</li>
+<li>为什么建议InnoDB表必须建主键，并且推荐使用整型的自增主键？<ul>
+<li>主动建立主键是为了更好地建立b+tree结构，方便我们使用主键进行查找，如果不主动建立，那么InnoDB也会去找唯一索引的列作为主键建立，如果还没有，那么将自动建立一个列，作为建立B+tree结构的</li>
+<li>使用整型比使用字符串进行大小比较更有效率，而自增的主键，当插入数据时，只可能在原有b+tree结构上向后插入，不会向原有已经排好的结构进行插入导致节点分裂问题；</li>
+</ul>
+</li>
+<li>为什么非主键索引结构叶子节点存储的是主键值？<ul>
+<li>降低占用磁盘空间的大小；</li>
+</ul>
+</li>
+<li>联合索引的最左前缀原理？<ul>
+<li>联合索引结构根据建立索引时，从左到低字段的顺序进行比较建立b+tree结构，当第一个字段相等，比较第二个字段，依次比较；</li>
+<li></li>
+</ul>
+</li>
+<li>MyISAM 与InnoDB索引有什么不同？<ul>
+<li>MyISAM 索引通过数据的物理位置引用被索引的行</li>
+<li>InnoDB索引根据主键引用被索引的行；</li>
+</ul>
+</li>
+<li>索引的优点：<ul>
+<li>索引大大减少了服务器需要扫描的数据量</li>
+<li>索引可以帮助服务器避免进行排序</li>
+<li>索引可以将随机I/O变为顺序I/O;</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-理解msyql索引的命令"><a href="#8-理解msyql索引的命令" class="headerlink" title="8. 理解msyql索引的命令"></a>8. 理解msyql索引的命令</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">show global status like 'Innodb_page_size';</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="9-不命中索引的情况有："><a href="#9-不命中索引的情况有：" class="headerlink" title="9. 不命中索引的情况有："></a>9. 不命中索引的情况有：</h2><ul>
+<li><p>范围问题：范围太大，或者不明确的时候，查询依旧很慢：&gt;, &gt;=, &lt;, &lt;=, !=, between..and.. ,like,</p>
+</li>
+<li><p>尽量选择区分度高的列作为索引， （不重复的索引和数据表的记录总数的比值，选择性高的索引可以让mysql在查找时过滤掉更多的行）</p>
+</li>
+<li><p>索引列不能是表达式的一部分，或者函数的参数；</p>
+</li>
+</ul>
+<h2 id="10-explain-各字段含义"><a href="#10-explain-各字段含义" class="headerlink" title="10. explain 各字段含义"></a>10. explain 各字段含义</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">|  1 | SIMPLE      | test  | NULL       | range | ix_email      | ix_email | 203     | NULL |   11 |   100.00 | Using where; Using index |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">id: 表的读取顺序，id越大，优先读取</span><br><span class="line">select_type: 查询的类型；</span><br><span class="line">type: system&gt; const&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</span><br><span class="line"> - ALL: 不使用索引，全表扫描</span><br><span class="line"> - index: 全索引查找，遍历索引树查找</span><br><span class="line"> - range: 范围查找</span><br><span class="line"> - ref:辅助索引等值查找</span><br><span class="line"> - eq_ref: 多表连接，非驱动表连接条件时主键或者是唯一键；</span><br><span class="line"> - const:聚集索引等值查询；</span><br><span class="line"> key_len: 帮助判断，此次查询，走了联合索引的几部分；</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">对于整形：</span><br><span class="line">	tinyint   1</span><br><span class="line">	int 	  4</span><br><span class="line">	bigint    8</span><br><span class="line">	</span><br><span class="line">对于字符：</span><br><span class="line">	utf8:    每个字符是3个字节</span><br><span class="line">				 not null    没有not null   存储长度的字节</span><br><span class="line">	char(10)      30 			30+1                  key_len   30+1</span><br><span class="line">	varchar(10)   10*3          10*3+1        1-2     key_len   30+2+1</span><br><span class="line">	</span><br><span class="line">	utf8mb4: 每个字符是4个字节：</span><br><span class="line">	char(10)     4*10          4*10+1  </span><br><span class="line">	varchar(10)  4*10          4*10+1         1-2	  key_len   40+2+1</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Mysql索引</title>
+    <url>/2020/10/31/Mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h1 id="Mysql索引"><a href="#Mysql索引" class="headerlink" title="Mysql索引"></a><center>Mysql索引</center></h1><a id="more"></a>
+
+<h1 id="1-准备测试数据"><a href="#1-准备测试数据" class="headerlink" title="1. 准备测试数据"></a>1. 准备测试数据</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter $$</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> create procedure auto_insert()</span></span><br><span class="line">    -&gt; begin</span><br><span class="line">    -&gt; declare i int default 1;</span><br><span class="line">    -&gt; while(i&lt;3000000) do</span><br><span class="line">    -&gt; insert into test values(i, 'eva', 'female', concat('eva', i, '@oldboy'));</span><br><span class="line">    -&gt; set i=i+1;</span><br><span class="line">    -&gt; end while;</span><br><span class="line">    -&gt; end$$</span><br><span class="line">Query OK, 0 rows affected (0.14 sec)</span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> call auto_insert();</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Query OK, 1 row affected (3 days 47 min 3.30 sec)</strong>， 使用默认配置，插入3000000 条数据用到的时间。</p>
+<h1 id="2-使用索引进行优化"><a href="#2-使用索引进行优化" class="headerlink" title="2. 使用索引进行优化"></a>2. 使用索引进行优化</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 使用联合索引时，查询条件中必须包含建立索引时最左列字段，并且多个字段时，不能跳过中间字段进行查询，否则，不能使用索引，这是联合索引的最左前缀法则；</span><br><span class="line">2. 索引列上不能作为表达式的一部分，或者作为函数的参数，保证索引列独立；</span><br><span class="line">3. 存储引擎不能使用范围条件右边的索引列；</span><br><span class="line">4.尽量使用覆盖索引获取查询的结果(覆盖索引是指查询结果的列在建立索引列的范围)</span><br><span class="line">5.使用like 进行模糊查询时，如果%在前面，索引不生效，如果想使用%xx% 而且还想使索引生效，则可以考虑使用覆盖索引，解决它，只要使用</span><br><span class="line">select name, age from user where user like &#39;%cgn%&#39;;  建立联合索引(name, age); </span><br><span class="line">或者通过 elasticsearch + mongodb;</span><br><span class="line">6.字符串不加引号，将导致默认做类型转换，不符合第二条索引原则，也有可能导致索引失效；</span><br><span class="line">7.&lt;&gt;, not in 不走索引，</span><br><span class="line">8.单独的&gt;,&lt;,in 有可能走，有可能不走，和结果集(15%-30%)有关，尽量结合业务使用Limit;</span><br><span class="line">9. or或者in 尽量改成union, union all,可以使用，要测试,看数据唯一性如何，是否有太多的重复性；</span><br><span class="line">10.!&#x3D;不走索引，但是对于主键 走索引。。。。。。not in也是</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-优化的过程"><a href="#3-优化的过程" class="headerlink" title="3. 优化的过程"></a>3. 优化的过程</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 开始慢查询日志，设置阈值。</span><br><span class="line">2. 使用explain 工具分析是否命中索引；</span><br><span class="line">3. show profile</span><br><span class="line">4. mysql服务器端的参数调优；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">查询优化：</span><br><span class="line">	小表驱动大表</span><br><span class="line">	select * from A where id in (select id from B)</span><br><span class="line">	当B表的数据集必须小于A表的数据集时，用in优于exists</span><br><span class="line">	</span><br><span class="line">	select * from A where exists (select 1 from B where B.id = A.id);</span><br><span class="line">	当A表的数据集小于B表的数据集时，用exists优于in;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">order by 优化：尽可能在索引列上进行排序</span><br><span class="line"></span><br><span class="line">两种排序：文件排序或者扫描有序索引排序</span><br><span class="line">能够使用索引排序的情况有：(a,b,c)联合索引</span><br><span class="line"> - order by a</span><br><span class="line"> - order by a,b</span><br><span class="line"> - order by a,b,c</span><br><span class="line"> - order by a desc, b desc, c desc</span><br><span class="line"> </span><br><span class="line"> 使用where的最左前缀定义为常量，</span><br><span class="line">  - where a = const order by b,c</span><br><span class="line">  - where a = const and b = const order by c</span><br><span class="line">  - where a = const and b &gt; const order by b,c</span><br><span class="line"> 不能使用索引排序的情况：</span><br><span class="line">  - order by a asc,b desc, c desc  - 排序不一致</span><br><span class="line">  - where g = const order by b,c   - 丢失a</span><br><span class="line">  - where a = const order by c    - 丢失b索引</span><br><span class="line">  - where a = const order by a,d  - d 不是索引的一部分</span><br><span class="line">  - where a in () order by b,c    - 多个相等条件也是范围查询</span><br><span class="line"></span><br><span class="line">针对产生 using filesort的情况来说：(age,birth)作为联合索引来用；</span><br><span class="line">explain select * from A where age &gt; 20 order by birth;</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A <span class="built_in">where</span> age &gt; 20 order by birth,age;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by birth;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by age asc, birth desc;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line"></span><br><span class="line">两种排序： </span><br><span class="line">using index ,using filesort ; using index使用索引带来的排序，using filesort需要再做排序，相当于没有使用索引带来的排序；</span><br><span class="line">要想使用using index, 要求排序字段需要使用最左索引列；</span><br><span class="line"></span><br><span class="line">提高order by的查询速度方式：</span><br><span class="line">当有order by 查询时，使用select * 是大忌：因为，有可能取出的数据超过sort_buffer_size的容量，会导致创建tmp文件进行合并排序，</span><br><span class="line">导致多次I/O</span><br><span class="line">改进的点： </span><br><span class="line">尝试提高sort_buffer_size容量大小；</span><br><span class="line">尝试提高max_length_for_sort_data,会增加使用改进算法的概率；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">group by 优化：</span><br><span class="line">实质是先排序再进行分组，遵照索引的最左前缀</span><br><span class="line">当无法使用索引时，可以通过设置 sort_buffer_size，max_length_for_sort_data </span><br><span class="line">where高于having,能在where中限定的条件不要去having中限定；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">慢查询日志：</span><br><span class="line">- 默认情况下，mysql没有开启慢查询，可以通过 show variables like '%slow_query_log%' 查看，因为开启会带来一定的性能影响；</span><br><span class="line">- 如何开启：</span><br><span class="line">    set global slow_query_log =1 进行开启，仅仅对当前数据库生效，mysql重启会失效；</span><br><span class="line">     show variables like '%query_time%';  默认是10s,</span><br><span class="line">    set global long_query_time=3 修改慢sql的阈值为3s;</span><br><span class="line">    # show global variables like '%query_time%'查看设置是否成功，或者 通过重开一个新连接进行查看；</span><br><span class="line">    show global status like '%slow_queries%'; #查询当前慢查询日志的个数；</span><br><span class="line">    </span><br><span class="line">- 永久生效：配置到配置文件中</span><br><span class="line"> [mysqld]</span><br><span class="line">  slow_query_log=1;</span><br><span class="line">  slow_query_log_file=/var/lib/mysql/slow_query.log;</span><br><span class="line">  long_query_time=3;</span><br><span class="line">  log_output=FILE</span><br><span class="line">  </span><br><span class="line">-mysqldumpslow 工具查看慢查询日志的详细信息</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">show profile 进行mysql语句的资源消耗分析</span><br><span class="line"> - show variables like 'profiling'; 默认情况下关闭 </span><br><span class="line"> - set profiling=on; # 开启后将记录下每条SQL语句的执行情况，并编号；</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 根据编号查询cpu，以及io情况</span></span><br><span class="line"> show profiles;</span><br><span class="line"> </span><br><span class="line"> show profile cpu, block io for query Quey_id;</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 当分析出的列中含有：就需要仔细分析了</span></span><br><span class="line"> converting HEAP to MyISAM表示查询结果太大，内存不够用，</span><br><span class="line"> creating tmp table 创建临时表，拷贝数据到临时表，用完再删除；</span><br><span class="line"> copying to tmp table on disk 把内存中的临时表复制到磁盘，危险!!!!!!!!!!</span><br><span class="line"> locked</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">全局日志</span><br><span class="line">set global general_log =1;</span><br><span class="line">set global log_output='TABLE';</span><br><span class="line">select * from mysql.general_log;   # 只能在测试环境下开启！！！！！！！！！！！！！，</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">table: 关联的表</span><br><span class="line">type:</span><br><span class="line">	ALL:全表扫描</span><br><span class="line">		desc desc select * from test_dk where addr not in ('sdf', 'sdsdf');</span><br><span class="line">		desc select * from test_dk;</span><br><span class="line">		desc select * from test_dk where 1=1;</span><br><span class="line">		desc select * from test_dk where addr != 'sdf';</span><br><span class="line"></span><br><span class="line">	索引扫描： index &lt; range &lt; ref &lt; eq_ref &lt; const</span><br><span class="line">	const: 主键等值查询，性能最好</span><br><span class="line">	index:全索引扫描,索引扫描中，性能最差；</span><br><span class="line">		desc select addr from test_dk;</span><br><span class="line">		desc select * from test_dk where addr like '%a';</span><br><span class="line">		</span><br><span class="line">	range:索引范围扫描(&gt;, &lt; ,&gt;=, &lt;=, in, like, between and )</span><br><span class="line">		desc select * from test_dk where addr in ('bj', 'tj');</span><br><span class="line">			可以通过使用union all进行优化</span><br><span class="line">			select * from test_dk where addr= 'bj' union all select * from test_dk where addr='bj';</span><br><span class="line">		desc select * from test_dk where addr like 'asdf%';</span><br><span class="line">		desc select * from test_dk where id != 3;</span><br><span class="line">		desc select * from test_dk where id not in (1, 5); # 有时候走range, 有时候走all</span><br><span class="line">	ref：辅助索引等值查询</span><br><span class="line">		desc select * from test_dk where addr = 'bj';	eq_ref:针对多表连接中，非驱动表连接条件是主键或者是唯一键。</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">不走索引的情况：</span><br><span class="line">	1. 没有查询参数</span><br><span class="line">	2. 查询条件中没有建立索引</span><br><span class="line">	3. 查询结果集是原来表中大部分数据时，15%-30%， 索引失效，优化器觉得没有必要走索引了；</span><br><span class="line">		使用分页，控制数据</span><br><span class="line">		要么使用redis存放。</span><br><span class="line">	4.索引有自我管理的能力，对于表内容变化比较频繁的情况下，有可能出现索引失效；</span><br><span class="line">		这种情况下，删除索引重建。(表索引的统计信息不及时：</span><br><span class="line">		select * from innodb_index_stats where table_name = 't_test';</span><br><span class="line">	5. 索引列参与了算术运算，导致索引失效</span><br><span class="line">	desc select * from t_test where id + 1= 3000;</span><br><span class="line">	6. like查询 '%开头的'，不走索引</span><br><span class="line">	7. 类型不一致，发生了隐式类型转换时，不走索引；</span><br><span class="line">		如： 定义了char类型， 使用了int参数查询时，但是对于int类型的，使用字符串查询时，并没有发生此类情况</span><br><span class="line">		desc select * from t_test where phone = 2342;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="4-锁机制"><a href="#4-锁机制" class="headerlink" title="4.锁机制"></a>4.锁机制</h1><ul>
+<li><p>查看表上加过的锁</p>
+<ul>
+<li><p>show open tables;</p>
+</li>
+<li><p>手动增加锁： lock table table_name read, table_name write;</p>
+</li>
+<li><p>释放锁： unlock tables;</p>
+</li>
+</ul>
+</li>
+<li><p>表锁 MyISAM 如下：</p>
+</li>
+<li><p>读锁（读共享锁，写阻塞）</p>
+<ul>
+<li>lock table table_name read;</li>
+<li>当前会话加读锁后的现象:<ul>
+<li>当前会话只能读这个表，不能对这个表修改,同时也不能对没有加锁的其他表进行读写，对锁定的表进行插入或者更新都会报错；</li>
+<li>其他会话也可以读这个表，但是对此次表的更新操作将阻塞，其他会话可以读写其他未锁定的表；</li>
+<li>一旦这个表锁释放，其他会话对这个表的操作会立即执行；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>写锁：</p>
+<ul>
+<li>lock table table_name write;</li>
+<li>写锁后的现象：<ul>
+<li>当前会话，可以对当前加的锁表进行读写操作，不能对没有加锁的表进行读写操作；</li>
+<li>其他会话，可以对未加锁的表进行读写操作，但是不能对加锁的表进行读写操作，会阻塞；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>总结：</p>
+<ul>
+<li>加上读锁，会阻塞写；而写锁会阻塞读写；</li>
+</ul>
+</li>
+<li><p>分析</p>
+<ul>
+<li><p>show statue like ‘table%’  查看table_locks_waited 和table_locks_immediate状态变量分析</p>
+</li>
+<li><p><strong>table_locks_waited</strong>表示出现表级锁争用而等待的次数，不能立即获取锁的次数；</p>
+</li>
+<li><p>table_locks_immediate:表示表级锁定的次数，表示可以立即获取锁的查询次数，每立即获取锁值加1；</p>
+</li>
+<li><p>Myisam的读写锁调度是写优先，不适合做写为主表的引擎，因为写表后，其他线程不能做任何操作；</p>
+</li>
+</ul>
+</li>
+<li><p>InnoDB 使用行锁：</p>
+<ul>
+<li><p>使用方式如下：</p>
+<ul>
+<li><p>select *  from test_inno where name=’hello’ for update;</p>
+<ul>
+<li>当为name列设置索引了话，那么这时候就是行锁， 其他事务可以对其他行进行读写;</li>
+<li>当没有为name列设置索引了话，那么这时候就是表锁，其他事务将不能对其他行进行写；</li>
+</ul>
+</li>
+<li><p><a href="https://blog.csdn.net/sanyuesan0000/article/details/90235335" target="_blank" rel="noopener">可重复读如何实现的</a></p>
+</li>
+</ul>
+</li>
+<li><p>问题！！！！！！！！！！！！！！！！！！！！！！！！！！！！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">并发下单时，仓库中的库存量发生了意外的变化？？？？？</span><br><span class="line">在默认的可重复读事务隔离级别下，两个事务在快照读的情况下，都不能访问其他事务的插入，更新，和删除操作，而实际需要一个事务提交后，需要及时的获取更新后的值，因此，将事务的隔离级别设置为读提交；之所以mysql使用默认的可重复读的隔离级别，因为binlog的主从复制在读提交的隔离级别下，出现过bug,mysql5.0版本；</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="5-Innodb核心特性"><a href="#5-Innodb核心特性" class="headerlink" title="5. Innodb核心特性"></a>5. Innodb核心特性</h1><ul>
+<li><p>MVCC</p>
+</li>
+<li><p>Clustered Index</p>
+</li>
+<li><p>更改缓冲(change buffer)</p>
+</li>
+<li><p>缓冲区</p>
+</li>
+<li><p>行级锁</p>
+</li>
+<li><p>事务</p>
+</li>
+<li><p>查询高速缓存</p>
+</li>
+<li><p>AHI(自适应hash索引)</p>
+</li>
+<li><p>备份（热备份）</p>
+</li>
+<li><p>自动故障恢复</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">select @@default_storage_engine;  #默认存储引擎</span><br><span class="line">set default_storage_engine=innodb; #修改当前会话引擎</span><br><span class="line">set global default_storage_engine=innodb; #修改全局，在新的会话中表现出来</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">set</span>命令在mysql重启后，失效，如果需要永久配置，设置到配置文件；</span></span><br><span class="line">/etc/my.cnf</span><br><span class="line">[mysqld]</span><br><span class="line">default_storage_engine=myisam;</span><br><span class="line">存储引擎是表级别的，可以在建表的时候指定某个存储引擎，同时也可以将一个表引擎修改成其他引擎；</span><br><span class="line">select table_schema, table_name, engine from information_schema.tables where table_shcema not in ('sys', 'mysql', 'information_schema', 'performance_schema'); # 查询所有库下表的表引擎；</span><br><span class="line"></span><br><span class="line">处理的mysql问题：碎片整理（delete操作产生的，经常删除数据，导致磁盘占用空间大，不释放）</span><br><span class="line">select table_schema, table_name, data_free from information_schema.tables; #查询碎片data_free</span><br><span class="line">可以通过 alter table table_name engine=innodb; </span><br><span class="line">方案： 对表归档(pt-archive工具），使用truncate方式</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何批量修改表引擎,将zabbix库中所有表 innodb替换成tokudb</span></span><br><span class="line">select concat('alter table zabbix.', table_name, " engine tokudb;") from information_schema.tables where</span><br><span class="line">table_schema='zabbix' into outfile '/tmp/tokudb.sql';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何将所有非innodb业务表查询出来，并修改为innodb;</span></span><br><span class="line">select concat("alter table ", table_schema, ".", table_name, " engine=innodb;") from information_schema.tables where engine != 'InnoDB' and table_schema not in ('sys', 'performance_schema'， ‘information_schema', 'mysql') into outfile '/tmp/alter.sql';</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">  InnoDB 将为每张表构建聚集索引（优化主键列的查询）</span><br><span class="line">  一个表就是一个段，1个段由1个或者多个区组成，这些区不一定连续；	·1</span><br><span class="line">  一个区就是连续的64page，1M</span><br><span class="line">  一个page就是连续的4个block,16KB</span><br><span class="line">  一个block就是连续的8个扇区，一个扇区是512B</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  1）首先主键列，</span><br><span class="line">  2）再次unique列</span><br><span class="line">  3）最后是根据row id构建隐藏的列；</span><br><span class="line">  作用：有了聚集索引之后，以后插入数据的时候，在同一个区内，按照id的顺序，有序的在磁盘存储数据，那么将来利用了聚集索引查找数据的时候，就是顺序I/O,查找的更快；</span><br><span class="line">  构建聚集索引的过程：</span><br><span class="line">  </span><br><span class="line">  直接将数据行所在的数据页作为叶子结点，然后根据每个叶子结点中的最小值组成的范围构建枝结点，最后构建根节点；</span><br><span class="line">  当我们使用主键作为查询条件时，会从根节点的范围公平的查找记录（找到每个主键使用的i/O次数一样）;</span><br><span class="line">  而没有建立索引的情况下，会把全表所有页加载到内存，遍历查询，对于大表来说，非常低效；</span><br><span class="line">  </span><br><span class="line">  那么非主键列的查询如何优化？通过建立  辅助索引来优化非聚集索引列的查询；</span><br><span class="line">  辅助索引建立的过程：</span><br><span class="line">  	将主键和辅助索引列单独申请空间，先按照辅助索引列进行排序，建立叶子节点，然后构建枝节点，最后根节点，查询时候根据辅助索引列查询到辅助索引列和id,如果辅助索引能够完全覆盖查询结果时，不需要回表；如果想查询一条记录，不能完全覆盖到，那么需要回到聚集索引树结构根据id进行再次查询，这称之为回表操作，回表操作增加了磁盘I/O,将顺序I/O变成了随机I/O,数据页不在一个区，变成随机I/O；</span><br><span class="line">  - 如何减少回表：</span><br><span class="line">  	1）查询尽可能使用id主键查询；</span><br><span class="line">  	2）设计合理的联合索引；完全覆盖查询结果；</span><br><span class="line">  辅助索引的分类：</span><br><span class="line">  	单列索引</span><br><span class="line">  	联合索引</span><br><span class="line">  		将id和多列拿出来构建索引树，然后先对第一列进行排序，如果第一列相同，再按照第二列进行排序，排好序后构建叶子节点，然后	   根据第一列的值的范围构建枝节点，最后构建根节点；比如(a,b,c)构建了联合索引，那么实际上是建立了，a,ab,abc的索引；</span><br><span class="line">  	联合索引的注意点：</span><br><span class="line">  		1）查询条件中，必须要包含联合索引最左列，至于是使用的部分根据查询不同而不同，要么所有列都走索引，要么部分列走索引；</span><br><span class="line">  		2）构建联合索引，一定将值重复最少的列，作为联合索引的最左列；</span><br><span class="line">  	前缀索引：</span><br><span class="line">  		前缀索引，针对得是对列的值长度非常长建立索引时，可能导致索引数高度增高。</span><br><span class="line">  		mysql建议索引树高度3-4层，最少2层(根节点和叶子节点)。容纳的数据量800w-1000w行，表的列有20-30列。</span><br><span class="line">  		这时候，可以取前面部分字符作为索引生成条件；</span><br><span class="line">  	b+tree的高度影响因素：</span><br><span class="line">  		1）索引字段值较长：前缀索引</span><br><span class="line">  		2）数据行过多： 建立分区表，归档表（pt-archive), 分布式架构</span><br><span class="line">  		3）选择合适的数据类型：变长使用varchar,能使用enum的，使用它；</span><br><span class="line">  		</span><br><span class="line">  索引的建立是按照业务的需求来建立的，不能建立太多的索引原因有2：</span><br><span class="line">  1）：更新，和删除的时候，可能影响索引树的结构</span><br><span class="line">  2）：优化器选择索引上可能出现偏差，导致没有按照预期列走索引；</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  查询索引：</span><br><span class="line">  	desc table_name;</span><br><span class="line">  	Key列：  PRI(聚集索引)  MUL(辅助索引)   UNI(唯一索引)</span><br><span class="line">  	show index from table_name;</span><br><span class="line">  建立索引：</span><br><span class="line">  	alter table table_name add index idx_name(name);</span><br><span class="line">  	alter table table_name add index idx_n_c(name, country);联合索引</span><br><span class="line">  	alter table table_name add index idx_d(district(5)); # 大字段100个字符，取前5个，主要用于like的查询；前缀索引</span><br><span class="line">  删除索引</span><br><span class="line">  	alter table table_name drop index idx_name;</span><br><span class="line">  	</span><br><span class="line">  压测命令：100个人，并发查询200次</span><br><span class="line">  mysqlslap --defaults-file=/etc/my.cnf --concurrency=100 --iterations=1 --create-schema='test'</span><br><span class="line">  --query="select * from test.t100w where ke='780p'" engine=innodb</span><br><span class="line">--number-of-queries=200 -uroot -p123456 -verbose</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">  mysql InnoDB共享表空间大小查看</span><br><span class="line">  select @@innodb_data_file_path;</span><br><span class="line">  ibdata1:12M:autoextend</span><br><span class="line">  初始化之前，在my.cnf加入配置</span><br><span class="line">  innodb_data_file_path = ibdata1:1G;ibdata2:1G:autoextend;</span><br><span class="line">  在运行之后，数据库扩展多个ibdata文件方式一样：</span><br><span class="line">  innodb_data_file_path=ibdata1:128M;idbdata2:128M;ibdata3:128M:autoextend;</span><br><span class="line">设置过之后，可能报错，因为第一个不一定是128M,已经在使用的共享表空间要按照实际大小来设置，用完之后，使用第二个，然后第三个，使用完后，自动扩展；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">一个表存储分 独立表空间，和共享表空间，每个表空间就是一个段，每个段有多个区，每个区有连续的页，每页就是连续的block,对应于连续的扇区；</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="6-利用拷贝表空间的方式恢复数据"><a href="#6-利用拷贝表空间的方式恢复数据" class="headerlink" title="6. 利用拷贝表空间的方式恢复数据"></a>6. 利用拷贝表空间的方式恢复数据</h1>  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有建表语句和idb文件，就可以恢复里面的数据</span><br><span class="line"></span><br><span class="line">1) 利用建表语句创建一个一模一样的表</span><br><span class="line">   create table table_name</span><br><span class="line">2) 删除这张空表的表空间</span><br><span class="line">	alter table test.t1 discard tablespace;</span><br><span class="line">3) 拷贝准备好的ibd,修改权限，导入表空间</span><br><span class="line">	alter table test.t1 import tablespace;</span><br><span class="line">	</span><br><span class="line">备份建表语句</span><br><span class="line">mysqldump -uroot -p -B test --no-data &gt; test.sql</span><br><span class="line"></span><br><span class="line">表空间删除</span><br><span class="line">select concat(&quot;alter table &quot;, table_schema, &#39;.&#39;)</span><br></pre></td></tr></table></figure>
+<h1 id="7-事务生命周期"><a href="#7-事务生命周期" class="headerlink" title="7. 事务生命周期"></a>7. 事务生命周期</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">select @@autocommit;  # 1.默认提交开启 ，这个功能就是自动添加begin, commit语句在每个操作语句之前，之后；</span><br><span class="line">1）显式开启事务</span><br><span class="line">begin; start transcation; # 都可以</span><br><span class="line">DML(insert, update, delete, select)</span><br><span class="line">commit;</span><br><span class="line">rollback;</span><br><span class="line">2) 一些非事务语句将导致自动隐式提交</span><br><span class="line">DDL语句 （Alter, create, drop)</span><br><span class="line">DCL语句 （grant, revoke, set password)</span><br><span class="line">锁语句（lock tables, unlock tables)</span><br><span class="line">truncate table;</span><br><span class="line">load data infile;</span><br><span class="line">select for update;</span><br><span class="line"></span><br><span class="line">3) 隐式回滚：</span><br><span class="line">会话关闭</span><br><span class="line">数据库宕机</span><br><span class="line">事务语句执行失败；</span><br><span class="line"></span><br><span class="line">事务的隔离级别：</span><br><span class="line">RU:</span><br><span class="line">会引发：脏读，不可重复读，幻读；</span><br><span class="line">脏读：读取到了其他事务没有提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">不可重复读：读取到了其他事务提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">幻读：一个事务更新数据后，出现了其他事务插入数据的幻行； 违背了事务的隔离性，一致性；</span><br><span class="line">RC:</span><br><span class="line">会引发：不可重复读，幻读；</span><br><span class="line">RR:</span><br><span class="line">利用的是Undo的一致性快照读，是MVCC的重要功能；</span><br><span class="line">完美解决幻读的方案：加入GAP锁，next-lock，这些功能是在辅助索引上实现的；</span><br><span class="line">在索引列（name)上  update test set num=25 where num &gt; 25;</span><br><span class="line">另外一个事务插入了一个大于 num&gt;25的值，将因为GAP锁而锁住，</span><br><span class="line">SR:</span><br><span class="line">永久修改隔离级别：</span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">transaction_isolation='read-committed'</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">对象锁：</span><br><span class="line">	MDL:(元数据锁),修改元数据时，DDL(alter) </span><br><span class="line">	table lock: 表锁，DDL,备份（FTWRL全局表锁），lock tables t1 read;(手动加锁)，行级锁升级为表锁；</span><br><span class="line">	row lock:  行级锁，聚集索引上的锁；</span><br><span class="line">	gap lock:  间隙锁，普通辅助索引列的范围锁(也不能是唯一锁),范围超过（15%-30%），可能导致表锁；</span><br><span class="line">	next lock: 下一键锁，普通辅助索引的范围锁（gap lock + row lock)</span><br></pre></td></tr></table></figure>
+
+<h1 id="8-存储引擎核心参数"><a href="#8-存储引擎核心参数" class="headerlink" title="8.存储引擎核心参数"></a>8.存储引擎核心参数</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">innodb_flush_log_at_trx_commit=1/0/2 redo log flush到磁盘的参数</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置1 ：每次事务提交的时候，刷到redo <span class="built_in">log</span> ，同时flsh to disk;</span></span><br><span class="line">innodb_flush_method=fsync/O_DSYNC/O_DIRECT/ ：控制mysql刷写磁盘时，是否使用 os buffer</span><br><span class="line">fsync: （默认值，当buffer pool设置太大时，有可能会发生OOM)</span><br><span class="line">	buffer pool的数据写磁盘的时候，需要先经过os buffer,然后写磁盘(经过os buffer,需要申请buffer pool的大小)</span><br><span class="line">	redo buffer的数据写磁盘的时候，需要先经过os buffer,然后写磁盘</span><br><span class="line">O_DIRECT:（防止出现问题，设置次选项,生产上设置此选项）</span><br><span class="line">	buffer pool的数据写磁盘的时候，直接写磁盘，跨过OS buffer；</span><br><span class="line">	redo buffer的数据写磁盘的时候，经过os buffer,然后写磁盘；</span><br><span class="line">	</span><br><span class="line">innodb_buffer_pool_size :数据缓冲区大小，缓冲数据也和索引页，mysql最大的内存区域；生产上75%一下；</span><br><span class="line">show engine innodb status\G</span><br></pre></td></tr></table></figure>
+
+<h1 id="9-日志管理"><a href="#9-日志管理" class="headerlink" title="9.日志管理"></a>9.日志管理</h1><h3 id="1-错误日志"><a href="#1-错误日志" class="headerlink" title="1.错误日志"></a>1.错误日志</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">默认位置 select @@datadir/hostname.err;</span><br><span class="line">配置位置：vim /etc/my.cnf</span><br><span class="line">log_error=/tmp/mysql.log</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志"><a href="#2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志" class="headerlink" title="2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志"></a>2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志</h3><p>应用：数据恢复，主从复制中使用</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/my.cnf  # 8.0之前，没有开启，生产上建议开启；8.0之后，默认开启 select @@log_bin;</span><br><span class="line">[mysqld]</span><br><span class="line">server_id=7  #开启binlog需要参数</span><br><span class="line">log_bin=/data/binlog/mysql-bin # 设置和data不同的目录，路径/data/binlog要首先创建，设置mysql.mysql权限；</span><br><span class="line">sync_binlog=1 #binlog日志刷磁盘策略，每次事务提交立即刷写binlog到磁盘</span><br><span class="line">binlog_format=raw # binlog的记录格式为row模式</span><br><span class="line"></span><br><span class="line">binlog 记录sql语句的分类：</span><br><span class="line">DDL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DCL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DML: 只记录已经提交事务DML(insert, update, delete)</span><br><span class="line"></span><br><span class="line">binlog三种记录格式</span><br><span class="line">1）statement（5.6默认）: SBR(statement based replication)，语句模式原封不定的记录当前DML</span><br><span class="line">2) row: (5.7默认)：RBR  :记录数据行的变化（用户看不懂，需要工具分析）</span><br><span class="line">3)mixed:</span><br><span class="line"></span><br><span class="line">statement: 可读性高，日志量少，不够严谨</span><br><span class="line">（statement 只记录update t1 set xxx=xxx where id&gt;1000)</span><br><span class="line">insert into t1 values(1, now())</span><br><span class="line">row: 可读性差，日志量大，足够严谨；（update t1 set xxx=xxx where id&gt;1000  一共500w行，row模式逐行记录）</span><br><span class="line">insert into t1 values(1, 2020-0-28 16:32:06) # 记录行具体变化；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的位置</span></span><br><span class="line">select @@log_bin_basename;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前有几个日志文件</span></span><br><span class="line">show binary logs;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前在使用的binlog;</span></span><br><span class="line">show master status;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的事件行为：</span></span><br><span class="line">show binlog events in 'mysql-bin.000001';</span><br><span class="line"></span><br><span class="line"> mysql -uroot -p123 -e "show binlog events in 'mysql-bin.000001'"|grep DROP 查看binlog中drop的事件；</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog中具体内容</span></span><br><span class="line">mysqlbinlog mysql-bin.000001 &gt; /tmp/a.sql;</span><br><span class="line">vim /tmp/a.sql</span><br><span class="line"></span><br><span class="line">mysqlbinlog --base64-output=decode-rows -vvv mysql-bin.000001 &gt; /tmp/b.sql # 查看加密的DML操作；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 滚动日志</span></span><br><span class="line">flush logs; # 生成一个新的binlog日志文件；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数据恢复：找到起点和终点位置</span></span><br><span class="line">mysql/bin/mysqlbinlog --start-position=219 --stop-position=1356 mysql-bin.000002 &gt; /tmp/b.sql</span><br><span class="line"></span><br><span class="line">set sql_log_bin=0;# 当前会话，临时不记录binlog;</span><br><span class="line">source /tmp/b.sql;</span><br><span class="line">set sql_log_bin=1;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有几点需要注意：</span></span><br><span class="line">1.binlog中如果有对其他库的操作，如何提取出只有目标库的操作？</span><br><span class="line">-d bindb  ：加上参数只提取出bindb库的操作</span><br><span class="line">2.需要的日志在多个文件中分布</span><br><span class="line">用起点时间，终点时间，起点位置，终点位置，混合使用去确定</span><br></pre></td></tr></table></figure>
+
+<h1 id="10-mysqldump"><a href="#10-mysqldump" class="headerlink" title="10. mysqldump"></a>10. mysqldump</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">连接参数： -u,-p,-S</span><br><span class="line">1. 全备参数 -A</span><br><span class="line">mysqldump -uroot -p123 -A &gt; /tmp/all.sql</span><br><span class="line">2. 备份一个或者库 -B</span><br><span class="line">mysqldump -uroot -p123 -B test &gt;/tmp/test.sql #备份test下的所有表，同时自动创建test库，use test;</span><br><span class="line">3. 备份库下一个或者多个表 </span><br><span class="line">mysqldump -uroot -p123 test &gt;/tmp/test.sql   # 备份test下的所有表,这条命令需要自己去创建库，并且use test;</span><br><span class="line">4. 高级参数</span><br><span class="line"></span><br><span class="line">--master-data=2 ：</span><br><span class="line">1. 将binlog 位置和文件名作为注释的方式写入到文件中；</span><br><span class="line">2. 将自动锁表和解锁；</span><br><span class="line">3. 配合single-transaction 减少锁表时间；</span><br><span class="line"></span><br><span class="line">--single-transaction: 对于InnoDB引擎开启一个独立事务，获取一致性快照，进行备份；</span><br><span class="line">-R, -E --triggers :备份存储过程，</span><br><span class="line">--max_allowed_packet=64M： 设置服务端向客户端发送包的大小，防止因表数据太大，导致</span><br><span class="line">1153- 错误 Got a packet bigger than 'max_allowed_packet'</span><br><span class="line"></span><br><span class="line">mysqldump -uroot -p -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; backup/full_bak.sql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">GTID(Global Transaction ID): 已提交事务的编号；GTID= server_uuid: transaction_id</span><br><span class="line">用户记录binlog 中的是事务Id,用于主从复制</span><br><span class="line"></span><br><span class="line">select @@gtid_mode; # 默认关闭</span><br><span class="line">开启 vim /etc/my.inf</span><br><span class="line">gtid-mode=on</span><br><span class="line">enforce-gtid-consistency=true #保证主从数据的一致性；</span><br><span class="line"></span><br><span class="line">如何利用GTID 在多个binlog中截取需要的日志：</span><br><span class="line"></span><br><span class="line">1） 确定截取的GTID范围</span><br><span class="line">mysql-bin.000005 | 356 | Gtid           |      3306 |         421 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:9'</span><br><span class="line"></span><br><span class="line">| mysql-bin.000003 |  586 | Gtid           |      3306 |         651 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:3' |</span><br><span class="line">| mysql-bin.000003 |  651 | Query          |      3306 |         761 | create database gtdb charset utf8mb4  </span><br><span class="line">2）确定在哪些文件中执行这些操作</span><br><span class="line">mysql-bin.000003 mysql-bin.000004 mysql-bin.000005</span><br><span class="line">3) 开始截取</span><br><span class="line">mysql/bin/mysqlbinlog --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid.sql</span><br><span class="line">4)开始执行sql</span><br><span class="line"> set sql_log_bin=0; #先关闭binlog，不记录接下来的操作</span><br><span class="line"> source /tmp/gtid.sql</span><br><span class="line"> 发现并没有执行成功</span><br><span class="line"> </span><br><span class="line">5)关闭gtid的幂等性检查，一旦binlog已经存在gtid,而我们截取出来的也有相同的gtid,那么就不会再次执行，跳过；</span><br><span class="line">使用--skip-gtids 可以截取没有gtid的binlog</span><br><span class="line"></span><br><span class="line">mysql/bin/mysqlbinlog --skip-gtids --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid1.sql</span><br><span class="line">6)重新执行sql,成功恢复gtid数据库</span><br><span class="line">set sql_log_bin=0;</span><br><span class="line">source /tmp/gtid1.sql</span><br><span class="line">set sql_log_bin=1;</span><br></pre></td></tr></table></figure>
+
+<h1 id="11-InnoDB体系结构"><a href="#11-InnoDB体系结构" class="headerlink" title="11.InnoDB体系结构"></a>11.InnoDB体系结构</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">On-disk </span><br><span class="line">	系统表空间(ibdata&#123;1..N&#125;)共享</span><br><span class="line">		InnoDB data dictionary</span><br><span class="line">		DoubleWrite Buffer：在故障恢复期间，发生了意外宕机，可以从这里获取完整的副本，存放了缓冲池中刷新的页。使用Redo +undo + DWB可以实现自动故障恢复。</span><br><span class="line">		Change Buffer</span><br><span class="line">	Undo 表空间（存放回滚日志）rollback </span><br><span class="line">	独立表空间(段，区，页)</span><br><span class="line">		t1.idb</span><br><span class="line">		t2.idb</span><br><span class="line">	Temporary 表空间</span><br><span class="line">		ibtmp1</span><br><span class="line">	redo log(ib_logfile0 ib_logfile1): </span><br><span class="line">In-Memory：</span><br><span class="line">	buffer Pool: 缓冲数据页（读写数据加载到此区域）</span><br><span class="line">		AHI(自适应HASH索引，内存的hash表，评估buffer pool中经常被访问索引页，生成hash索引，加快寻找这些索引页，默认打开)</span><br><span class="line">		change buffer(对辅助索引的inset ,update, delete 操作的优化)</span><br><span class="line">	log buffer:</span><br><span class="line">		</span><br><span class="line">一个事务当执行update table set name='test' where id =1; 过程</span><br><span class="line">先将数据页加载到buffer pool, 记载此时的修改变化到log buffer(物理变化的日志)，undo记录的是修改之前的日志(反操作的逻辑日志)。WAL(write ahead log日志优先写)，当commit的时候，日志优先（fsync）写到磁盘，而数据异步写到磁盘.(如果日志没有写到磁盘，说明commit没有成功)。当宕机的时候（内存中的数据消失，就可以根据数据页中的数据和redo log进行恢复）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当插入，更新或者删除数据时，对于建立辅助索引的列，要排序，会影响原有的索引树结构，在业务繁忙期，索引树结构的改变，可能导致索引不能正常工作(内部结构锁之类的）。解决的方法就是change buffer:</span><br><span class="line"></span><br><span class="line">chang buffer:先将对辅助索引的更改存放到这个地方，一旦需要它的时候，在buffer bool中进行索引页和change buffer的merge。（自己决定什么时候更新到索引树）</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+]]></content>
+  </entry>
+  <entry>
+    <title>ubuntu 18.04同版本多实例开始</title>
+    <url>/2020/10/30/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/</url>
+    <content><![CDATA[<h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a><center>ubuntu 18.04同版本多实例开始</center></h1><a id="more"></a>
+
+<h2 id="1-创建data目录"><a href="#1-创建data目录" class="headerlink" title="1. 创建data目录"></a>1. 创建data目录</h2><ul>
+<li><p>sudo mkdir -p /space/data/330{7..9}/data</p>
+</li>
+<li><p>sudo mkdir -p /space/binlog/330{7..9}</p>
+</li>
+</ul>
+<h2 id="2-创建配置文件"><a href="#2-创建配置文件" class="headerlink" title="2.创建配置文件"></a>2.创建配置文件</h2><p> cat &gt; /space/data/3307/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3307/data<br>socket=/tmp/mysql3307.sock<br>log_error=/space/data/3307/mysql.log<br>port=3307<br>server_id=7<br>log_bin=/space/binlog/3307/mysql-bin</p>
+<p> cat &gt; /space/data/3308/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3308/data<br>socket=/tmp/mysql3308.sock<br>log_error=/space/data/3308/mysql.log<br>port=3308<br>server_id=8</p>
+<p> cat &gt; /space/data/3309/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3309/data<br>socket=/tmp/mysql3309.sock<br>log_error=/space/data/3309/mysql.log<br>port=3309<br>server_id=9</p>
+<h2 id="3-修改属主"><a href="#3-修改属主" class="headerlink" title="3. 修改属主"></a>3. 修改属主</h2><p>space/data# chown -R mysql.mysql 330*</p>
+<p>/space/binlog# chown -R mysql.mysql 330*</p>
+<h2 id="4-初始化之前准备"><a href="#4-初始化之前准备" class="headerlink" title="4. 初始化之前准备"></a>4. 初始化之前准备</h2><p>mv /etc/my.cnf  /etc/my.cnf.bak  # 初始化也会读这文件；</p>
+<h2 id="5-初始化数据"><a href="#5-初始化数据" class="headerlink" title="5.初始化数据"></a>5.初始化数据</h2><p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3307/data –basedir=/space/database/mysql</p>
+<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3308/data –basedir=/space/database/mysql</p>
+<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3309/data –basedir=/space/database/mysql</p>
+<h2 id="5-使用systemctl管理"><a href="#5-使用systemctl管理" class="headerlink" title="5. 使用systemctl管理"></a>5. 使用systemctl管理</h2><p>/etc/systemd/system/mysqld3307.service</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1 [Service]                                                                                                                                                                                  </span><br><span class="line">2 User=mysql</span><br><span class="line">3 Group=mysql</span><br><span class="line">4 ExecStart=/space/database/mysql/bin/mysqld --defaults-file=/space/data/3309/my.cnf</span><br><span class="line">5 LimitNOFILE=5000</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">也可以通过mysqld_safe去启动</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3307/my.cnf &amp;</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3308/my.cnf &amp;</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3309/my.cnf &amp;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="6-开启多实例"><a href="#6-开启多实例" class="headerlink" title="6. 开启多实例"></a>6. 开启多实例</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1）</span><br><span class="line">systemctl start mysqld3307</span><br><span class="line">systemctl start mysqld3308</span><br><span class="line">systemctl start mysqld3309</span><br><span class="line">2）检查server_id是否不同：</span><br><span class="line">mysql -S /tmp/mysql3307.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3308.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3309.sock  -e 'select @@server_id' -uroot</span><br><span class="line">3）检查主库binlog是否开启</span><br><span class="line"> mysql -S /tmp/mysql3307.sock -e "select @@log_bin" -uroot;</span><br><span class="line"> </span><br><span class="line">4）主库建立复制用户</span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "grant replication slave on *.* to repl@'192.168.0.%' identified by '123'" -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认用户是否建立成功</span></span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "select user,host from mysql.user" -uroot -p </span><br><span class="line">5）主库备份恢复到从库</span><br><span class="line"> </span><br><span class="line"> mysqldump -uroot -p -S /tmp/mysql3307.sock -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; /tmp/full3307.sql</span><br><span class="line"> mysql -uroot -S /tmp/mysql3308.sock &lt; /tmp/full3307.sql </span><br><span class="line"> </span><br><span class="line">6）从库：告知从库复制连接信息和要复制的起点信息</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.111',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3307,</span><br><span class="line">  MASTER_LOG_FILE='mysql-bin.000002',</span><br><span class="line">  MASTER_LOG_POS=691,</span><br><span class="line"><span class="meta">#</span><span class="bash">  MASTER_CONNECT_RETRY=10;(可选参数)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看从库要复制的起点</span></span><br><span class="line">grep "\-- CHANGE MASTER TO" /tmp/full3307.sql </span><br><span class="line">-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=691;</span><br><span class="line">7） 从库：开启专用的复制线程</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> start slave;</span></span><br><span class="line">8) 从库验证主从状态：</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot -e "show slave status\G" |grep Running:</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line">如果搭建失败：，执行以下命令，重新开始</span><br><span class="line">mysql -S /tmp/mysql3308.sock -e "stop slave;reset slave all;"</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-主从复制的原理"><a href="#7-主从复制的原理" class="headerlink" title="7.主从复制的原理"></a>7.主从复制的原理</h2><h3 id="1-从库中有关的文件"><a href="#1-从库中有关的文件" class="headerlink" title="1.从库中有关的文件"></a>1.从库中有关的文件</h3><ul>
+<li>relay_log_basename ：默认在从库的数据目录中，设置此参数可自定义文件名,用来存储接收的binlog;<ul>
+<li>自定义文件名: relay_log_basename=</li>
+</ul>
+</li>
+<li>master.info: 默认在从库的数据目录中，存放的是连接主库的信息和已经接收binlog位置点信息<ul>
+<li>默认以文件的形式，可以存放到表中，进行优化</li>
+<li>master_info_repository=FILE/TABLE</li>
+</ul>
+</li>
+<li>relay-log.info: 记录从库回放到relay-log的位置点，默认在从库数据目录下,防止从库宕机，不知道回放到什么位置<ul>
+<li>relay_log_info_repository=FILE/TABLE 进行配置</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL线程，执行下面的操作）</span><br><span class="line">2）从库：根据上面的信息连接主库；</span><br><span class="line">3）主库：分配Dump_thread(一个从库对应一个线程show processlist可以查看）专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： Dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到c8d3633d1de2-relay-bin.000002(relay.log)中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-log.info，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行c8d3633d1de2-relay-bin.000001,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-监控主从的状态"><a href="#3-监控主从的状态" class="headerlink" title="3.监控主从的状态"></a>3.监控主从的状态</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">主库：</span><br><span class="line">show processlist</span><br><span class="line">show slave hosts;</span><br><span class="line"></span><br><span class="line">从库：show slave status \G</span><br><span class="line">		从库连接主库的信息，来自于master.info</span><br><span class="line">                  Master_Host: 192.168.0.111</span><br><span class="line">                  Master_User: repl</span><br><span class="line">                  Master_Port: 3307</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000002</span><br><span class="line">          Read_Master_Log_Pos: 866</span><br><span class="line">          </span><br><span class="line">          从库relay-log.info的执行情况，来自于relay-log.info，用来判断主从延时的判断信息</span><br><span class="line">               Relay_Log_File: ubuntu-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 495</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000002</span><br><span class="line">                Exec_Master_Log_Pos: 866</span><br><span class="line">               Seconds_Behind_Master: 0</span><br><span class="line">        </span><br><span class="line">        从库线程状态,具体错误信息</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">                     Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">               </span><br><span class="line">               </span><br><span class="line">         过滤复制相关，只想复制某些库</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">  </span><br><span class="line">        用来设置从库延时复制的相关信息</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">   </span><br><span class="line">           GTID 相关复制信息</span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set:</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-主从复制的延时"><a href="#4-主从复制的延时" class="headerlink" title="4. 主从复制的延时"></a>4. 主从复制的延时</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1.如何监控发生了延时</span><br><span class="line">seconds_behind_master</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 同一时间，查看master的binlog位置点</span></span><br><span class="line">日志量show master status；  # 查看主库binlog的信息</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看slave的relay-log.info的位置点</span></span><br><span class="line">cat relay-log.info #记录了已经回放到relay.log的位置点</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-主从复制实现读写分离的方式"><a href="#5-主从复制实现读写分离的方式" class="headerlink" title="5. 主从复制实现读写分离的方式"></a>5. 主从复制实现读写分离的方式</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1. 利用</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>mysql二进制安装</title>
+    <url>/2020/10/29/mysql%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%AE%89%E8%A3%85/</url>
+    <content><![CDATA[<h1 id="mysql-二进制安装"><a href="#mysql-二进制安装" class="headerlink" title="mysql 二进制安装"></a><center>mysql 二进制安装</center></h1><h2 id="1-使用-mysql-5-7-28-linux-glibc2-12-x86-64-tar-gz-进行安装"><a href="#1-使用-mysql-5-7-28-linux-glibc2-12-x86-64-tar-gz-进行安装" class="headerlink" title="1. 使用 mysql-5.7.28-linux-glibc2.12-x86_64.tar.gz 进行安装"></a>1. 使用 mysql-5.7.28-linux-glibc2.12-x86_64.tar.gz 进行安装</h2><h2 id="2-创建安装目录"><a href="#2-创建安装目录" class="headerlink" title="2. 创建安装目录"></a>2. 创建安装目录</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1. mkdir -p /data/app /data/3306/&#123;data,log&#125;</span><br><span class="line">2. useradd mysql -s /sbin/nologin</span><br><span class="line">3. tar xzf mysql-5.7.28-linux-glibc2.12-x86_64.tar.gz -C app/</span><br><span class="line">4. cd app</span><br><span class="line">5. ln -s mysql-5.7.28-linux-glibc2.12-x86_64/ mysql</span><br><span class="line">6.  vi /etc/profile</span><br><span class="line">7. export PATH=/data/app/mysql/bin:$PATH</span><br><span class="line">8. source /etc/profile</span><br><span class="line">9. mysql -V</span><br><span class="line">mysql  Ver 14.14 Distrib 5.7.28, for linux-glibc2.12 (x86_64) using  EditLine wrapper</span><br><span class="line">10. chown -R mysql.mysql /data/  修改权限</span><br><span class="line">11. 删除遗留 rm -rf /etc/my.cnf*</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-初始化数据"><a href="#3-初始化数据" class="headerlink" title="3. 初始化数据"></a>3. 初始化数据</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mysqld --initialize-insecure --user=mysql --datadir=/data/3306/data/</span><br><span class="line"></span><br><span class="line">报错：</span><br><span class="line">[ERROR] Can't find error-message file '/usr/local/mysql/share/errmsg.sys'. Check error-message file location and 'lc-messages-dir' configuration directive.</span><br><span class="line">解决：</span><br><span class="line"> cp errmsg.sys /usr/local/mysql/share/errmsg.sys</span><br><span class="line"> 失败之后，先删除/data/3306/data下的内容</span><br><span class="line"> 成功：</span><br><span class="line"> 2020-10-29T12:30:15.859751Z 0 [Warning] Gtid table is not ready to be used. Table 'mysql.gtid_executed' cannot be opened.</span><br><span class="line">2020-10-29T12:30:16.639490Z 0 [Warning] CA certificate ca.pem is self signed.</span><br><span class="line">2020-10-29T12:30:17.061519Z 1 [Warning] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-准备配置文件"><a href="#4-准备配置文件" class="headerlink" title="4. 准备配置文件"></a>4. 准备配置文件</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">user=mysql</span><br><span class="line">basedir=/data/app/mysql  # 启动需要的数据</span><br><span class="line">datadir=/data/3306/data  # 启动后存放的数据目录</span><br><span class="line">socket=/tmp/mysql.sock</span><br><span class="line">port=3306   # 默认端口</span><br><span class="line">server_id=6 # 主从复制需要使用</span><br><span class="line">log_error=/data/3306/logs/mysql.err #错误日志</span><br><span class="line">log_bin=/data/3306/logs/mysql-bin   #开启binlog</span><br><span class="line">[client]   #所有本地连接的客户端配置</span><br><span class="line">socket=/tmp/mysql.sock</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="5-准备启动脚本"><a href="#5-准备启动脚本" class="headerlink" title="5. 准备启动脚本"></a>5. 准备启动脚本</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp mysql.server /etc/init.d/mysqld</span><br><span class="line">vi /etc/systemd/system/mysqld.service</span><br><span class="line">[Service]</span><br><span class="line">User=mysql</span><br><span class="line">Group=mysql</span><br><span class="line">ExecStart=/data/app/mysql/bin/mysqld --defaults-file=/data/3306/my.cnf</span><br><span class="line">LimitNOFILE=5000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动</span></span><br><span class="line">systemctl start mysqld</span><br><span class="line"></span><br><span class="line">netstat -tulnp|grep 3306</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-重启，使-etc-profile配置的生效"><a href="#6-重启，使-etc-profile配置的生效" class="headerlink" title="6. 重启，使/etc/profile配置的生效"></a>6. 重启，使/etc/profile配置的生效</h2><h2 id="7-创建用户"><a href="#7-创建用户" class="headerlink" title="7. 创建用户"></a>7. 创建用户</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">创建并查询用户</span></span><br><span class="line">create user cgn@localhost identified by '123456';</span><br><span class="line">select user,host,authentication_string,plugin from mysql.user;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">修改用户密码</span></span><br><span class="line">alter user root@localhost identified by '123456';</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">删除用户</span></span><br><span class="line">drop user cgn @localhost;</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-授权"><a href="#8-授权" class="headerlink" title="8. 授权"></a>8. 授权</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 8.0之前可以在建立用户的同时授权</span></span><br><span class="line">grant all on *.* to cgn@localhost identified by <span class="string">'123456'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 8.0之后必须先建立用户，才能授权</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看用户权限</span></span><br><span class="line">show grants <span class="keyword">for</span> root@localhost;</span><br><span class="line"><span class="comment"># 授予增删改查在app库的权限</span></span><br><span class="line">grant insert,update,delete,select on app.* to app_user@<span class="string">'10.0.0.%'</span> identified by <span class="string">'123'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 回收权限</span></span><br><span class="line">revoke delete on app.* <span class="keyword">from</span> app_user@<span class="string">'l0.0.0.%'</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="9-连接管理"><a href="#9-连接管理" class="headerlink" title="9. 连接管理"></a>9. 连接管理</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1. socket方法连接 </span><br><span class="line">mysql -uroot -p -S /tmp/mysql.sock</span><br><span class="line">2. tcp/ip方式</span><br><span class="line">	先授权远程登录的用户</span><br><span class="line">	grant all on *.* to cgn@'192.168.0.%' identified by '123456';</span><br><span class="line">	通过远程方式连接</span><br><span class="line">	mysql -ucgn -p -h 192.168.0.114 -P 3306</span><br></pre></td></tr></table></figure>
+
+<h2 id="10-初始化配置"><a href="#10-初始化配置" class="headerlink" title="10. 初始化配置"></a>10. 初始化配置</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mysqld --help --verbose|grep my.cnf # 后面的相同配置覆盖前面的配置</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 跳过密码启动</span></span><br><span class="line">mysqld_safe --skip-grant-tables --skip-networking &amp;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 用于忘记密码时，修改密码 ，原理就是在连接层，跳过授权表，连接协议;</span></span><br><span class="line">alter user cgn@localhost identified by '123';</span><br><span class="line">ERROR 1290 (HY000): The MySQL server is running with the --skip-grant-tables option so it cannot execute this statement</span><br><span class="line"><span class="meta">#</span><span class="bash"> 加载授权表</span></span><br><span class="line">flush privileges;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改密码，就可以成功</span></span><br><span class="line">alter user cgn@localhost identified by '123';</span><br><span class="line"></span><br><span class="line">mysqld &amp;  # 将日志直接打印到终端，用于快速定位启动问题</span><br><span class="line"></span><br><span class="line">上面的方式关闭，可以用shutdown;</span><br><span class="line">mysqladmin -uroot -p shutdown</span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql备份方式</title>
+    <url>/2020/10/29/mysql%E5%A4%87%E4%BB%BD%E6%96%B9%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="Mysql备份方式"><a href="#Mysql备份方式" class="headerlink" title="Mysql备份方式"></a><center>Mysql备份方式</center></h2><h2 id="1-逻辑备份"><a href="#1-逻辑备份" class="headerlink" title="1. 逻辑备份"></a>1. 逻辑备份</h2><ul>
+<li>mysqldump(MDP),备份的是SQL语句<ul>
+<li>mysql –help –verbose |grep my.cnf   查看mysql配置文件的优先级顺序</li>
+<li>InnoDB采用快照备份方式，开启一个事务，获取当前最新的一致性快照，将快照数据转换成SQL,保存到sql文件中</li>
+<li>非InnoDB表需要锁表备份，触发FTWRL(全局锁表)；（5.7中系统表有MyISAM表，在全备时，也会将InnoDB表锁表；8.0中系统表使用InnoDB，备份时性能更好）</li>
+<li>核心参数<ul>
+<li>连接相关的参数(客户端工具，需要数据库提前启动)<ul>
+<li>-u, -p, -h, -P, -S </li>
+</ul>
+</li>
+<li>备份参数(覆盖备份，如果表存在，先删除已经有的表，再创建)<ul>
+<li>-A: 全备<ul>
+<li>mysqldump -uroot -p -A &gt; full.sql;</li>
+</ul>
+</li>
+<li>-B: 指定库，库备份<ul>
+<li>mysqldump -uroot -p -B study_sql test &gt; db.sql;</li>
+<li>会自动创建库和表</li>
+</ul>
+</li>
+<li>没有参数， db_name table_name1 table_name2 (备份db_name库下的table_name1 表和table_name2表)<ul>
+<li>mysqldump -uroot -p study_sql table1   table2 &gt; table.sql </li>
+<li>mysqldump -uroot -p study_sql &gt;table.sql 也会将study_sql库下所有表进行备份，恢复时，不会自动创建库和 use study_sql；</li>
+</ul>
+</li>
+<li>高级参数：<ul>
+<li>–master-data=2<ul>
+<li>需要开启binlog才能使用此选项，开启binglog配置<ul>
+<li>server_id=1</li>
+<li>log_bin=/data/binlog/mysql-bin  # 需要保证/data/binlog目录存在，有写权限</li>
+<li>sync_binlog=1  # 每次事务提交，立即刷写binlog到磁盘</li>
+<li>binlog_format=row  #控制binlog记录格式为row</li>
+</ul>
+</li>
+<li>备份开始时，自动记录日志文件信息<ul>
+<li>以注释的方式记录了binlog的日志文件名和位置(在全备的时候记录了binlog的起点位置)</li>
+<li>自动锁表和解锁</li>
+<li>配合single-transaction减少锁表的时间</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>–single-transaction<ul>
+<li>对于InnoDB引擎备份时，开启一个独立事务，获取一致性快照，进行备份</li>
+</ul>
+</li>
+<li>-R  -E –triggers:备份事件，触发器，</li>
+<li>–max_allowed_packet=64M  (设置客户端从服务器端允许接收的值)</li>
+</ul>
+</li>
+<li>最后生产上的备份参数就是：<ul>
+<li>mysqldump -uroot -p -A –master-data=2 –single-transaction -R -E –triggers –max_allowed_packet=64M &gt; /data/backup/full.sql</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>load data in file</li>
+</ul>
+</li>
+<li>mydumper</li>
+</ul>
+<h2 id="2-物理备份"><a href="#2-物理备份" class="headerlink" title="2. 物理备份"></a>2. 物理备份</h2><ul>
+<li>mysql enterpriise backup(企业版)</li>
+<li>Percona Xtrabackup(PBK, XBK)</li>
+</ul>
+<h2 id="3-主从复制"><a href="#3-主从复制" class="headerlink" title="3. 主从复制"></a>3. 主从复制</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#1.检查server_id 是否相同, 用来区分不同的主从；</span></span><br><span class="line"> mysql -uroot -p -P <span class="number">3308</span> -h <span class="number">192.168</span><span class="number">.0</span><span class="number">.114</span> -e <span class="string">'select @@server_id'</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 2.检查主库binlog 是否开启</span></span><br><span class="line">mysql -uroot -p -e <span class="string">'select @@log_bin'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 主库建立复制用户</span></span><br><span class="line">mysql -uroot -e <span class="string">"grant replication slave on *.* to repl@'192.168.0.%' identified by '123'"</span></span><br><span class="line">mysql -uroot -e <span class="string">"select host, user from mysql.user"</span></span><br><span class="line"><span class="comment"># 4. 主库全备</span></span><br><span class="line">mysqldump -uroot -p -A --master-data=<span class="number">2</span> --single-transaction -R -E --triggers --max_allowed_packet=<span class="number">64</span>M &gt; /data/backup/full.sql</span><br><span class="line"><span class="comment">#5. 从库恢复</span></span><br><span class="line">mysql -uroot -p -P <span class="number">3308</span> -h <span class="number">192.168</span><span class="number">.0</span><span class="number">.114</span> &lt; full.sql</span><br><span class="line"><span class="comment">#6. 主库要告知从库，连接主库的信息，以及复制的起点</span></span><br><span class="line">grep <span class="string">"\-- CHANGE MASTER TO"</span> full.sql</span><br><span class="line"><span class="comment"># -- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000009', MASTER_LOG_POS=641;</span></span><br><span class="line"></span><br><span class="line">确定复制的起点：</span><br><span class="line">help change master to;</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST=<span class="string">'192.168.0.109'</span>,</span><br><span class="line">  MASTER_USER=<span class="string">'repl'</span>,</span><br><span class="line">  MASTER_PASSWORD=<span class="string">'123'</span>,</span><br><span class="line">  MASTER_PORT=<span class="number">3306</span>,</span><br><span class="line">  MASTER_LOG_FILE=<span class="string">'mysql-bin.000009'</span>,</span><br><span class="line">  MASTER_LOG_POS=<span class="number">641</span>,</span><br><span class="line">  MASTER_CONNECT_RETRY=<span class="number">10</span>;</span><br><span class="line">    </span><br><span class="line"><span class="comment"># 7.从库中开启专用的复制线程</span></span><br><span class="line">start slave;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-验证主从状态："><a href="#4-验证主从状态：" class="headerlink" title="4. 验证主从状态："></a>4. 验证主从状态：</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看从库状态：</span></span><br><span class="line">show slave status \G   #下面都是Yes,表示成功；</span><br><span class="line">     Slave_IO_Running: Yes</span><br><span class="line">     Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 命令：</span></span><br><span class="line">start slave; # 开启所有线程</span><br><span class="line">stop slave; # 关闭所有线程</span><br><span class="line">start slave sql_thread; # 单独启动sql线程</span><br><span class="line">start slave io_thread; # 单独启动IO线程</span><br><span class="line">stop slave sql_thread;</span><br><span class="line">stop slave io_thread;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 解除从库身份</span></span><br><span class="line">reset slave all;</span><br><span class="line">show slave status \G</span><br><span class="line"><span class="meta">#</span><span class="bash"> 出现问题：</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-SQL线程问题"><a href="#5-SQL线程问题" class="headerlink" title="5. SQL线程问题"></a>5. SQL线程问题</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">从库写入后，而主库也执行了相同的操作，导致主库的操作在同步的时候，从库不能再重复操作，SQL线程崩溃，主从关系不再同步。</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">主从建立后，从库先执行了删除操作，主库后来也执行了删除操作，导致从库同步时失败，因为从库已经删除过，不能再执行删除操作，从库SQL线程处于No</span><br><span class="line"></span><br><span class="line">后来想重新全备，重新建立主从关系，结果开启了GTID，导致全备后，不能应用到从库上，</span><br><span class="line">这时候查资料，说要执行reset master(这会删除主库的binglog日志文件，使其日志文件重新从1开始)</span><br></pre></td></tr></table></figure>
+
+<p>解决方法：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">方法-：如果确定主库和从库执行了同样的操作(比如从库建立了一个库，主库后来也建立了一个库)</span><br><span class="line">从库进行反操作一下：</span><br><span class="line">	drop database db1;</span><br><span class="line">	start slave;</span><br><span class="line">	</span><br><span class="line">方法2: 以从库为准，跳过此次复制错误(这种方法，要保证主从的数据一致时，才能采用)</span><br><span class="line">stop slave;</span><br><span class="line">set global sql_slave_skip_counter=1;</span><br><span class="line">start slave;</span><br><span class="line"></span><br><span class="line">也有同步工具 pt-table-sync</span><br><span class="line"></span><br><span class="line">方案3 暴力跳过</span><br><span class="line">/etc/my.cnf</span><br><span class="line">slave-skip-errors = 1032,1062,1007</span><br><span class="line">1007:对象 已经存在</span><br><span class="line">1032：无法执行DML</span><br><span class="line">1062：主键冲突或者约束冲突</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-延时从库"><a href="#6-延时从库" class="headerlink" title="6. 延时从库"></a>6. 延时从库</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1.普通的主从，擅长处理物理层面的数据库问题，</span><br><span class="line">为了解决逻辑方面的数据库问题(主库执行了drop database)，可以设置从库延时多长时间回放(SQL)出现了延时从库的配置</span><br><span class="line"><span class="meta">#</span><span class="bash"> 1. 保证主从没有问题</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 从库执行如下操作：</span></span><br><span class="line">	stop slave;</span><br><span class="line">	change master to master_delay = 300;</span><br><span class="line">	start slave;</span><br><span class="line">	show slave status \G</span><br><span class="line">		SQL_Delay: 300</span><br><span class="line">		SQL_Remaining_Delay: NULL</span><br><span class="line">		</span><br><span class="line"><span class="meta">#</span><span class="bash">恢复：</span></span><br><span class="line">	从库：</span><br><span class="line">	1. 停止sql线程，也就是不让它回放relay.log</span><br><span class="line">		stop slave sql_thread;</span><br><span class="line">	2. 截取relay.log</span><br><span class="line">	 	cat /data/3308/data/relay-log.info</span><br><span class="line">	 	./db01-relay-bin.000002</span><br><span class="line">	 	482</span><br><span class="line">	查看终点位置：</span><br><span class="line">		show relaylog events in 'db01-relay-bin.000002';</span><br><span class="line">		找到左侧一列     drop database db;  ---这个位置点</span><br><span class="line">		执行截取命令</span><br><span class="line">		mysqlbinlog --start-position=482 --stop-position=1402 /data/3308/data/db01-relay-bin.000002 &gt; /tmp/relay.sql</span><br><span class="line">		</span><br><span class="line">		进入从库：</span><br><span class="line">			set sql_log_bin=0;</span><br><span class="line">			source /tmp/relay.sql</span><br><span class="line">			set sql_log_bin=1;</span><br><span class="line">		然后应用直接连接到此库上就可以了</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-GTID主从复制"><a href="#7-GTID主从复制" class="headerlink" title="7. GTID主从复制"></a>7. GTID主从复制</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">GTID特性能够为主库并发传输binlog,从库并发回放binlog提供支持。</span><br><span class="line">配置</span><br><span class="line">关于GTID配置的参数</span><br><span class="line">gtid-mode=on</span><br><span class="line">enforce-gtid-consistency=true</span><br><span class="line">log-slave-updates=1</span><br><span class="line"></span><br><span class="line">修改mysql提示符 (db01为hostname)</span><br><span class="line">[mysql]</span><br><span class="line">prompt=db01 [\\d]&gt;</span><br><span class="line"></span><br><span class="line">GTID复制流程：</span><br><span class="line"></span><br><span class="line">开启主从的时候：</span><br><span class="line">从库先去读取当前relay.log中记录的已经获取到的binlog,还要检查是否执行gtid_purge命令（删除已经备份过的gtid),从库直接从删除的点开始执行gtid;</span><br><span class="line"></span><br><span class="line">从库执行change master to 命令区别：</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.109',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3306,</span><br><span class="line">  MASTER_AUTO_POSITION=1;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ubuntu使用docker</title>
     <url>/2020/10/29/ubuntu%E4%BD%BF%E7%94%A8docker/</url>
     <content><![CDATA[<h1 id="ubuntu-使用docker"><a href="#ubuntu-使用docker" class="headerlink" title="ubuntu 使用docker"></a><center>ubuntu 使用docker</center></h1><a id="more"></a>
@@ -130,12 +690,18 @@
 
 <h2 id="4-操作容器"><a href="#4-操作容器" class="headerlink" title="4.操作容器"></a>4.操作容器</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker container ls  --查看正在运行的容器 或者 docker ps</span><br><span class="line">docker container ls --all 查看所有的容器</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动容器</span></span><br><span class="line">docker run 参数 镜像名 [向启动容器中传入命令]</span><br><span class="line">-i: 交互</span><br><span class="line">-t: 分配伪终端</span><br><span class="line">--name: 容器名</span><br><span class="line">-v: 目录映射</span><br><span class="line">-d:后台运行</span><br><span class="line">-p:端口映射  &lt;host_port&gt;:&lt;container_port&gt;</span><br><span class="line">--network=host </span><br><span class="line">docker run --name nginx -it nginx:alpine /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash"> 退出容器后,容器会变成退出状态</span></span><br><span class="line"></span><br><span class="line">docker run --cpuset-cpus="0-3" --cpu-shares=512 --memory=500m nginx:alpine</span><br><span class="line"><span class="meta">#</span><span class="bash"> --cpuset-cpus: 设置容器可以使用的cpu核</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --cpus-shares: 容器分配到cpu时间比例，所占用的权重，默认1024，cpu密集型任务，抢占cpu时生效；</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --memory: 资源限制</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">docker run -it --name=buntu_study ubuntu /bin/bash</span><br><span class="line"><span class="comment"># 参数</span></span><br><span class="line"><span class="comment"># --it 交互式</span></span><br><span class="line"><span class="comment"># --name:指定容器名</span></span><br><span class="line"><span class="comment"># ubuntu:基于哪个镜像名</span></span><br><span class="line"><span class="comment"># /bin/bash 进行后执行的命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 后台运行容器</span></span><br><span class="line">docker run -dit --name=ubuntu_study ubuntu</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入后台运行的容器</span></span><br><span class="line">docker <span class="keyword">exec</span> -it ubuntu_study /bin/bash</span><br><span class="line"><span class="comment"># 停止后台运行的容器</span></span><br><span class="line">docker  stop 容器名或者id</span><br><span class="line"><span class="comment"># 重启容器</span></span><br><span class="line">docker  restart 容器名或者id</span><br><span class="line"><span class="comment"># stop无法停止用kill</span></span><br><span class="line">docker  kill 容器名或者id</span><br><span class="line"><span class="comment"># 删除容器</span></span><br><span class="line">docker  rm 容器名或者id</span><br><span class="line"><span class="comment"># 查看容器详情</span></span><br><span class="line">docker inspect 容器名</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">docker run -it --name=buntu_study ubuntu /bin/bash</span><br><span class="line"><span class="comment"># 参数</span></span><br><span class="line"><span class="comment"># --it 交互式</span></span><br><span class="line"><span class="comment"># --name:指定容器名</span></span><br><span class="line"><span class="comment"># ubuntu:基于哪个镜像名</span></span><br><span class="line"><span class="comment"># /bin/bash 进行后执行的命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 后台运行容器</span></span><br><span class="line">docker run -dit --name=ubuntu_study ubuntu</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入后台运行的容器</span></span><br><span class="line">docker <span class="keyword">exec</span> -it ubuntu_study /bin/bash</span><br><span class="line"><span class="comment"># 停止后台运行的容器095b6487fb77</span></span><br><span class="line">docker  stop 容器名或者id</span><br><span class="line"><span class="comment"># 重启容器</span></span><br><span class="line">docker  restart 容器名或者id</span><br><span class="line"><span class="comment"># stop无法停止用kill</span></span><br><span class="line">docker  kill 容器名或者id</span><br><span class="line"><span class="comment"># 删除容器</span></span><br><span class="line">docker  rm 容器名或者id</span><br><span class="line"><span class="comment"># 查看容器详情</span></span><br><span class="line">docker inspect 容器名</span><br></pre></td></tr></table></figure>
 
 <h2 id="5-将容器打包成镜像-供其他人使用"><a href="#5-将容器打包成镜像-供其他人使用" class="headerlink" title="5. 将容器打包成镜像,供其他人使用"></a>5. 将容器打包成镜像,供其他人使用</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="number">1.</span> docker commit f46cae58c8f1 study_ubuntu   <span class="comment"># 没有指定版本号，默认是latest</span></span><br><span class="line"><span class="number">2.</span> docker save -o test.tar study_ubuntu  <span class="comment"># 将这个镜像压缩成文件 test.tar</span></span><br><span class="line"><span class="number">3.</span> docker load -i test.tar <span class="comment"># 将镜像加载</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="6-使用docker-安装FastDFS"><a href="#6-使用docker-安装FastDFS" class="headerlink" title="6. 使用docker 安装FastDFS"></a>6. 使用docker 安装FastDFS</h2><p>可以从<a href="https://hub.docker.com/search?q=&type=image" target="_blank" rel="noopener">docker hub</a>中查找想要的镜像</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 拉取已经安装好的fastdfs 开源软件</span></span><br><span class="line">docker image pull delron/fastdfs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 开启tracker服务的一个容器</span></span><br><span class="line">docker run -dit --name tracker --network=host -v /var/fdfs/tracker:/var/fdfs delron/fastdfs tracker </span><br><span class="line"><span class="meta">#</span><span class="bash">-d 后台运行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -it:交互式运行， 与/bin/bash或者/bin/sh配套使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --network=host 将宿主机的host映射到容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v  将容器中的/var/fdfs 映射到宿主机的/var/fdfs/tracker </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> delron/fastdfs  镜像名字</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> tracker 运行的命令</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 开启storage服务的一个容器</span></span><br><span class="line">docker run -dit --name storage --network=host -e TRACKER_SERVER=192.168.0.114:22122 -v /var/fdfs/storage:/var/fdfs delron/fastdfs storage</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> --network=host映射宿主机的ip作为容器的ip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -e：映射环境变量 TRACKER_SERVER ,storage需要知道tracker服务器的位置，这样storage才能够将它的空闲状态发送给tracker,因此需要将tracker的ip和端口告诉storage服务器，而tracker服务器的ip就是宿主机的ip,因为做了--network=host;tracker端口必定是22122;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v: 映射目录</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果重启storage失败，删除 /var/fdfs/storage/data/fdfs_storaged.pid 再启动</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 拉取已经安装好的fastdfs 开源软件</span></span><br><span class="line">docker image pull delron/fastdfs</span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 开启tracker服务的一个容器</span></span><br><span class="line">docker run -dit --name tracker --network=host -v /var/fdfs/tracker:/var/fdfs delron/fastdfs tracker </span><br><span class="line"><span class="meta">#</span><span class="bash">-d 后台运行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -it:交互式运行， 与/bin/bash或者/bin/sh配套使用</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> --network=host 将宿主机的host映射到容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v  将容器中的/var/fdfs 映射到宿主机的/var/fdfs/tracker </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> delron/fastdfs  镜像名字</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> tracker 运行的命令</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 开启storage服务的一个容器</span></span><br><span class="line"> </span><br><span class="line"> docker run -dit --name storage --network=host -e TRACKER_SERVER=192.168.0.114:22122 -v /var/fdfs/storage:/var/fdfs delron/fastdfs storage</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> --network=host映射宿主机的ip作为容器的ip</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -e：映射环境变量 TRACKER_SERVER ,storage需要知道tracker服务器的位置，这样storage才能够将它的空闲状态发送给tracker,因此需要将tracker的ip和端口告诉storage服务器，而tracker服务器的ip就是宿主机的ip,因为做了--network=host;tracker端口必定是22122;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -v: 映射目录</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果重启storage失败，删除 /var/fdfs/storage/data/fdfs_storaged.pid 再启动</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">docker run -d --name=elasticsearch --network=host -v /home/cgn/elasticsearch-2.4.6/config/:/usr/share/elasticsearch/config delron/elasticsearch-ik:2.4.6-1.0</span><br></pre></td></tr></table></figure>
+
+
+
+
 
 <h2 id="7-配置宿主机网卡转发"><a href="#7-配置宿主机网卡转发" class="headerlink" title="7. 配置宿主机网卡转发"></a>7. 配置宿主机网卡转发</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 检查值是否为1</span><br><span class="line">sysctl -a |grep -w net.ipv4.ip_forward  </span><br><span class="line"></span><br><span class="line"># 未配置，执行如下：</span><br><span class="line">cat &lt;&lt;EOF &gt; &#x2F;etc&#x2F;sysctl.d&#x2F;docker.conf</span><br><span class="line">net.bridge.bridge-nf-call-ip6tables &#x3D;1</span><br><span class="line">net.bridge.bridge-nf-call-iptables &#x3D; 1</span><br><span class="line">net.ipv4.ip_forward&#x3D;1</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line">sysctl -p &#x2F;etc&#x2F;sysctl.d&#x2F;docker.conf</span><br></pre></td></tr></table></figure>
 
@@ -1597,54 +2163,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>ubuntu 18.04同版本多实例开始</title>
-    <url>/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/</url>
-    <content><![CDATA[<h1 id="ubuntu-18-04同版本多实例开始"><a href="#ubuntu-18-04同版本多实例开始" class="headerlink" title="ubuntu 18.04同版本多实例开始"></a><center>ubuntu 18.04同版本多实例开始</center></h1><a id="more"></a>
-
-<h2 id="1-创建data目录"><a href="#1-创建data目录" class="headerlink" title="1. 创建data目录"></a>1. 创建data目录</h2><ul>
-<li><p>sudo mkdir -p /space/data/330{7..9}/data</p>
-</li>
-<li><p>sudo mkdir -p /space/binlog/330{7..9}</p>
-</li>
-</ul>
-<h2 id="2-创建配置文件"><a href="#2-创建配置文件" class="headerlink" title="2.创建配置文件"></a>2.创建配置文件</h2><p> cat &gt; /space/data/3307/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3307/data<br>socket=/tmp/mysql3307.sock<br>log_error=/space/data/3307/mysql.log<br>port=3307<br>server_id=7<br>log_bin=/space/binlog/3307/mysql-bin</p>
-<p> cat &gt; /space/data/3308/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3308/data<br>socket=/tmp/mysql3308.sock<br>log_error=/space/data/3308/mysql.log<br>port=3308<br>server_id=8</p>
-<p> cat &gt; /space/data/3309/my.cnf &lt;&lt; EOF<br>[mysqld]<br>basedir=/space/database/mysql<br>datadir=/space/data/3309/data<br>socket=/tmp/mysql3309.sock<br>log_error=/space/data/3309/mysql.log<br>port=3309<br>server_id=9</p>
-<h2 id="3-修改属主"><a href="#3-修改属主" class="headerlink" title="3. 修改属主"></a>3. 修改属主</h2><p>space/data# chown -R mysql.mysql 330*</p>
-<p>/space/binlog# chown -R mysql.mysql 330*</p>
-<h2 id="4-初始化之前准备"><a href="#4-初始化之前准备" class="headerlink" title="4. 初始化之前准备"></a>4. 初始化之前准备</h2><p>mv /etc/my.cnf  /etc/my.cnf.bak  # 初始化也会读这文件；</p>
-<h2 id="5-初始化数据"><a href="#5-初始化数据" class="headerlink" title="5.初始化数据"></a>5.初始化数据</h2><p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3307/data –basedir=/space/database/mysql</p>
-<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3308/data –basedir=/space/database/mysql</p>
-<p>mysql/bin/mysqld –initialize-insecure –user=mysql –datadir=/space/data/3309/data –basedir=/space/database/mysql</p>
-<h2 id="5-使用systemctl管理"><a href="#5-使用systemctl管理" class="headerlink" title="5. 使用systemctl管理"></a>5. 使用systemctl管理</h2><p>/etc/systemd/system/mysqld3307.service</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1 [Service]                                                                                                                                                                                  </span><br><span class="line">2 User=mysql</span><br><span class="line">3 Group=mysql</span><br><span class="line">4 ExecStart=/space/database/mysql/bin/mysqld --defaults-file=/space/data/3309/my.cnf</span><br><span class="line">5 LimitNOFILE=5000</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="6-开启多实例"><a href="#6-开启多实例" class="headerlink" title="6. 开启多实例"></a>6. 开启多实例</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1）</span><br><span class="line">systemctl start mysqld3307</span><br><span class="line">systemctl start mysqld3308</span><br><span class="line">systemctl start mysqld3309</span><br><span class="line">2）检查server_id是否不同：</span><br><span class="line">mysql -S /tmp/mysql3307.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3308.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3309.sock  -e 'select @@server_id' -uroot</span><br><span class="line">3）检查主库binlog是否开启</span><br><span class="line"> mysql -S /tmp/mysql3307.sock -e "select @@log_bin" -uroot;</span><br><span class="line"> </span><br><span class="line">4）主库建立复制用户</span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "grant replication slave on *.* to repl@'192.168.0.%' identified by '123'" -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认用户是否建立成功</span></span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "select user,host from mysql.user" -uroot -p </span><br><span class="line">5）主库备份恢复到从库</span><br><span class="line"> </span><br><span class="line"> mysqldump -uroot -p -S /tmp/mysql3307.sock -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; /tmp/full3307.sql</span><br><span class="line"> mysql -uroot -S /tmp/mysql3308.sock &lt; /tmp/full3307.sql </span><br><span class="line"> </span><br><span class="line">6）从库：告知从库复制连接信息和要复制的起点信息</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.111',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3307,</span><br><span class="line">  MASTER_LOG_FILE='mysql-bin.000002',</span><br><span class="line">  MASTER_LOG_POS=691,</span><br><span class="line"><span class="meta">#</span><span class="bash">  MASTER_CONNECT_RETRY=10;(可选参数)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看从库要复制的起点</span></span><br><span class="line">grep "\-- CHANGE MASTER TO" /tmp/full3307.sql </span><br><span class="line">-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=691;</span><br><span class="line">7） 从库：开启专用的复制线程</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> start slave;</span></span><br><span class="line">8) 从库验证主从状态：</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot -e "show slave status\G" |grep Running:</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line">如果搭建失败：，执行以下命令，重新开始</span><br><span class="line">mysql -S /tmp/mysql3308.sock -e "stop slave;reset slave all;"</span><br></pre></td></tr></table></figure>
-
-<h2 id="7-主从复制的原理"><a href="#7-主从复制的原理" class="headerlink" title="7.主从复制的原理"></a>7.主从复制的原理</h2><h3 id="1-从库中有关的文件"><a href="#1-从库中有关的文件" class="headerlink" title="1.从库中有关的文件"></a>1.从库中有关的文件</h3><ul>
-<li>relay_log_basename ：默认在从库的数据目录中，设置此参数可自定义文件名,用来存储接收的binlog;<ul>
-<li>自定义文件名: relay_log_basename=</li>
-</ul>
-</li>
-<li>master.info: 默认在从库的数据目录中，存放的是连接主库的信息和已经接收binlog位置点信息<ul>
-<li>默认以文件的形式，可以存放到表中，进行优化</li>
-<li>master_info_repository=FILE/TABLE</li>
-</ul>
-</li>
-<li>relay-info.log: 记录从库回放到relay-log的位置点，默认在从库数据目录下<ul>
-<li>relay_log_info_repository=FILE/TABLE 进行配置</li>
-</ul>
-</li>
-</ul>
-<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL)</span><br><span class="line">2）从库：连接主库；</span><br><span class="line">3）主库：分配dump_thread专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到relay-info.log中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-info.log，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行新的relay-info.log,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-监控主从的状态"><a href="#3-监控主从的状态" class="headerlink" title="3.监控主从的状态"></a>3.监控主从的状态</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">主库：</span><br><span class="line">show processlist</span><br><span class="line">show slave hosts;</span><br><span class="line"></span><br><span class="line">从库：show slave status \G</span><br><span class="line">		从库连接主库的信息，来自于master.info</span><br><span class="line">                  Master_Host: 192.168.0.111</span><br><span class="line">                  Master_User: repl</span><br><span class="line">                  Master_Port: 3307</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000002</span><br><span class="line">          Read_Master_Log_Pos: 866</span><br><span class="line">          </span><br><span class="line">          从库relay-log.info的执行情况，来自于relay-log.info，用来判断主从延时的判断信息</span><br><span class="line">               Relay_Log_File: ubuntu-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 495</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000002</span><br><span class="line">                Exec_Master_Log_Pos: 866</span><br><span class="line">               Seconds_Behind_Master: 0</span><br><span class="line">        </span><br><span class="line">        从库线程状态,具体错误信息</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">                     Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">               </span><br><span class="line">               </span><br><span class="line">         过滤复制相关，只想复制某些库</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">  </span><br><span class="line">        用来设置从库延时复制的相关信息</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">   </span><br><span class="line">           GTID 相关复制信息</span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set:</span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
     <title>python函数</title>
     <url>/2020/10/12/python%E5%87%BD%E6%95%B0-1/</url>
     <content><![CDATA[<h1 id="Python函数"><a href="#Python函数" class="headerlink" title="Python函数"></a><center>Python函数</center></h1><a id="more"></a>
@@ -2264,380 +2782,6 @@ limit_req_conn:限制同一时间连接数，并发限制
 <h2 id="15-基于MaxMind数据库从客户端地址获取变量-geoip模块，默认没有编译进nginx"><a href="#15-基于MaxMind数据库从客户端地址获取变量-geoip模块，默认没有编译进nginx" class="headerlink" title="15. 基于MaxMind数据库从客户端地址获取变量  geoip模块，默认没有编译进nginx:"></a>15. 基于MaxMind数据库从客户端地址获取变量  geoip模块，默认没有编译进nginx:</h2><h2 id="16-nginx作为反向代理使用"><a href="#16-nginx作为反向代理使用" class="headerlink" title="16. nginx作为反向代理使用"></a>16. nginx作为反向代理使用</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nginx 反向代理http服务器</span><br><span class="line">设置变量：</span><br></pre></td></tr></table></figure>
 
 <h2 id="17-日志切割"><a href="#17-日志切割" class="headerlink" title="17. 日志切割"></a>17. 日志切割</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">0 0 1 * * root /usr/local/openresty/nginx/logs/rotate.sh</span><br><span class="line">LOGS_PATH=/usr/local/openresty/nginx/logs/history</span><br><span class="line">CUR_LOGS_PATH=/usr/local/openresty/nginx/logs</span><br><span class="line">YESTERDAY=$(date -d "yesterday" +%Y-%m-%d)</span><br><span class="line">mv $&#123;CUR_LOGS_PATH&#125;/user1_access.log $&#123;LOGS_PATH&#125;/user1_access_$&#123;YESTERDAY&#125;.log</span><br><span class="line">mv $&#123;CUR_LOGS_PATH&#125;/user2_access.log $&#123;LOGS_PATH&#125;/user2_access_$&#123;YESTERDAY&#125;.log</span><br><span class="line">kill -USR1 $(cat /user/local/openresty/nginx/logs/nginx.pid)</span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
-    <title>Mysql继续学习</title>
-    <url>/2020/10/12/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<h1 id="Mysql继续学习"><a href="#Mysql继续学习" class="headerlink" title="Mysql继续学习"></a><center>Mysql继续学习</center></h1><a id="more"></a>
-
-<h2 id="1-索引的原理"><a href="#1-索引的原理" class="headerlink" title="1. 索引的原理"></a>1. 索引的原理</h2><p> 索引就是帮助Mysql高效获取数据的数据结构。</p>
-<p>优势：快速查询数据，降低数据库的IO成本；</p>
-<p>劣势：索引也是表，也要占用空间；虽然提高了查询效率，但是降低了更新表的速度，对表进行insert, update, delete等，更新表时，mysql不仅要保存数据，还要保存一下索引文件每次更新添加了索引列的字段，调整更新带来的键值变化后的索引信息；</p>
-<ul>
-<li>索引结构<ul>
-<li>索引是MySQL的存储引擎层中实现的，不是在服务器层实现，每种存储引擎的索引不一定相同，也不是所有的存储引擎都支持所有的索引类型，</li>
-<li>InnoDB引擎支持的索引有：Btree索引，full-text索引（5.6版本后支持），平常所说的索引，没有特别指定，都是指B+树（多路搜索树，不一定是二叉的）结构的索引；其中聚集索引，复合索引，前缀索引，唯一索引默认都是使用B+tree树索引；</li>
-<li>b-tree结构：<ul>
-<li>btree又叫多路平衡搜索树，一个m叉的btree特性：<ul>
-<li>树中每个节点最多包含有m个孩子；</li>
-<li>除根节点和叶子节点外，每个节点至少有（m/2)（向上取整）个孩子</li>
-<li>若根节点不是叶子节点，则至少有两个孩子</li>
-<li>所有叶子节点都在同一层</li>
-<li>每个非叶子节点由n个key与n+1个指针组成，其中 （m/2)（向上取整）- 1 &lt;= n &lt;= m -1;当n大于最大值时，中间节点分裂到父节点，两边节点分裂；</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>b+tree与btree区别<ul>
-<li>b+tree的叶子节点保存包含主键的一条记录或者是主键索引，索引从左到右递增排列，而b-tree树每个结点都包含索引和对应的数据，这样的话，会增加树的高度，因而带来更多的磁盘I/O操作；</li>
-<li>b+tree所有的非叶子节点只存储索引，不存储数据；</li>
-<li>b+tree的叶子节点增加了双向链表指针，优化了区间查询的性能，而不像b-tree那样在区间查找时，对于每个元素进行重新查找；</li>
-</ul>
-</li>
-<li>mysql中的b+tree数据结构对经典的b-tree进行了优化，在原有b-tree基础上，增加了一个指向相邻叶子节点的链表指针，形成了带有顺序指针的B+tree,提高区间访问的性能；</li>
-</ul>
-</li>
-<li>索引分类：                                  <ul>
-<li>单值索引：一个索引包含单个列</li>
-<li>唯一索引：索引列的值必须唯一，可以有多个null</li>
-<li>复合索引：多列构成的索引；</li>
-</ul>
-</li>
-</ul>
-<h2 id="2-索引的增删改查"><a href="#2-索引的增删改查" class="headerlink" title="2.索引的增删改查"></a>2.索引的增删改查</h2><ul>
-<li><p>创建索引：create index idx_city_name on city(city_name);</p>
-<ul>
-<li>也可以通过：alter table city add unique idx_city_name(city_name);  创建唯一索引</li>
-</ul>
-</li>
-<li><p>查看索引： show index from city;</p>
-</li>
-<li><p>删除索引： drop index idx_city_name on city;</p>
-</li>
-</ul>
-<h2 id="3-视图"><a href="#3-视图" class="headerlink" title="3. 视图"></a>3. 视图</h2><ul>
-<li>视图：提高复杂SQL语句的复用性和表操作的安全性；</li>
-<li>视图作用<ul>
-<li>安全，创建一个视图，定义好该视图操作的数据，之后将用户权限与视图进行绑定，可以通过grant语句对视图进行授予权限；</li>
-<li>查询性能提高，将查询的结果保存到视图中；</li>
-<li>数据独立： 一个视图就是一个表的查询结果集，相当于一个虚拟的表，可以对这个表再进行查询，</li>
-</ul>
-</li>
-<li>创建视图 <ul>
-<li>create view view_city_country as select c.*, t.country_name from city c, country t where c.country_id = t.country_id;</li>
-<li>create or replace view view_city_country as 新的查询语句；创建或者覆盖已经存在的视图名</li>
-</ul>
-</li>
-<li>修改视图:通过视图能够修改原表；<ul>
-<li>update view_city_country set city_name = ‘西安市’ where city_id =1;</li>
-</ul>
-</li>
-<li>使用视图： <ul>
-<li>select * from view_city_country;</li>
-</ul>
-</li>
-<li>删除视图<ul>
-<li>drop view view_city_country;</li>
-</ul>
-</li>
-<li>查看视图： show tables;</li>
-<li>查看视图创建语句： show  create view view_city_country;</li>
-<li>视图的其他参数：<ul>
-<li>with check option:在插入或者更新数据时，不能插入或者更新不符合限制条件的记录</li>
-<li>algorithm 参数有 merge,temptable,undefined,默认参数为merge<ul>
-<li>merge :直接将视图转化为sql语句执行；修改视图生成表的数据也会直接更新基表；</li>
-<li>temptable:先将视图结果存放到内存，然后创建一个临时表，再从临时表取数据，不能直接更新基表；</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>视图中的数据不可更新<ul>
-<li>视图表中的数据不是直接来源于基表，不能修改；</li>
-</ul>
-</li>
-</ul>
-<h2 id="4-存储过程和函数"><a href="#4-存储过程和函数" class="headerlink" title="4. 存储过程和函数"></a>4. 存储过程和函数</h2><ul>
-<li><p>存储过程：实现将一组对表操作的sql语句代码当做一个整体来执行；</p>
-<ul>
-<li>将重复性操作封装到存储过程中，减少对sql的调用；</li>
-<li>批量处理</li>
-</ul>
-</li>
-<li><p>创建存储过程</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test1()</span><br><span class="line">begin</span><br><span class="line">select * from view_city_country;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>调用存储过程</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">call pro_test1();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查询存储过程</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show procedure status; -- 查看数据库中所有存储过程</span><br><span class="line">-- 查看数据库中指定存储过程：</span><br><span class="line">show procedure status where db&#x3D;&#39;use_index&#39;;</span><br><span class="line">-- 查看创建存储过程语句：</span><br><span class="line">show create procedure pro_test1;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除存储过程</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">drop procedure pro_test1;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="4-1-语法"><a href="#4-1-语法" class="headerlink" title="4.1 语法"></a>4.1 语法</h4><h5 id="1-变量"><a href="#1-变量" class="headerlink" title="1.变量"></a>1.变量</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">declare res varchar(100) default &#39;&#39;;</span><br><span class="line">declare x,y int default 0;  -- 变量声明</span><br><span class="line">set x &#x3D; 3; -- 变量赋值 第一种方式</span><br><span class="line">set y &#x3D; 4;</span><br><span class="line">declare avgres double;</span><br><span class="line">select avg(salary) into avgres from test;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; create procedure pro_test2()</span><br><span class="line">    -&gt; begin</span><br><span class="line">    -&gt; declare num int;</span><br><span class="line">    -&gt; select count(*) into num from city; -- 变量赋值 第二种方式</span><br><span class="line">    -&gt; select concat(&#39;city表中的记录数为:&#39;, num);</span><br><span class="line">    -&gt; end$$</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-参数"><a href="#2-参数" class="headerlink" title="2.参数"></a>2.参数</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 输入参数 </span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test3(in height int)</span><br><span class="line">begin</span><br><span class="line">declare description varchar(50) default &#39;&#39;;</span><br><span class="line">if height &gt;&#x3D; 180 then</span><br><span class="line">	set description&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D;170 and height &lt; 180 then</span><br><span class="line">	set description&#x3D;&#39;标准身材&#39;;</span><br><span class="line">else</span><br><span class="line">	set description&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">select concat(&#39;身高&#39;, height, &#39; 对应的身材类型是:&#39;, description);</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test6(height int, out descrip varchar(50))</span><br><span class="line">begin</span><br><span class="line">if height &gt;&#x3D;180 then</span><br><span class="line">	set descrip&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D; 170 and height &lt; 180 then</span><br><span class="line">	set descrip&#x3D;&#39;身材一般&#39;;</span><br><span class="line">else</span><br><span class="line">	set descrip&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line">-- 调用上面的方式有</span><br><span class="line">call(145, @description);</span><br><span class="line">select @description;  @description 用户定义的会话变量</span><br></pre></td></tr></table></figure>
-
-
-
-<h5 id="3-条件判断语句"><a href="#3-条件判断语句" class="headerlink" title="3.条件判断语句"></a>3.条件判断语句</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test3()</span><br><span class="line">begin</span><br><span class="line">declare height int default 175;</span><br><span class="line">declare description varchar(50) default &#39;&#39;;</span><br><span class="line">if height &gt;&#x3D; 180 then</span><br><span class="line">	set description&#x3D;&#39;身材高挑&#39;;</span><br><span class="line">elseif height &gt;&#x3D;170 and height &lt; 180 then</span><br><span class="line">	set description&#x3D;&#39;标准身材&#39;;</span><br><span class="line">else</span><br><span class="line">	set description&#x3D;&#39;一般身材&#39;;</span><br><span class="line">end if;</span><br><span class="line">select concat(&#39;身高&#39;, height, &#39; 对应的身材类型是:&#39;, description);</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
-
-<h5 id="4-case"><a href="#4-case" class="headerlink" title="4. case"></a>4. case</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test8(mon int)</span><br><span class="line">begin</span><br><span class="line">declare result varchar(10);</span><br><span class="line">case </span><br><span class="line">when mon&gt;&#x3D;1 and mon &lt;&#x3D;3 then</span><br><span class="line">	set result&#x3D;&#39;第一季度&#39;;</span><br><span class="line">when mon&gt;&#x3D;4 and mon&lt;&#x3D;6 then</span><br><span class="line">	set result&#x3D;&#39;第二季度&#39;;</span><br><span class="line">when mon&gt;&#x3D;7 and mon&lt;&#x3D;9 then</span><br><span class="line">	set result&#x3D;&#39;第三季度&#39;;</span><br><span class="line">else</span><br><span class="line">	set result&#x3D;&#39;第四季度&#39;;</span><br><span class="line">end case;</span><br><span class="line">select concat(&#39;传递的月份是:&#39;, mon, &#39;,计算出的结果是：&#39;, result) as content;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
-
-<h5 id="5-while-repeat-loop循环"><a href="#5-while-repeat-loop循环" class="headerlink" title="5. while, repeat, loop循环"></a>5. while, repeat, loop循环</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 从1累加到n，求结果</span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test9(n int)</span><br><span class="line">begin </span><br><span class="line">	declare total int default 0;</span><br><span class="line">	declare num int default 1;</span><br><span class="line">	while num &lt;&#x3D; n do</span><br><span class="line">		set total &#x3D; total + num;</span><br><span class="line">		set num &#x3D; num + 1;</span><br><span class="line">	end while;</span><br><span class="line">	select total;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test10(n int)</span><br><span class="line">begin</span><br><span class="line">	declare total int default 0;</span><br><span class="line">	declare num int default 1;</span><br><span class="line">	repeat </span><br><span class="line">		set total&#x3D;total+n;</span><br><span class="line">		set n&#x3D;n-1;</span><br><span class="line">		until n&#x3D;0</span><br><span class="line">	end repeat;</span><br><span class="line">	select total;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test11(n int)</span><br><span class="line">begin</span><br><span class="line">declare total int default 0;</span><br><span class="line">c:loop</span><br><span class="line">	set total &#x3D; total + n;</span><br><span class="line">	set n &#x3D; n - 1;</span><br><span class="line">	if n &lt;&#x3D; 0 then</span><br><span class="line">		leave c;</span><br><span class="line">	end if;</span><br><span class="line">end loop c;</span><br><span class="line">select total;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
-
-<h5 id="6-循环使用"><a href="#6-循环使用" class="headerlink" title="6. 循环使用"></a>6. 循环使用</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">delimiter $$</span><br><span class="line">create procedure pro_test13()</span><br><span class="line">begin</span><br><span class="line">declare e_id int;</span><br><span class="line">declare e_name varchar(50);</span><br><span class="line">declare e_age int;</span><br><span class="line">declare e_salary int;</span><br><span class="line">declare has_data int default 1;</span><br><span class="line">declare emp_result cursor for select * from emp;</span><br><span class="line">declare exit handler for NOT FOUND set has_data &#x3D; 0;</span><br><span class="line">open emp_result;</span><br><span class="line">repeat</span><br><span class="line">fetch emp_result into e_id, e_name, e_age, e_salary;</span><br><span class="line">select concat(&#39;id&#x3D;&#39;, e_id, &#39;, name&#x3D;&#39;, e_name, &#39;, age&#x3D;&#39;, e_age, &#39;,salary&#x3D;&#39;, e_salary);</span><br><span class="line">until has_data &#x3D; 0</span><br><span class="line">end repeat;</span><br><span class="line">close emp_result;</span><br><span class="line">end$$</span><br></pre></td></tr></table></figure>
-
-<h5 id="7-函数"><a href="#7-函数" class="headerlink" title="7. 函数"></a>7. 函数</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- log_bin_trust_function_creators需要这个参数开启的情况下，才能创建函数</span><br><span class="line"></span><br><span class="line">delimiter $$</span><br><span class="line">create function test_func(c_id int) returns int</span><br><span class="line">begin</span><br><span class="line">declare result int;</span><br><span class="line">select count(*) into result from city where country_id&#x3D;c_id;</span><br><span class="line">return result;</span><br><span class="line">end$$</span><br><span class="line"></span><br><span class="line">-- 调用函数</span><br><span class="line">select test_func(1);</span><br><span class="line">-- 删除函数</span><br><span class="line">drop function test_func;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 返回指定个数的随机字符串</span><br><span class="line">DELIMITER $$</span><br><span class="line"></span><br><span class="line">CREATE FUNCTION rand_str(n INT) RETURNS VARCHAR(255) </span><br><span class="line">BEGIN</span><br><span class="line">DECLARE str VARCHAR(100) DEFAULT &#39;adcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;;</span><br><span class="line">DECLARE i INT DEFAULT 0;</span><br><span class="line">DECLARE result VARCHAR(255) DEFAULT &#39;&#39;;</span><br><span class="line">WHILE i &lt; n DO</span><br><span class="line"></span><br><span class="line">-- 随机返回一个字符串</span><br><span class="line">-- substr(str, floor(1 + rand() * 52), 1);</span><br><span class="line">SET result &#x3D; CONCAT(result, SUBSTR(str, FLOOR(1 + RAND() * 52), 1));</span><br><span class="line">SET i &#x3D; i + 1;</span><br><span class="line">END WHILE;</span><br><span class="line">RETURN result;</span><br><span class="line">END$$</span><br><span class="line">DELIMITER ;</span><br></pre></td></tr></table></figure>
-
-<h2 id="5-触发器"><a href="#5-触发器" class="headerlink" title="5.触发器"></a>5.触发器</h2><ul>
-<li>与表相关的数据库对象，在进行insert,update, delete事件之前或者之后，执行触发器中的动作；</li>
-<li>触发器类型： insert, update,delete 只有这三类动作，自动执行触发器</li>
-</ul>
-<h4 id="5-1-创建触发器"><a href="#5-1-创建触发器" class="headerlink" title="5.1 创建触发器"></a>5.1 创建触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create trigger trigger_name -- 触发器命名 trigger_xxx 或者tri_xxx</span><br><span class="line">before|after trigger_event</span><br><span class="line">on table_name -- 哪个表</span><br><span class="line">for each row -- 任何一条记录上的操作满足触发条件就会触发该触发器</span><br><span class="line">trigger_sTMT -- 激活触发器后被执行的语句</span><br><span class="line"></span><br><span class="line">CREATE TRIGGER tri_emp_logs</span><br><span class="line">AFTER INSERT</span><br><span class="line">ON emp</span><br><span class="line">FOR EACH ROW</span><br><span class="line">INSERT INTO emp_logs VALUES(NULL, &#39;insert&#39;, NOW(), new.id, CONCAT(&#39;插入后(id:&#39;, now.id, &#39;, name:&#39;, now.name,&#39;, age:&#39;,now.age,&#39;,salary:&#39;, new.salary, &#39;)&#39;));</span><br><span class="line"></span><br><span class="line">-- 当对emp表执行insert操作后，自动将向emp_logs表中插入一条记录</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 当对emp表执行update操作后，自动向emp_logs表中插入一条记录</span><br><span class="line">CREATE TRIGGER tri_update_emp</span><br><span class="line">AFTER UPDATE</span><br><span class="line">ON emp</span><br><span class="line">FOR EACH ROW</span><br><span class="line">INSERT INTO emp_logs VALUES(NULL, &#39;update&#39;, NOW(), new.id, CONCAT(&#39;修改前(id:&#39;, old.id, &#39;, name:&#39;, old.name,&#39;, age:&#39;,old.age, &#39;,salary:&#39;, old.salary,&#39;),&#39;,&#39;修改后(id:&#39;,</span><br><span class="line">new.id,&#39;, name:&#39;, new.name, &#39;,age:&#39;, new.age, &#39;,salary:&#39;,new.salary,&#39;)&#39;));</span><br><span class="line"></span><br><span class="line">-- 当对emp表执行delete操作后，自动向emp_logs表中插入一条记录</span><br></pre></td></tr></table></figure>
-
-<h4 id="5-2-删除触发器"><a href="#5-2-删除触发器" class="headerlink" title="5.2 删除触发器"></a>5.2 删除触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">drop trigger trigger_name;</span><br></pre></td></tr></table></figure>
-
-<h4 id="5-3-查看触发器"><a href="#5-3-查看触发器" class="headerlink" title="5.3 查看触发器"></a>5.3 查看触发器</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show triggers;</span><br></pre></td></tr></table></figure>
-
-<h2 id="6-引擎"><a href="#6-引擎" class="headerlink" title="6. 引擎"></a>6. 引擎</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 查看支持的引擎</span><br><span class="line">show engines;</span><br><span class="line">-- 默认情况下，使用innodb</span><br><span class="line">show variables like &#39;%storage_engine%&#39;;</span><br></pre></td></tr></table></figure>
-
-<h4 id="6-1-Innodb引擎的特性：（针对表而言的，也是表引擎）"><a href="#6-1-Innodb引擎的特性：（针对表而言的，也是表引擎）" class="headerlink" title="6.1 Innodb引擎的特性：（针对表而言的，也是表引擎）"></a>6.1 Innodb引擎的特性：（针对表而言的，也是表引擎）</h4><ul>
-<li>支持事务</li>
-<li>支持行级锁</li>
-<li>支持外键</li>
-</ul>
-<h4 id="6-2-优化SQL步骤"><a href="#6-2-优化SQL步骤" class="headerlink" title="6.2 优化SQL步骤"></a>6.2 优化SQL步骤</h4><h5 id="6-2-1-查看sql执行频率"><a href="#6-2-1-查看sql执行频率" class="headerlink" title="6.2.1 查看sql执行频率"></a>6.2.1 查看sql执行频率</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-- 查看全局各个操作的执行次数</span><br><span class="line">show global status like &#39;Com_______&#39;;</span><br><span class="line">-- 比如</span><br><span class="line">-- Com_insert: 执行insert操作的次数，批量插入，只累加一次；</span><br><span class="line">-- 查看针对innodb操作的行数</span><br><span class="line">show global status like &#39;Innodb_rows_%&#39;;</span><br><span class="line">-- Innodb_rows_read :select查询返回的行数</span><br></pre></td></tr></table></figure>
-
-<h5 id="6-2-2-定位低效的sql语句方式"><a href="#6-2-2-定位低效的sql语句方式" class="headerlink" title="6.2.2 定位低效的sql语句方式"></a>6.2.2 定位低效的sql语句方式</h5><ul>
-<li>第一种通过慢查询日志</li>
-<li>第二种通过show processlist命令进行操作，可以实时查看sql的执行情况</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; show processlist;</span><br><span class="line">+----+-----------------+-----------+------+---------+-------+------------------------+------------------+</span><br><span class="line">| Id | User            | Host      | db   | Command | Time  | State                  | Info             |</span><br><span class="line">+----+-----------------+-----------+------+---------+-------+------------------------+------------------+</span><br><span class="line">|  5 | event_scheduler | localhost | NULL | Daemon  | 48810 | Waiting on empty queue | NULL             |</span><br><span class="line">| 46 | root            | localhost | NULL | Query   |     0 | starting               | show processlist |</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- id: 用户登录mysql，系统分配的connection_id, 可以通过connection_id()查看</span><br><span class="line">-- user: 显示当前用户</span><br><span class="line">-- host: 显示从哪个ip发出的</span><br><span class="line">-- db: 显示这个进程目前连接的是哪个数据库</span><br><span class="line">-- command: 显示当前执行的命令</span><br><span class="line">-- time: 显示状态持续的时间，单位为s</span><br><span class="line">-- state: 显示当前连接的sql语句的状态，描述的是语句执行中的某一个状态，一个sql语句，以查询为例，可能需要经过copying to tmp table, sorting result , sending data 才可以完成</span><br><span class="line">-- info： 显示执行的sql语句；</span><br></pre></td></tr></table></figure>
-
-<h5 id="6-2-3-explain-分析执行计划"><a href="#6-2-3-explain-分析执行计划" class="headerlink" title="6.2.3  explain 分析执行计划"></a>6.2.3  explain 分析执行计划</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">explain sql语句 -- 分析sql语句的执行计划</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="7-mysql-面试题："><a href="#7-mysql-面试题：" class="headerlink" title="7. mysql 面试题："></a>7. mysql 面试题：</h2><ul>
-<li>数据库的索引结构是什么，b-tree 与b+tree有什么区别<ul>
-<li>B+tree中每个叶子节点都包含指向下一个叶子节点的指针，方便叶子节点的范围遍历；</li>
-</ul>
-</li>
-<li>联合索引是什么，如何才能命中联合索引</li>
-<li>数据库的隔离级别，每个级别都有什么问题？<ul>
-<li>读未提交级别，  会造成 脏读；</li>
-<li>读提交级别， 带来不可重复读；</li>
-<li>可重复读级别（InnoDB默认使用的）， 带来幻读问题；</li>
-<li>序列化级别,解决上面所有问题，没有并发可言；</li>
-</ul>
-</li>
-<li>可重复读是怎么实现的？<ul>
-<li>通过MVCC(多版本并发控制) 实现可重复读隔离级别，解决了脏读，不可重复读问题，但是还有幻读问题；<ul>
-<li>幻读问题，是因为执行了对数据修改的操作（update, insert, delete)采用了当前读模式，每次都会读取最新的版本号记录；</li>
-<li>当两个事务都同时操作了同一条记录，那么另一个事务将等待，直到一个事务提交，有等待时间超时限制（更新或者删除）；<ul>
-<li>当同时删除一条记录，一个事务在提交之前，另一个事务处于等待，当这个事务提交后，这个事务才能执行，但是没有任何作用，不会进行删除操作，数据和删除前一样；更新操作一样；</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>分库分表， 基于什么进行拆分，拆分后出现了什么问题，怎么解决的？</li>
-<li>为什么建议InnoDB表必须建主键，并且推荐使用整型的自增主键？<ul>
-<li>主动建立主键是为了更好地建立b+tree结构，方便我们使用主键进行查找，如果不主动建立，那么InnoDB也会去找唯一索引的列作为主键建立，如果还没有，那么将自动建立一个列，作为建立B+tree结构的</li>
-<li>使用整型比使用字符串进行大小比较更有效率，而自增的主键，当插入数据时，只可能在原有b+tree结构上向后插入，不会向原有已经排好的结构进行插入导致节点分裂问题；</li>
-</ul>
-</li>
-<li>为什么非主键索引结构叶子节点存储的是主键值？<ul>
-<li>降低占用磁盘空间的大小；</li>
-</ul>
-</li>
-<li>联合索引的最左前缀原理？<ul>
-<li>联合索引结构根据建立索引时，从左到低字段的顺序进行比较建立b+tree结构，当第一个字段相等，比较第二个字段，依次比较；</li>
-<li></li>
-</ul>
-</li>
-<li>MyISAM 与InnoDB索引有什么不同？<ul>
-<li>MyISAM 索引通过数据的物理位置引用被索引的行</li>
-<li>InnoDB索引根据主键引用被索引的行；</li>
-</ul>
-</li>
-<li>索引的优点：<ul>
-<li>索引大大减少了服务器需要扫描的数据量</li>
-<li>索引可以帮助服务器避免进行排序</li>
-<li>索引可以将随机I/O变为顺序I/O;</li>
-</ul>
-</li>
-</ul>
-<h2 id="8-理解msyql索引的命令"><a href="#8-理解msyql索引的命令" class="headerlink" title="8. 理解msyql索引的命令"></a>8. 理解msyql索引的命令</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">show global status like 'Innodb_page_size';</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="9-不命中索引的情况有："><a href="#9-不命中索引的情况有：" class="headerlink" title="9. 不命中索引的情况有："></a>9. 不命中索引的情况有：</h2><ul>
-<li><p>范围问题：范围太大，或者不明确的时候，查询依旧很慢：&gt;, &gt;=, &lt;, &lt;=, !=, between..and.. ,like,</p>
-</li>
-<li><p>尽量选择区分度高的列作为索引， （不重复的索引和数据表的记录总数的比值，选择性高的索引可以让mysql在查找时过滤掉更多的行）</p>
-</li>
-<li><p>索引列不能是表达式的一部分，或者函数的参数；</p>
-</li>
-</ul>
-<h2 id="10-explain-各字段含义"><a href="#10-explain-各字段含义" class="headerlink" title="10. explain 各字段含义"></a>10. explain 各字段含义</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">|  1 | SIMPLE      | test  | NULL       | range | ix_email      | ix_email | 203     | NULL |   11 |   100.00 | Using where; Using index |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">id: 表的读取顺序，id越大，优先读取</span><br><span class="line">select_type: 查询的类型；</span><br><span class="line">type: system&gt; const&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</span><br><span class="line"> - ALL: 不使用索引，全表扫描</span><br><span class="line"> - index: 全索引查找，遍历索引树查找</span><br><span class="line"> - range: 范围查找</span><br><span class="line"> - ref:辅助索引等值查找</span><br><span class="line"> - eq_ref: 多表连接，非驱动表连接条件时主键或者是唯一键；</span><br><span class="line"> - const:聚集索引等值查询；</span><br><span class="line"> key_len: 帮助判断，此次查询，走了联合索引的几部分；</span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
-    <title>Mysql索引</title>
-    <url>/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h1 id="Mysql索引"><a href="#Mysql索引" class="headerlink" title="Mysql索引"></a><center>Mysql索引</center></h1><a id="more"></a>
-
-<h1 id="1-准备测试数据"><a href="#1-准备测试数据" class="headerlink" title="1. 准备测试数据"></a>1. 准备测试数据</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter $$</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> create procedure auto_insert()</span></span><br><span class="line">    -&gt; begin</span><br><span class="line">    -&gt; declare i int default 1;</span><br><span class="line">    -&gt; while(i&lt;3000000) do</span><br><span class="line">    -&gt; insert into test values(i, 'eva', 'female', concat('eva', i, '@oldboy'));</span><br><span class="line">    -&gt; set i=i+1;</span><br><span class="line">    -&gt; end while;</span><br><span class="line">    -&gt; end$$</span><br><span class="line">Query OK, 0 rows affected (0.14 sec)</span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> delimiter ;</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> call auto_insert();</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>Query OK, 1 row affected (3 days 47 min 3.30 sec)</strong>， 使用默认配置，插入3000000 条数据用到的时间。</p>
-<h1 id="2-使用索引进行优化"><a href="#2-使用索引进行优化" class="headerlink" title="2. 使用索引进行优化"></a>2. 使用索引进行优化</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 使用联合索引时，查询条件中必须包含建立索引时最左列字段，并且多个字段时，不能跳过中间字段进行查询，否则，不能使用索引，这是联合索引的最左前缀法则；</span><br><span class="line">2. 索引列上不能作为表达式的一部分，或者作为函数的参数，保证索引列独立；</span><br><span class="line">3. 存储引擎不能使用范围条件右边的索引列；</span><br><span class="line">4.尽量使用覆盖索引获取查询的结果(覆盖索引是指查询结果的列在建立索引列的范围)</span><br><span class="line">5.使用like 进行模糊查询时，如果%在前面，索引不生效，如果想使用%xx% 而且还想使索引生效，则可以考虑使用覆盖索引，解决它，只要使用</span><br><span class="line">select name, age from user where user like &#39;%cgn%&#39;;  建立联合索引(name, age); </span><br><span class="line">或者通过 elasticsearch + mongodb;</span><br><span class="line">6.字符串不加引号，将导致默认做类型转换，不符合第二条索引原则，也有可能导致索引失效；</span><br><span class="line">7.&lt;&gt;, not in 不走索引，</span><br><span class="line">8.单独的&gt;,&lt;,in 有可能走，有可能不走，和结果集(15%-30%)有关，尽量结合业务使用Limit;</span><br><span class="line">9. or或者in 尽量改成union, union all,可以使用，要测试,看数据唯一性如何，是否有太多的重复性；</span><br><span class="line">10.!&#x3D;不走索引，但是对于主键 走索引。。。。。。not in也是</span><br></pre></td></tr></table></figure>
-
-<h1 id="3-优化的过程"><a href="#3-优化的过程" class="headerlink" title="3. 优化的过程"></a>3. 优化的过程</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 开始慢查询日志，设置阈值。</span><br><span class="line">2. 使用explain 工具分析是否命中索引；</span><br><span class="line">3. show profile</span><br><span class="line">4. mysql服务器端的参数调优；</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">查询优化：</span><br><span class="line">	小表驱动大表</span><br><span class="line">	select * from A where id in (select id from B)</span><br><span class="line">	当B表的数据集必须小于A表的数据集时，用in优于exists</span><br><span class="line">	</span><br><span class="line">	select * from A where exists (select 1 from B where B.id = A.id);</span><br><span class="line">	当A表的数据集小于B表的数据集时，用exists优于in;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">order by 优化：尽可能在索引列上进行排序</span><br><span class="line"></span><br><span class="line">两种排序：文件排序或者扫描有序索引排序</span><br><span class="line">能够使用索引排序的情况有：(a,b,c)联合索引</span><br><span class="line"> - order by a</span><br><span class="line"> - order by a,b</span><br><span class="line"> - order by a,b,c</span><br><span class="line"> - order by a desc, b desc, c desc</span><br><span class="line"> </span><br><span class="line"> 使用where的最左前缀定义为常量，</span><br><span class="line">  - where a = const order by b,c</span><br><span class="line">  - where a = const and b = const order by c</span><br><span class="line">  - where a = const and b &gt; const order by b,c</span><br><span class="line"> 不能使用索引排序的情况：</span><br><span class="line">  - order by a asc,b desc, c desc  - 排序不一致</span><br><span class="line">  - where g = const order by b,c   - 丢失a</span><br><span class="line">  - where a = const order by c    - 丢失b索引</span><br><span class="line">  - where a = const order by a,d  - d 不是索引的一部分</span><br><span class="line">  - where a in () order by b,c    - 多个相等条件也是范围查询</span><br><span class="line"></span><br><span class="line">针对产生 using filesort的情况来说：(age,birth)作为联合索引来用；</span><br><span class="line">explain select * from A where age &gt; 20 order by birth;</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A <span class="built_in">where</span> age &gt; 20 order by birth,age;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | idx_ageBirth  | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using where; Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+------------------------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by birth;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> explain select * from A order by age asc, birth desc;</span></span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key          | key_len | ref  | rows | filtered | Extra                       |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line">|  1 | SIMPLE      | A     | NULL       | index | NULL          | idx_ageBirth | 9       | NULL |    3 |   100.00 | Using index; Using filesort |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+--------------+---------+------+------+----------+-----------------------------+</span><br><span class="line"></span><br><span class="line">两种排序： </span><br><span class="line">using index ,using filesort ; using index使用索引带来的排序，using filesort需要再做排序，相当于没有使用索引带来的排序；</span><br><span class="line">要想使用using index, 要求排序字段需要使用最左索引列；</span><br><span class="line"></span><br><span class="line">提高order by的查询速度方式：</span><br><span class="line">当有order by 查询时，使用select * 是大忌：因为，有可能取出的数据超过sort_buffer_size的容量，会导致创建tmp文件进行合并排序，</span><br><span class="line">导致多次I/O</span><br><span class="line">改进的点： </span><br><span class="line">尝试提高sort_buffer_size容量大小；</span><br><span class="line">尝试提高max_length_for_sort_data,会增加使用改进算法的概率；</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">group by 优化：</span><br><span class="line">实质是先排序再进行分组，遵照索引的最左前缀</span><br><span class="line">当无法使用索引时，可以通过设置 sort_buffer_size，max_length_for_sort_data </span><br><span class="line">where高于having,能在where中限定的条件不要去having中限定；</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">慢查询日志：</span><br><span class="line">- 默认情况下，mysql没有开启慢查询，可以通过 show variables like '%slow_query_log%' 查看，因为开启会带来一定的性能影响；</span><br><span class="line">- 如何开启：</span><br><span class="line">    set global slow_query_log =1 进行开启，仅仅对当前数据库生效，mysql重启会失效；</span><br><span class="line">     show variables like '%query_time%';  默认是10s,</span><br><span class="line">    set global long_query_time=3 修改慢sql的阈值为3s;</span><br><span class="line">    # show global variables like '%query_time%'查看设置是否成功，或者 通过重开一个新连接进行查看；</span><br><span class="line">    show global status like '%slow_queries%'; #查询当前慢查询日志的个数；</span><br><span class="line">    </span><br><span class="line">- 永久生效：配置到配置文件中</span><br><span class="line"> [mysqld]</span><br><span class="line">  slow_query_log=1;</span><br><span class="line">  slow_query_log_file=/var/lib/mysql/slow_query.log;</span><br><span class="line">  long_query_time=3;</span><br><span class="line">  log_output=FILE</span><br><span class="line">  </span><br><span class="line">-mysqldumpslow 工具查看慢查询日志的详细信息</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">show profile 进行mysql语句的资源消耗分析</span><br><span class="line"> - show variables like 'profiling'; 默认情况下关闭 </span><br><span class="line"> - set profiling=on; # 开启后将记录下每条SQL语句的执行情况，并编号；</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 根据编号查询cpu，以及io情况</span></span><br><span class="line"> show profiles;</span><br><span class="line"> </span><br><span class="line"> show profile cpu, block io for query Quey_id;</span><br><span class="line"> </span><br><span class="line"><span class="meta"> #</span><span class="bash"> 当分析出的列中含有：就需要仔细分析了</span></span><br><span class="line"> converting HEAP to MyISAM表示查询结果太大，内存不够用，</span><br><span class="line"> creating tmp table 创建临时表，拷贝数据到临时表，用完再删除；</span><br><span class="line"> copying to tmp table on disk 把内存中的临时表复制到磁盘，危险!!!!!!!!!!</span><br><span class="line"> locked</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">全局日志</span><br><span class="line">set global general_log =1;</span><br><span class="line">set global log_output='TABLE';</span><br><span class="line">select * from mysql.general_log;   # 只能在测试环境下开启！！！！！！！！！！！！！，</span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="4-锁机制"><a href="#4-锁机制" class="headerlink" title="4.锁机制"></a>4.锁机制</h1><ul>
-<li><p>查看表上加过的锁</p>
-<ul>
-<li><p>show open tables;</p>
-</li>
-<li><p>手动增加锁： lock table table_name read, table_name write;</p>
-</li>
-<li><p>释放锁： unlock tables;</p>
-</li>
-</ul>
-</li>
-<li><p>表锁 MyISAM 如下：</p>
-</li>
-<li><p>读锁（读共享锁，写阻塞）</p>
-<ul>
-<li>lock table table_name read;</li>
-<li>当前会话加读锁后的现象:<ul>
-<li>当前会话只能读这个表，不能对这个表修改,同时也不能对没有加锁的其他表进行读写，对锁定的表进行插入或者更新都会报错；</li>
-<li>其他会话也可以读这个表，但是对此次表的更新操作将阻塞，其他会话可以读写其他未锁定的表；</li>
-<li>一旦这个表锁释放，其他会话对这个表的操作会立即执行；</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>写锁：</p>
-<ul>
-<li>lock table table_name write;</li>
-<li>写锁后的现象：<ul>
-<li>当前会话，可以对当前加的锁表进行读写操作，不能对没有加锁的表进行读写操作；</li>
-<li>其他会话，可以对未加锁的表进行读写操作，但是不能对加锁的表进行读写操作，会阻塞；</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>总结：</p>
-<ul>
-<li>加上读锁，会阻塞写；而写锁会阻塞读写；</li>
-</ul>
-</li>
-<li><p>分析</p>
-<ul>
-<li><p>show statue like ‘table%’  查看table_locks_waited 和table_locks_immediate状态变量分析</p>
-</li>
-<li><p><strong>table_locks_waited</strong>表示出现表级锁争用而等待的次数，不能立即获取锁的次数；</p>
-</li>
-<li><p>table_locks_immediate:表示表级锁定的次数，表示可以立即获取锁的查询次数，每立即获取锁值加1；</p>
-</li>
-<li><p>Myisam的读写锁调度是写优先，不适合做写为主表的引擎，因为写表后，其他线程不能做任何操作；</p>
-</li>
-</ul>
-</li>
-<li><p>InnoDB 使用行锁：</p>
-<ul>
-<li><p>使用方式如下：</p>
-<ul>
-<li><p>select *  from test_inno where name=’hello’ for update;</p>
-<ul>
-<li>当为name列设置索引了话，那么这时候就是行锁， 其他事务可以对其他行进行读写;</li>
-<li>当没有为name列设置索引了话，那么这时候就是表锁，其他事务将不能对其他行进行写；</li>
-</ul>
-</li>
-<li><p><a href="https://blog.csdn.net/sanyuesan0000/article/details/90235335" target="_blank" rel="noopener">可重复读如何实现的</a></p>
-</li>
-</ul>
-</li>
-<li><p>问题！！！！！！！！！！！！！！！！！！！！！！！！！！！！</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">并发下单时，仓库中的库存量发生了意外的变化？？？？？</span><br><span class="line">在默认的可重复读事务隔离级别下，两个事务在快照读的情况下，都不能访问其他事务的插入，更新，和删除操作，而实际需要一个事务提交后，需要及时的获取更新后的值，因此，将事务的隔离级别设置为读提交；之所以mysql使用默认的可重复读的隔离级别，因为binlog的主从复制在读提交的隔离级别下，出现过bug,mysql5.0版本；</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="5-Innodb核心特性"><a href="#5-Innodb核心特性" class="headerlink" title="5. Innodb核心特性"></a>5. Innodb核心特性</h1><ul>
-<li><p>MVCC</p>
-</li>
-<li><p>Clustered Index</p>
-</li>
-<li><p>更改缓冲</p>
-</li>
-<li><p>多个缓冲区</p>
-</li>
-<li><p>行级锁</p>
-</li>
-<li><p>事务</p>
-</li>
-<li><p>查询高速缓存</p>
-</li>
-<li><p>复制</p>
-</li>
-<li><p>备份（热备份）</p>
-</li>
-<li><p>自动故障恢复</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">select @@default_storage_engine;  #默认存储引擎</span><br><span class="line">set default_storage_engine=innodb; #修改当前会话引擎</span><br><span class="line">set global default_storage_engine=innodb; #修改全局，在新的会话中表现出来</span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">set</span>命令在mysql重启后，失效，如果需要永久配置，设置到配置文件；</span></span><br><span class="line">/etc/my.cnf</span><br><span class="line">[mysqld]</span><br><span class="line">default_storage_engine=myisam;</span><br><span class="line">存储引擎是表级别的，可以在建表的时候指定某个存储引擎，同时也可以将一个表引擎修改成其他引擎；</span><br><span class="line">select table_schema, table_name, engine from information_schema.tables where table_shcema not in ('sys', 'mysql', 'information_schema', 'performance_schema'); # 查询所有库下表的表引擎；</span><br><span class="line"></span><br><span class="line">处理的mysql问题：碎片整理（delete操作产生的，经常删除数据，导致磁盘占用空间大，不释放）</span><br><span class="line">select table_schema, table_name, data_free from information_schema.tables; #查询碎片data_free</span><br><span class="line">可以通过 alter table table_name engine=innodb; </span><br><span class="line">方案： 对表归档(pt-archive工具），使用truncate方式</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何批量修改表引擎,将zabbix库中所有表 innodb替换成tokudb</span></span><br><span class="line">select concat('alter table zabbix.', table_name, " engine tokudb;") from information_schema.tables where</span><br><span class="line">table_schema='zabbix' into outfile '/tmp/tokudb.sql';</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何将所有非innodb业务表查询出来，并修改为innodb;</span></span><br><span class="line">select concat("alter table ", table_schema, ".", table_name, " engine=innodb;") from information_schema.tables where engine != 'InnoDB' and table_schema not in ('sys', 'performance_schema'， ‘information_schema', 'mysql') into outfile '/tmp/alter.sql';</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">InnoDB 将为每张表构建聚集索引（优化主键列的查询）</span><br><span class="line">一个表就是一个段，1个段由1个或者多个区组成，这些区不一定连续；	·1</span><br><span class="line">一个区就是连续的64page，1M</span><br><span class="line">一个page就是连续的4个block,16KB</span><br><span class="line">一个block就是连续的8个扇区；512B</span><br><span class="line">1）首先主键列，</span><br><span class="line">2）再次unique列</span><br><span class="line">3）最后是根据row id构建隐藏的列；</span><br><span class="line">作用：有了聚集索引之后，以后插入数据的时候，在同一个区内，按照id的顺序，有序的在磁盘存储数据，那么将来利用了聚集索引查找数据的时候，就是顺序I/O,查找的更快；</span><br><span class="line">构建聚集索引的过程：</span><br><span class="line"></span><br><span class="line">直接将数据行所在的数据页作为叶子结点，然后根据每个叶子结点中的最小值组成的范围构建枝结点，最后构建根节点；</span><br><span class="line">当我们使用主键作为查询条件时，会从根节点的范围公平的查找记录（找到每个主键使用的i/O次数一样）;</span><br><span class="line">而没有建立索引的情况下，会把全表所有页加载到内存，遍历查询，对于大表来说，非常低效；</span><br><span class="line"></span><br><span class="line">那么非主键列的查询如何优化？通过建立  辅助索引来优化非聚集索引列的查询；</span><br><span class="line">辅助索引建立的过程：</span><br><span class="line">	将主键和辅助索引列单独申请空间，先按照辅助索引列进行排序，建立叶子节点，然后构建枝节点，最后根节点，查询时候根据辅助索引列查询到辅助索引列和id,如果辅助索引能够完全覆盖查询结果时，不需要回表；如果想查询一条记录，不能完全覆盖到，那么需要回到聚集索引树结构根据id进行再次查询，这称之为回表操作，回表操作增加了磁盘I/O,将顺序I/O变成了随机I/O,数据页不在一个区，变成随机I/O；</span><br><span class="line">- 如何减少回表：</span><br><span class="line">	1）查询尽可能使用id主键查询；</span><br><span class="line">	2）设计合理的联合索引；完全覆盖查询结果；</span><br><span class="line">辅助索引的分类：</span><br><span class="line">	单列索引</span><br><span class="line">	联合索引</span><br><span class="line">		将id和多列拿出来构建索引树，然后先对第一列进行排序，如果第一列相同，再按照第二列进行排序，排好序后构建叶子节点，然后	   根据第一列的值的范围构建枝节点，最后构建根节点；比如(a,b,c)构建了联合索引，那么实际上是建立了，a,ab,abc的索引；</span><br><span class="line">	联合索引的注意点：</span><br><span class="line">		1）查询条件中，必须要包含联合索引最左列，至于是使用的部分根据查询不同而不同，要么所有列都走索引，要么部分列走索引；</span><br><span class="line">		2）构建联合索引，一定将值重复最少的列，作为联合索引的最左列；</span><br><span class="line">	前缀索引：</span><br><span class="line">		前缀索引，针对得是对列的值长度非常长建立索引时，可能导致索引数高度增高。</span><br><span class="line">		mysql建议索引树高度3-4层，最少2层(根节点和叶子节点)。容纳的数据量800w-1000w行，表的列有20-30列。</span><br><span class="line">		这时候，可以取前面部分字符作为索引生成条件；</span><br><span class="line">	b+tree的高度影响因素：</span><br><span class="line">		1）索引字段值较长：前缀索引</span><br><span class="line">		2）数据行过多： 建立分区表，归档表（pt-archive), 分布式架构</span><br><span class="line">		3）选择合适的数据类型：变长使用varchar,能使用enum的，使用它；</span><br><span class="line">		</span><br><span class="line">索引的建立是按照业务的需求来建立的，不能建立太多的索引原因有2：</span><br><span class="line">1）：更新，和删除的时候，可能影响索引树的结构</span><br><span class="line">2）：优化器选择索引上可能出现偏差，导致没有按照预期列走索引；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">查询索引：</span><br><span class="line">	desc table_name;</span><br><span class="line">	Key列：  PRI(聚集索引)  UML(辅助索引)   UNI(唯一索引)</span><br><span class="line">	show index from table_name;</span><br><span class="line">建立索引：</span><br><span class="line">	alter table table_name add index idx_name(name);</span><br><span class="line">	alter table table_name add index idx_n_c(name, country);联合索引</span><br><span class="line">	alter table table_name add index idx_d(district(5)); # 大字段100个字符，取前5个，主要用于like的查询；前缀索引</span><br><span class="line">删除索引</span><br><span class="line">	alter table table_name drop index idx_name;</span><br><span class="line">	</span><br><span class="line">压测命令：100个人，并发查询200次</span><br><span class="line">mysqlslap --defaults-file=/etc/my.cnf --concurrency=100 --iterations=1 --create-schema='test'</span><br><span class="line">--query="select * from test.t100w where ke='780p'" engine=innodb</span><br><span class="line">--number-of-queries=200 -uroot -p123456 -verbose</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mysql InnoDB共享表空间大小查看</span><br><span class="line">select @@innodb_data_file_path;</span><br><span class="line">ibdata1:12M:autoextend</span><br><span class="line">初始化之前，在my.cnf加入配置</span><br><span class="line">innodb_data_file_path = ibdata1:1G;ibdata2:1G:autoextend;</span><br><span class="line">在运行之后，数据库扩展多个ibdata文件方式一样：</span><br><span class="line">innodb_data_file_path=ibdata1:128M;idbdata2:128M;ibdata3:128M:autoextend;</span><br><span class="line">设置过之后，可能报错，因为第一个不一定是128M,已经在使用的共享表空间要按照实际大小来设置，用完之后，使用第二个，然后第三个，使用完后，自动扩展；</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">一个表存储分 独立表空间，和共享表空间，每个表空间就是一个段，每个段有多个区，每个区有连续的页，每页就是连续的block,对应于连续的扇区；</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h1 id="6-利用拷贝表空间的方式恢复数据"><a href="#6-利用拷贝表空间的方式恢复数据" class="headerlink" title="6. 利用拷贝表空间的方式恢复数据"></a>6. 利用拷贝表空间的方式恢复数据</h1>  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有建表语句和idb文件，就可以恢复里面的数据</span><br><span class="line"></span><br><span class="line">1) 利用建表语句创建一个一模一样的表</span><br><span class="line">   create table table_name</span><br><span class="line">2) 删除这张空表的表空间</span><br><span class="line">	alter table test.t1 discard tablespace;</span><br><span class="line">3) 拷贝准备好的ibd,修改权限，导入表空间</span><br><span class="line">	alter table test.t1 import tablespace;</span><br><span class="line">	</span><br><span class="line">备份建表语句</span><br><span class="line">mysqldump -uroot -p -B test --no-data &gt; test.sql</span><br><span class="line"></span><br><span class="line">表空间删除</span><br><span class="line">select concat(&quot;alter table &quot;, table_schema, &#39;.&#39;)</span><br></pre></td></tr></table></figure>
-<h1 id="7-事务生命周期"><a href="#7-事务生命周期" class="headerlink" title="7. 事务生命周期"></a>7. 事务生命周期</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">select @@autocommit;  # 1.默认提交开启 ，这个功能就是自动添加begin, commit语句在每个操作语句之前，之后；</span><br><span class="line">1）显式开启事务</span><br><span class="line">begin; start transcation; # 都可以</span><br><span class="line">DML(insert, update, delete, select)</span><br><span class="line">commit;</span><br><span class="line">rollback;</span><br><span class="line">2) 一些非事务语句将导致自动隐式提交</span><br><span class="line">DDL语句 （Alter, create, drop)</span><br><span class="line">DCL语句 （grant, revoke, set password)</span><br><span class="line">锁语句（lock tables, unlock tables)</span><br><span class="line">truncate table;</span><br><span class="line">load data infile;</span><br><span class="line">select for update;</span><br><span class="line"></span><br><span class="line">3) 隐式回滚：</span><br><span class="line">会话关闭</span><br><span class="line">数据库宕机</span><br><span class="line">事务语句执行失败；</span><br><span class="line"></span><br><span class="line">事务的隔离级别：</span><br><span class="line">RU:</span><br><span class="line">会引发：脏读，不可重复读，幻读；</span><br><span class="line">脏读：读取到了其他事务没有提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">不可重复读：读取到了其他事务提交的改变，违背了事务的隔离性，一致性；</span><br><span class="line">幻读：一个事务更新数据后，出现了其他事务插入数据的幻行； 违背了事务的隔离性，一致性；</span><br><span class="line">RC:</span><br><span class="line">会引发：不可重复读，幻读；</span><br><span class="line">RR:</span><br><span class="line">利用的是Undo的一致性快照读，是MVCC的重要功能；</span><br><span class="line">完美解决幻读的方案：加入GAP锁，next-lock，这些功能是在辅助索引上实现的；</span><br><span class="line">在索引列（name)上  update test set num=25 where num &gt; 25;</span><br><span class="line">另外一个事务插入了一个大于 num&gt;25的值，将因为GAP锁而锁住，</span><br><span class="line">SR:</span><br><span class="line">永久修改隔离级别：</span><br><span class="line">vim /etc/my.cnf</span><br><span class="line">transaction_isolation='read-committed'</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">对象锁：</span><br><span class="line">	MDL:(元数据锁),修改元数据时，DDL(alter) </span><br><span class="line">	table lock: 表锁，DDL,备份（FTWRL全局表锁），lock tables t1 read;(手动加锁)，行级锁升级为表锁；</span><br><span class="line">	row lock:  行级锁，聚集索引上的锁；</span><br><span class="line">	gap lock:  间隙锁，普通辅助索引列的范围锁(也不能是唯一锁),范围超过（15%-30%），可能导致表锁；</span><br><span class="line">	next lock: 下一键锁，普通辅助索引的范围锁（gap lock + row lock)</span><br></pre></td></tr></table></figure>
-
-<h1 id="8-存储引擎核心参数"><a href="#8-存储引擎核心参数" class="headerlink" title="8.存储引擎核心参数"></a>8.存储引擎核心参数</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">innodb_flush_log_at_trx_commit=1/0/2 redo log flush到磁盘的参数</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置1 ：每次事务提交的时候，刷到redo <span class="built_in">log</span> ，同时flsh to disk;</span></span><br><span class="line">innodb_flush_method=fsync/O_DSYNC/O_DIRECT/ ：控制mysql刷写磁盘时，是否使用 os buffer</span><br><span class="line">fsync: （默认值，当buffer pool设置太大时，有可能会发生OOM)</span><br><span class="line">	buffer pool的数据写磁盘的时候，需要先经过os buffer,然后写磁盘(经过os buffer,需要申请buffer pool的大小)</span><br><span class="line">	redo buffer的数据写磁盘的时候，需要先经过os buffer,然后写磁盘</span><br><span class="line">O_DIRECT:（防止出现问题，设置次选项,生产上设置此选项）</span><br><span class="line">	buffer pool的数据写磁盘的时候，直接写磁盘，跨过OS buffer；</span><br><span class="line">	redo buffer的数据写磁盘的时候，经过os buffer,然后写磁盘；</span><br><span class="line">	</span><br><span class="line">innodb_buffer_pool_size :数据缓冲区大小，缓冲数据也和索引页，mysql最大的内存区域；生产上75%一下；</span><br><span class="line">show engine innodb status\G</span><br></pre></td></tr></table></figure>
-
-<h1 id="9-日志管理"><a href="#9-日志管理" class="headerlink" title="9.日志管理"></a>9.日志管理</h1><h3 id="1-错误日志"><a href="#1-错误日志" class="headerlink" title="1.错误日志"></a>1.错误日志</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">默认位置 select @@datadir/hostname.err;</span><br><span class="line">配置位置：vim /etc/my.cnf</span><br><span class="line">log_error=/tmp/mysql.log</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志"><a href="#2-binlog日志：记录了数据库变化性质的日志（DDL-DCL-DML-是逻辑性质的日志" class="headerlink" title="2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志"></a>2.binlog日志：记录了数据库变化性质的日志（DDL,DCL,DML),是逻辑性质的日志</h3><p>应用：数据恢复，主从复制中使用</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/my.cnf  # 8.0之前，没有开启，生产上建议开启；8.0之后，默认开启 select @@log_bin;</span><br><span class="line">[mysqld]</span><br><span class="line">server_id=7  #开启binlog需要参数</span><br><span class="line">log_bin=/data/binlog/mysql-bin # 设置和data不同的目录，路径/data/binlog要首先创建，设置mysql.mysql权限；</span><br><span class="line">sync_binlog=1 #binlog日志刷磁盘策略，每次事务提交立即刷写binlog到磁盘</span><br><span class="line">binlog_format=raw # binlog的记录格式为row模式</span><br><span class="line"></span><br><span class="line">binlog 记录sql语句的分类：</span><br><span class="line">DDL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DCL: 原封不动的记录当前DDL(statement)</span><br><span class="line">DML: 只记录已经提交事务DML(insert, update, delete)</span><br><span class="line"></span><br><span class="line">binlog三种记录格式</span><br><span class="line">1）statement（5.6默认）: SBR(statement based replication)，语句模式原封不定的记录当前DML</span><br><span class="line">2) row: (5.7默认)：RBR  :记录数据行的变化（用户看不懂，需要工具分析）</span><br><span class="line">3)mixed:</span><br><span class="line"></span><br><span class="line">statement: 可读性高，日志量少，不够严谨</span><br><span class="line">（statement 只记录update t1 set xxx=xxx where id&gt;1000)</span><br><span class="line">insert into t1 values(1, now())</span><br><span class="line">row: 可读性差，日志量大，足够严谨；（update t1 set xxx=xxx where id&gt;1000  一共500w行，row模式逐行记录）</span><br><span class="line">insert into t1 values(1, 2020-0-28 16:32:06) # 记录行具体变化；</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的位置</span></span><br><span class="line">select @@log_bin_basename;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前有几个日志文件</span></span><br><span class="line">show binary logs;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看当前在使用的binlog;</span></span><br><span class="line">show master status;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog的事件行为：</span></span><br><span class="line">show binlog events in 'mysql-bin.000001';</span><br><span class="line"></span><br><span class="line"> mysql -uroot -p123 -e "show binlog events in 'mysql-bin.000001'"|grep DROP 查看binlog中drop的事件；</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看binlog中具体内容</span></span><br><span class="line">mysqlbinlog mysql-bin.000001 &gt; /tmp/a.sql;</span><br><span class="line">vim /tmp/a.sql</span><br><span class="line"></span><br><span class="line">mysqlbinlog --base64-output=decode-rows -vvv mysql-bin.000001 &gt; /tmp/b.sql # 查看加密的DML操作；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 滚动日志</span></span><br><span class="line">flush logs; # 生成一个新的binlog日志文件；</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 数据恢复：找到起点和终点位置</span></span><br><span class="line">mysql/bin/mysqlbinlog --start-position=219 --stop-position=1356 mysql-bin.000002 &gt; /tmp/b.sql</span><br><span class="line"></span><br><span class="line">set sql_log_bin=0;# 当前会话，临时不记录binlog;</span><br><span class="line">source /tmp/b.sql;</span><br><span class="line">set sql_log_bin=1;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有几点需要注意：</span></span><br><span class="line">1.binlog中如果有对其他库的操作，如何提取出只有目标库的操作？</span><br><span class="line">-d bindb  ：加上参数只提取出bindb库的操作</span><br><span class="line">2.需要的日志在多个文件中分布</span><br><span class="line">用起点时间，终点时间，起点位置，终点位置，混合使用去确定</span><br></pre></td></tr></table></figure>
-
-<h1 id="10-mysqldump"><a href="#10-mysqldump" class="headerlink" title="10. mysqldump"></a>10. mysqldump</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">连接参数： -u,-p,-S</span><br><span class="line">1. 全备参数 -A</span><br><span class="line">mysqldump -uroot -p123 -A &gt; /tmp/all.sql</span><br><span class="line">2. 备份一个或者库 -B</span><br><span class="line">mysqldump -uroot -p123 -B test &gt;/tmp/test.sql #备份test下的所有表，同时自动创建test库，use test;</span><br><span class="line">3. 备份库下一个或者多个表 </span><br><span class="line">mysqldump -uroot -p123 test &gt;/tmp/test.sql   # 备份test下的所有表,这条命令需要自己去创建库，并且use test;</span><br><span class="line">4. 高级参数</span><br><span class="line"></span><br><span class="line">--master-data=2 ：</span><br><span class="line">1. 将binlog 位置和文件名作为注释的方式写入到文件中；</span><br><span class="line">2. 将自动锁表和解锁；</span><br><span class="line">3. 配合single-transaction 减少锁表时间；</span><br><span class="line"></span><br><span class="line">--single-transaction: 对于InnoDB引擎开启一个独立事务，获取一致性快照，进行备份；</span><br><span class="line">-R, -E --triggers :备份存储过程，</span><br><span class="line">--max_allowed_packet=64M： 设置服务端向客户端发送包的大小，防止因表数据太大，导致</span><br><span class="line">1153- 错误 Got a packet bigger than 'max_allowed_packet'</span><br><span class="line"></span><br><span class="line">mysqldump -uroot -p -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; backup/full_bak.sql</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">GTID(Global Transaction ID): 已提交事务的编号；GTID= server_uuid: transaction_id</span><br><span class="line">用户记录binlog 中的是事务Id,用于主从复制</span><br><span class="line"></span><br><span class="line">select @@gtid_mode; # 默认关闭</span><br><span class="line">开启 vim /etc/my.inf</span><br><span class="line">gtid-mode=on</span><br><span class="line">enforce-gtid-consistency=true #保证主从数据的一致性；</span><br><span class="line"></span><br><span class="line">如何利用GTID 在多个binlog中截取需要的日志：</span><br><span class="line"></span><br><span class="line">1） 确定截取的GTID范围</span><br><span class="line">mysql-bin.000005 | 356 | Gtid           |      3306 |         421 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:9'</span><br><span class="line"></span><br><span class="line">| mysql-bin.000003 |  586 | Gtid           |      3306 |         651 | SET @@SESSION.GTID_NEXT= '9f53c030-f496-11ea-8f73-000c2964b59f:3' |</span><br><span class="line">| mysql-bin.000003 |  651 | Query          |      3306 |         761 | create database gtdb charset utf8mb4  </span><br><span class="line">2）确定在哪些文件中执行这些操作</span><br><span class="line">mysql-bin.000003 mysql-bin.000004 mysql-bin.000005</span><br><span class="line">3) 开始截取</span><br><span class="line">mysql/bin/mysqlbinlog --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid.sql</span><br><span class="line">4)开始执行sql</span><br><span class="line"> set sql_log_bin=0; #先关闭binlog，不记录接下来的操作</span><br><span class="line"> source /tmp/gtid.sql</span><br><span class="line"> 发现并没有执行成功</span><br><span class="line"> </span><br><span class="line">5)关闭gtid的幂等性检查，一旦binlog已经存在gtid,而我们截取出来的也有相同的gtid,那么就不会再次执行，跳过；</span><br><span class="line">使用--skip-gtids 可以截取没有gtid的binlog</span><br><span class="line"></span><br><span class="line">mysql/bin/mysqlbinlog --skip-gtids --include-gtids='9f53c030-f496-11ea-8f73-000c2964b59f:3-9' mysql-bin.000003 mysql-bin.000004 mysql-bin.000005 &gt; /tmp/gtid1.sql</span><br><span class="line">6)重新执行sql,成功恢复gtid数据库</span><br><span class="line">set sql_log_bin=0;</span><br><span class="line">source /tmp/gtid1.sql</span><br><span class="line">set sql_log_bin=1;</span><br></pre></td></tr></table></figure>
-
-
-
-
 
 ]]></content>
   </entry>

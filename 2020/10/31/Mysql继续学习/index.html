@@ -49,15 +49,15 @@
   <meta name="description" content="Mysql继续学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mysql继续学习">
-<meta property="og:url" content="http://yoursite.com/2020/10/12/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:url" content="http://yoursite.com/2020/10/31/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/index.html">
 <meta property="og:site_name" content="你的眼神">
 <meta property="og:description" content="Mysql继续学习">
-<meta property="article:published_time" content="2020-10-12T09:55:09.980Z">
-<meta property="article:modified_time" content="2020-10-12T09:55:09.980Z">
+<meta property="article:published_time" content="2020-10-31T14:29:55.688Z">
+<meta property="article:modified_time" content="2020-10-31T14:29:55.688Z">
 <meta property="article:author" content="cgn">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/10/12/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/">
+<link rel="canonical" href="http://yoursite.com/2020/10/31/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/">
 
 
 <script id="page-configurations">
@@ -145,7 +145,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">29</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">30</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -155,7 +155,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">70</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">72</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -211,7 +211,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/31/Mysql%E7%BB%A7%E7%BB%AD%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/sister.jpeg">
@@ -234,7 +234,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-10-12 17:55:09" itemprop="dateCreated datePublished" datetime="2020-10-12T17:55:09+08:00">2020-10-12</time>
+              <time title="创建时间：2020-10-31 22:29:55" itemprop="dateCreated datePublished" datetime="2020-10-31T22:29:55+08:00">2020-10-31</time>
             </span>
 
           
@@ -472,7 +472,7 @@
 <li><p>索引列不能是表达式的一部分，或者函数的参数；</p>
 </li>
 </ul>
-<h2 id="10-explain-各字段含义"><a href="#10-explain-各字段含义" class="headerlink" title="10. explain 各字段含义"></a>10. explain 各字段含义</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">|  1 | SIMPLE      | test  | NULL       | range | ix_email      | ix_email | 203     | NULL |   11 |   100.00 | Using where; Using index |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">id: 表的读取顺序，id越大，优先读取</span><br><span class="line">select_type: 查询的类型；</span><br><span class="line">type: system&gt; const&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</span><br><span class="line"> - ALL: 不使用索引，全表扫描</span><br><span class="line"> - index: 全索引查找，遍历索引树查找</span><br><span class="line"> - range: 范围查找</span><br><span class="line"> - ref:辅助索引等值查找</span><br><span class="line"> - eq_ref: 多表连接，非驱动表连接条件时主键或者是唯一键；</span><br><span class="line"> - const:聚集索引等值查询；</span><br><span class="line"> key_len: 帮助判断，此次查询，走了联合索引的几部分；</span><br></pre></td></tr></table></figure>
+<h2 id="10-explain-各字段含义"><a href="#10-explain-各字段含义" class="headerlink" title="10. explain 各字段含义"></a>10. explain 各字段含义</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key      | key_len | ref  | rows | filtered | Extra                    |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line">|  1 | SIMPLE      | test  | NULL       | range | ix_email      | ix_email | 203     | NULL |   11 |   100.00 | Using where; Using index |</span><br><span class="line">+----+-------------+-------+------------+-------+---------------+----------+---------+------+------+----------+--------------------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">id: 表的读取顺序，id越大，优先读取</span><br><span class="line">select_type: 查询的类型；</span><br><span class="line">type: system&gt; const&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</span><br><span class="line"> - ALL: 不使用索引，全表扫描</span><br><span class="line"> - index: 全索引查找，遍历索引树查找</span><br><span class="line"> - range: 范围查找</span><br><span class="line"> - ref:辅助索引等值查找</span><br><span class="line"> - eq_ref: 多表连接，非驱动表连接条件时主键或者是唯一键；</span><br><span class="line"> - const:聚集索引等值查询；</span><br><span class="line"> key_len: 帮助判断，此次查询，走了联合索引的几部分；</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">对于整形：</span><br><span class="line">	tinyint   1</span><br><span class="line">	int 	  4</span><br><span class="line">	bigint    8</span><br><span class="line">	</span><br><span class="line">对于字符：</span><br><span class="line">	utf8:    每个字符是3个字节</span><br><span class="line">				 not null    没有not null   存储长度的字节</span><br><span class="line">	char(10)      30 			30+1                  key_len   30+1</span><br><span class="line">	varchar(10)   10*3          10*3+1        1-2     key_len   30+2+1</span><br><span class="line">	</span><br><span class="line">	utf8mb4: 每个字符是4个字节：</span><br><span class="line">	char(10)     4*10          4*10+1  </span><br><span class="line">	varchar(10)  4*10          4*10+1         1-2	  key_len   40+2+1</span><br></pre></td></tr></table></figure>
 
 
     </div>
@@ -489,13 +489,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/10/12/Mysql%E7%B4%A2%E5%BC%95/" rel="prev" title="Mysql索引">
+    <a href="/2020/10/31/Mysql%E7%B4%A2%E5%BC%95/" rel="prev" title="Mysql索引">
       <i class="fa fa-chevron-left"></i> Mysql索引
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/10/12/nginx%20%E5%9C%A8ubuntu18.04%20%E4%B8%8A%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/" rel="next" title="nginx 在ubuntu18.04 上的安装和使用">
-      nginx 在ubuntu18.04 上的安装和使用 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -571,7 +568,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -584,7 +581,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

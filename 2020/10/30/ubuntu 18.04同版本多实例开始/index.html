@@ -49,15 +49,15 @@
   <meta name="description" content="ubuntu 18.04同版本多实例开始">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ubuntu 18.04同版本多实例开始">
-<meta property="og:url" content="http://yoursite.com/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/index.html">
+<meta property="og:url" content="http://yoursite.com/2020/10/30/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/index.html">
 <meta property="og:site_name" content="你的眼神">
 <meta property="og:description" content="ubuntu 18.04同版本多实例开始">
-<meta property="article:published_time" content="2020-10-13T03:53:56.910Z">
-<meta property="article:modified_time" content="2020-10-13T03:53:56.910Z">
+<meta property="article:published_time" content="2020-10-30T04:49:50.367Z">
+<meta property="article:modified_time" content="2020-10-30T04:49:50.367Z">
 <meta property="article:author" content="cgn">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
+<link rel="canonical" href="http://yoursite.com/2020/10/30/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
 
 
 <script id="page-configurations">
@@ -145,7 +145,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">29</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">30</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -155,7 +155,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">70</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">72</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -211,7 +211,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/13/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/30/ubuntu%2018.04%E5%90%8C%E7%89%88%E6%9C%AC%E5%A4%9A%E5%AE%9E%E4%BE%8B%E5%BC%80%E5%A7%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/sister.jpeg">
@@ -234,7 +234,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-10-13 11:53:56" itemprop="dateCreated datePublished" datetime="2020-10-13T11:53:56+08:00">2020-10-13</time>
+              <time title="创建时间：2020-10-30 12:49:50" itemprop="dateCreated datePublished" datetime="2020-10-30T12:49:50+08:00">2020-10-30</time>
             </span>
 
           
@@ -275,6 +275,8 @@
 <h2 id="5-使用systemctl管理"><a href="#5-使用systemctl管理" class="headerlink" title="5. 使用systemctl管理"></a>5. 使用systemctl管理</h2><p>/etc/systemd/system/mysqld3307.service</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1 [Service]                                                                                                                                                                                  </span><br><span class="line">2 User=mysql</span><br><span class="line">3 Group=mysql</span><br><span class="line">4 ExecStart=/space/database/mysql/bin/mysqld --defaults-file=/space/data/3309/my.cnf</span><br><span class="line">5 LimitNOFILE=5000</span><br></pre></td></tr></table></figure>
 
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">也可以通过mysqld_safe去启动</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3307/my.cnf &amp;</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3308/my.cnf &amp;</span><br><span class="line">mysqld_safe --defaults-file=/space/data/3309/my.cnf &amp;</span><br></pre></td></tr></table></figure>
+
 
 
 <h2 id="6-开启多实例"><a href="#6-开启多实例" class="headerlink" title="6. 开启多实例"></a>6. 开启多实例</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">1）</span><br><span class="line">systemctl start mysqld3307</span><br><span class="line">systemctl start mysqld3308</span><br><span class="line">systemctl start mysqld3309</span><br><span class="line">2）检查server_id是否不同：</span><br><span class="line">mysql -S /tmp/mysql3307.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3308.sock  -e 'select @@server_id' -uroot</span><br><span class="line">mysql -S /tmp/mysql3309.sock  -e 'select @@server_id' -uroot</span><br><span class="line">3）检查主库binlog是否开启</span><br><span class="line"> mysql -S /tmp/mysql3307.sock -e "select @@log_bin" -uroot;</span><br><span class="line"> </span><br><span class="line">4）主库建立复制用户</span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "grant replication slave on *.* to repl@'192.168.0.%' identified by '123'" -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 确认用户是否建立成功</span></span><br><span class="line">mysql -S /tmp/mysql3307.sock -e "select user,host from mysql.user" -uroot -p </span><br><span class="line">5）主库备份恢复到从库</span><br><span class="line"> </span><br><span class="line"> mysqldump -uroot -p -S /tmp/mysql3307.sock -A --master-data=2 --single-transaction -R -E --triggers --max_allowed_packet=64M &gt; /tmp/full3307.sql</span><br><span class="line"> mysql -uroot -S /tmp/mysql3308.sock &lt; /tmp/full3307.sql </span><br><span class="line"> </span><br><span class="line">6）从库：告知从库复制连接信息和要复制的起点信息</span><br><span class="line">CHANGE MASTER TO</span><br><span class="line">  MASTER_HOST='192.168.0.111',</span><br><span class="line">  MASTER_USER='repl',</span><br><span class="line">  MASTER_PASSWORD='123',</span><br><span class="line">  MASTER_PORT=3307,</span><br><span class="line">  MASTER_LOG_FILE='mysql-bin.000002',</span><br><span class="line">  MASTER_LOG_POS=691,</span><br><span class="line"><span class="meta">#</span><span class="bash">  MASTER_CONNECT_RETRY=10;(可选参数)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看从库要复制的起点</span></span><br><span class="line">grep "\-- CHANGE MASTER TO" /tmp/full3307.sql </span><br><span class="line">-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=691;</span><br><span class="line">7） 从库：开启专用的复制线程</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot</span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> start slave;</span></span><br><span class="line">8) 从库验证主从状态：</span><br><span class="line">mysql -S /tmp/mysql3308.sock -uroot -e "show slave status\G" |grep Running:</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line"></span><br><span class="line">如果搭建失败：，执行以下命令，重新开始</span><br><span class="line">mysql -S /tmp/mysql3308.sock -e "stop slave;reset slave all;"</span><br></pre></td></tr></table></figure>
@@ -289,14 +291,18 @@
 <li>master_info_repository=FILE/TABLE</li>
 </ul>
 </li>
-<li>relay-info.log: 记录从库回放到relay-log的位置点，默认在从库数据目录下<ul>
+<li>relay-log.info: 记录从库回放到relay-log的位置点，默认在从库数据目录下,防止从库宕机，不知道回放到什么位置<ul>
 <li>relay_log_info_repository=FILE/TABLE 进行配置</li>
 </ul>
 </li>
 </ul>
-<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL)</span><br><span class="line">2）从库：连接主库；</span><br><span class="line">3）主库：分配dump_thread专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到relay-info.log中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-info.log，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行新的relay-info.log,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
+<h3 id="2-原理"><a href="#2-原理" class="headerlink" title="2. 原理"></a>2. 原理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1) 从库： 使用change master to IP,port,user,password,binlog位置信息写入 master.info中；</span><br><span class="line">执行start slave(开启s_IO, s_SQL线程，执行下面的操作）</span><br><span class="line">2）从库：根据上面的信息连接主库；</span><br><span class="line">3）主库：分配Dump_thread(一个从库对应一个线程show processlist可以查看）专门和从库 s_IO通信</span><br><span class="line">	show processlist; </span><br><span class="line">4）从库： IO线程请求binlog日志</span><br><span class="line">5）主库： Dump_t 接收请求，截取日志，返回s_IO</span><br><span class="line">6)从库：IO线程接收binlog，日志放到TCP/IP缓存中，返回ack给主库，主库工作完成；</span><br><span class="line">7）从库：IO线程将binlog写入到c8d3633d1de2-relay-bin.000002(relay.log)中，并更新master.info,IO线程完成；</span><br><span class="line">8）从库：SQL线程读取relay-log.info，获取上次执行到得到位置点</span><br><span class="line">9）从库：SQL线程向后执行c8d3633d1de2-relay-bin.000001,再次更新relay-info.log,表示应用到从库中的位置点信息；</span><br><span class="line"></span><br><span class="line">从库中：</span><br><span class="line">参数 relay_log_purge=ON,定期删除应用过的relay-log,默认开启</span><br><span class="line">主库：实时监测binlog变化，有变化，发信号给从库；</span><br></pre></td></tr></table></figure>
 
 <h3 id="3-监控主从的状态"><a href="#3-监控主从的状态" class="headerlink" title="3.监控主从的状态"></a>3.监控主从的状态</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">主库：</span><br><span class="line">show processlist</span><br><span class="line">show slave hosts;</span><br><span class="line"></span><br><span class="line">从库：show slave status \G</span><br><span class="line">		从库连接主库的信息，来自于master.info</span><br><span class="line">                  Master_Host: 192.168.0.111</span><br><span class="line">                  Master_User: repl</span><br><span class="line">                  Master_Port: 3307</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000002</span><br><span class="line">          Read_Master_Log_Pos: 866</span><br><span class="line">          </span><br><span class="line">          从库relay-log.info的执行情况，来自于relay-log.info，用来判断主从延时的判断信息</span><br><span class="line">               Relay_Log_File: ubuntu-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 495</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000002</span><br><span class="line">                Exec_Master_Log_Pos: 866</span><br><span class="line">               Seconds_Behind_Master: 0</span><br><span class="line">        </span><br><span class="line">        从库线程状态,具体错误信息</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">                     Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">               </span><br><span class="line">               </span><br><span class="line">         过滤复制相关，只想复制某些库</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">  </span><br><span class="line">        用来设置从库延时复制的相关信息</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">   </span><br><span class="line">           GTID 相关复制信息</span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set:</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-主从复制的延时"><a href="#4-主从复制的延时" class="headerlink" title="4. 主从复制的延时"></a>4. 主从复制的延时</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1.如何监控发生了延时</span><br><span class="line">seconds_behind_master</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 同一时间，查看master的binlog位置点</span></span><br><span class="line">日志量show master status；  # 查看主库binlog的信息</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看slave的relay-log.info的位置点</span></span><br><span class="line">cat relay-log.info #记录了已经回放到relay.log的位置点</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-主从复制实现读写分离的方式"><a href="#5-主从复制实现读写分离的方式" class="headerlink" title="5. 主从复制实现读写分离的方式"></a>5. 主从复制实现读写分离的方式</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. 利用</span><br></pre></td></tr></table></figure>
 
 
     </div>
@@ -313,12 +319,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/10/12/python%E5%87%BD%E6%95%B0-1/" rel="prev" title="python函数">
-      <i class="fa fa-chevron-left"></i> python函数
+    <a href="/2020/10/29/mysql%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%AE%89%E8%A3%85/" rel="prev" title="mysql二进制安装">
+      <i class="fa fa-chevron-left"></i> mysql二进制安装
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/10/16/redis%20%E5%86%8D%E5%AD%A6%E4%B9%A0/" rel="next" title="redis 再学习">
-      redis 再学习 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/10/31/Mysql%E7%B4%A2%E5%BC%95/" rel="next" title="Mysql索引">
+      Mysql索引 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -379,7 +385,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ubuntu-18-04同版本多实例开始"><span class="nav-number">1.</span> <span class="nav-text">ubuntu 18.04同版本多实例开始</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建data目录"><span class="nav-number">1.1.</span> <span class="nav-text">1. 创建data目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">2.创建配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-修改属主"><span class="nav-number">1.3.</span> <span class="nav-text">3. 修改属主</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-初始化之前准备"><span class="nav-number">1.4.</span> <span class="nav-text">4. 初始化之前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-初始化数据"><span class="nav-number">1.5.</span> <span class="nav-text">5.初始化数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-使用systemctl管理"><span class="nav-number">1.6.</span> <span class="nav-text">5. 使用systemctl管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-开启多实例"><span class="nav-number">1.7.</span> <span class="nav-text">6. 开启多实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-主从复制的原理"><span class="nav-number">1.8.</span> <span class="nav-text">7.主从复制的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-从库中有关的文件"><span class="nav-number">1.8.1.</span> <span class="nav-text">1.从库中有关的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-原理"><span class="nav-number">1.8.2.</span> <span class="nav-text">2. 原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-监控主从的状态"><span class="nav-number">1.8.3.</span> <span class="nav-text">3.监控主从的状态</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ubuntu-18-04同版本多实例开始"><span class="nav-number">1.</span> <span class="nav-text">ubuntu 18.04同版本多实例开始</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建data目录"><span class="nav-number">1.1.</span> <span class="nav-text">1. 创建data目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">2.创建配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-修改属主"><span class="nav-number">1.3.</span> <span class="nav-text">3. 修改属主</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-初始化之前准备"><span class="nav-number">1.4.</span> <span class="nav-text">4. 初始化之前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-初始化数据"><span class="nav-number">1.5.</span> <span class="nav-text">5.初始化数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-使用systemctl管理"><span class="nav-number">1.6.</span> <span class="nav-text">5. 使用systemctl管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-开启多实例"><span class="nav-number">1.7.</span> <span class="nav-text">6. 开启多实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-主从复制的原理"><span class="nav-number">1.8.</span> <span class="nav-text">7.主从复制的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-从库中有关的文件"><span class="nav-number">1.8.1.</span> <span class="nav-text">1.从库中有关的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-原理"><span class="nav-number">1.8.2.</span> <span class="nav-text">2. 原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-监控主从的状态"><span class="nav-number">1.8.3.</span> <span class="nav-text">3.监控主从的状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-主从复制的延时"><span class="nav-number">1.9.</span> <span class="nav-text">4. 主从复制的延时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-主从复制实现读写分离的方式"><span class="nav-number">1.10.</span> <span class="nav-text">5. 主从复制实现读写分离的方式</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -395,7 +401,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -408,7 +414,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
